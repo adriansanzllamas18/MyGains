@@ -1,3 +1,7 @@
+
+
+https://github.com/user-attachments/assets/1ec11cce-e627-414a-91ac-06c28c0539d6
+
 # MyGains
 De la libreta al móvil: mi viaje como desarrollador Android y amante del fitness 💪📱
 
