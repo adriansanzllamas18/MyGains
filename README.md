@@ -1,6 +1,5 @@
 
 
-https://github.com/user-attachments/assets/1ec11cce-e627-414a-91ac-06c28c0539d6
 
 # MyGains
 De la libreta al móvil: mi viaje como desarrollador Android y amante del fitness 💪📱
@@ -26,3 +25,6 @@ Como desarrollador, estoy utilizando algunas de las tecnologías más potentes y
 
 👟 Google Fit API para el seguimiento de pasos diarios y calorías quemadas.
 📊 Nuevas librerías para añadir más funcionalidades de tracking y estadísticas personalizadas.
+
+https://github.com/user-attachments/assets/1ec11cce-e627-414a-91ac-06c28c0539d6
+
