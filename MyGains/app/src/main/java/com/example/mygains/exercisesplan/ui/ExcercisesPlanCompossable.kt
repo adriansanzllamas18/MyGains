@@ -1,8 +1,8 @@
 package com.example.mygains.exercisesplan.ui
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,21 +17,26 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,37 +54,53 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
 import com.example.mygains.exercisesplan.data.MuscleGroupe
 import com.example.mygains.R
+import com.example.mygains.exercisesplan.data.Exercises
+import com.example.mygains.exercisesplan.data.RoutineDayData
+import com.example.mygains.exercisesplan.data.SeriesAndReps
+import com.example.mygains.exercisesplan.data.ExcerciseType
 
 
 @Composable
-fun ExcercisesPlanCompossable(nav: NavHostController) {
+fun ExcercisesPlanCompossable(nav: NavHostController, excercisesPlanViewModel: ExcercisesPlanViewModel) {
+
+
+    val routineDayData by excercisesPlanViewModel._routineDayDataLife.observeAsState(initial = RoutineDayData() )
+
     Column(
+
         Modifier
             .fillMaxSize()
             .windowInsetsPadding(WindowInsets.systemBars)) {
         MyHeader(modifier = Modifier
             .align(Alignment.CenterHorizontally)
-            .padding(16.dp),nav)
+            .padding(16.dp),nav,routineDayData,excercisesPlanViewModel)
+
        ConstraintLayout {
            val (body) = createRefs()
            MyBodyRoutineExercisesType(modifier= Modifier
                .constrainAs(body) {
                    top.linkTo(parent.top)
                    start.linkTo(parent.start)
-               }
-               .padding(16.dp))
-       }
 
+               }
+               .padding(16.dp), excercisesPlanViewModel,routineDayData)
+       }
     }
 }
 
 @Composable
-fun MyBodyRoutineExercisesType(modifier: Modifier) {
+fun MyBodyRoutineExercisesType(modifier: Modifier, excercisesPlanViewModel: ExcercisesPlanViewModel, routineDayData: RoutineDayData) {
 
-    var selectedText by remember { mutableStateOf("") }
+// Estado para almacenar el grupo seleccionado
+    var selectedExcerciseType by remember { mutableStateOf<ExcerciseType?>(null) }
+
+    val excerciseTypes = listOf<ExcerciseType>(
+        ExcerciseType("Cardio",R.drawable.cardio),
+        ExcerciseType("Fuerza",R.drawable.fuerza)
+    )
     var expanded by remember { mutableStateOf(false) }
-    val typeList= mutableListOf("Cardio","Pesas")
 
+   routineDayData.exerciseType = selectedExcerciseType?.name ?: ""
     Column(modifier) {
             Text(
                 text = "Tipo de ejercicio",
@@ -88,44 +109,26 @@ fun MyBodyRoutineExercisesType(modifier: Modifier) {
                 fontStyle = FontStyle(R.font.poppins)
             )
 
-        Column {
-            OutlinedTextField(value = selectedText, onValueChange = {selectedText = it},
-                readOnly = true, enabled = false,
-                modifier = Modifier
-                    .clickable { expanded = true }
-                    .fillMaxWidth(), placeholder = { Text(text = "ejercico..")})
-
-            DropdownMenu(expanded = expanded, onDismissRequest = { expanded= false},
-                Modifier
-                    .background(colorResource(id = R.color.orange_low))) {
-                typeList.forEach {
-                    DropdownMenuItem(text = {
-                        Column {
-                            Row {
-                                Icon(modifier = Modifier.size(24.dp), painter = painterResource(id = if (it == "Pesas")R.drawable.weights else R.drawable.run), contentDescription ="icon" )
-                                Text(text = it)
-                            }
-                            HorizontalDivider(modifier = Modifier
-                                .height(8.dp),
-                                color = colorResource(id = R.color.orange)
-                            )
-                        } }, onClick = { expanded = false
-                        selectedText= it })
-                }
+        Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+            excerciseTypes.forEach { excerciseType ->
+                MuscleGroupCard(
+                    group = excerciseType.name,
+                    image = excerciseType.image,
+                    onClick = { selectedExcerciseType = excerciseType },
+                    isSelected = selectedExcerciseType == excerciseType
+                )
             }
-
         }
-            if (selectedText == "Pesas" && !expanded ){
+            if (selectedExcerciseType?.name  == "Fuerza" && !expanded ){
                 MyBodyLiftExcercises(
                     Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp))
+                        .padding(top = 16.dp),excercisesPlanViewModel,routineDayData)
             }
         }
 }
-
 @Composable
-fun MyBodyLiftExcercises(modifier: Modifier) {
+fun MyBodyLiftExcercises(modifier: Modifier,excercisesPlanViewModel: ExcercisesPlanViewModel,routineDayData: RoutineDayData) {
 
     // Estado para almacenar el grupo seleccionado
     var selectedMuscleGroup by remember { mutableStateOf<MuscleGroupe?>(null) }
@@ -139,6 +142,7 @@ fun MyBodyLiftExcercises(modifier: Modifier) {
         MuscleGroupe("Hombros",R.drawable.deltoides__1_,mutableListOf("")),
         MuscleGroupe("Abdominales",R.drawable.abdominales__1_,mutableListOf(""))
     )
+
     Column(modifier) {
         Text(
             text = "Grupo Muscular",
@@ -146,96 +150,150 @@ fun MyBodyLiftExcercises(modifier: Modifier) {
             modifier = Modifier.padding(8.dp),
             fontStyle = FontStyle(R.font.poppins)
         )
-        LazyRow {
-            items(muscleGroups.size){muscle->
-                MuscleGroupCard(group = muscleGroups[muscle].name, muscleGroups[muscle].image,
-                    onClick = {
-                        muscleGroups[muscle]
-                        selectedMuscleGroup = muscleGroups[muscle]
-                              },
-                    isSelected = selectedMuscleGroup == muscleGroups[muscle] )
+        Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+            muscleGroups.forEach { muscle ->
+                MuscleGroupCard(
+                    group = muscle.name,
+                    image = muscle.image,
+                    onClick = { selectedMuscleGroup = muscle },
+                    isSelected = selectedMuscleGroup == muscle
+                )
             }
         }
         //al principio como no hay nada seleccionado la vista de repeticiones y series no se muestra
-        selectedMuscleGroup?.let { MyExercisesSriesAndReps(modifier = Modifier.padding(top = 16.dp), muscleGroupe = it) }
+        selectedMuscleGroup?.let { MyExercisesSriesAndReps(modifier = Modifier.padding(top = 16.dp).fillMaxSize(), muscleGroupe = it, excercisesPlanViewModel = excercisesPlanViewModel, routineDayData = routineDayData ) }
 
     }
 }
 
 @Composable
-fun MyExercisesSriesAndReps(modifier: Modifier,muscleGroupe: MuscleGroupe) {
-
-    var excerciseName by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
+fun MyExercisesSriesAndReps(
+    modifier: Modifier = Modifier,
+    muscleGroupe: MuscleGroupe,
+    excercisesPlanViewModel: ExcercisesPlanViewModel,
+    routineDayData: RoutineDayData
+) {
     var numberSeries by remember { mutableStateOf(0) }
+    var excerciseName by remember { mutableStateOf("") }
 
+    // Convertir la lista de series en un `mutableStateListOf` para hacerla observable
+    val seriesAndReps = remember { mutableStateListOf<SeriesAndReps>() }
 
-    Column(modifier){
-
-        Row {
-            Text(
-                text = muscleGroupe.name,
-                fontSize = 24.sp,
-                modifier = Modifier.padding(8.dp),
-                fontStyle = FontStyle(R.font.poppins)
-            )
-
-            IconButton(onClick = { if (numberSeries >0 )numberSeries--},Modifier.align(Alignment.CenterVertically)) {
-                Icon(painter = painterResource(id =R.drawable.remove_circle_24 ) , contentDescription ="remove" )
+    // Ajuste de la lista de seriesAndReps cuando cambia `numberSeries`
+    LaunchedEffect(numberSeries) {
+        if (seriesAndReps.size < numberSeries) {
+            repeat(numberSeries - seriesAndReps.size) {
+                seriesAndReps.add(SeriesAndReps(serie = "${seriesAndReps.size + 1}", reps = "0", weght = "0"))
             }
-
-            Text(text = numberSeries.toString(), Modifier.align(Alignment.CenterVertically), fontSize = 18.sp)
-
-            IconButton(onClick = {  numberSeries++},Modifier.align(Alignment.CenterVertically)) {
-                Icon(imageVector = Icons.Filled.AddCircle, contentDescription ="add" )
+        } else if (seriesAndReps.size > numberSeries) {
+            repeat(seriesAndReps.size - numberSeries) {
+                seriesAndReps.removeLast()
             }
-
-            Text(text = "Ser.", Modifier.align(Alignment.CenterVertically), fontSize = 18.sp)
         }
 
-        LazyColumn(Modifier.padding(top = 16.dp, start = 24.dp)) {
-            items(numberSeries){
-                var kg by remember { mutableStateOf("") }
-                var numberReps by remember { mutableStateOf(0) }
+        // Actualizar `routineDayData.exercises`
+        routineDayData.exercises = Exercises(
+            muscle = muscleGroupe.name,
+            excerciseName = excerciseName,
+            seriesAndReps = seriesAndReps
+        )
+    }
 
-                OutlinedTextField(value = excerciseName, onValueChange = {excerciseName = it},
-                    modifier = Modifier
-                        .clickable { expanded = true }
-                        .padding(top = 16.dp)
-                        .width(200.dp), placeholder = { Text(text = "Nombre ejercicio..")})
+    LazyColumn(modifier = modifier.fillMaxSize()) { // Asegúrate de que LazyColumn ocupa todo el tamaño disponible
+        item {
+            // Parte de UI para el nombre del grupo muscular y el número de series
+            Row(
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Text(
+                    text = muscleGroupe.name,
+                    fontSize = 24.sp,
+                    modifier = Modifier.weight(1f).align(Alignment.CenterVertically), // Usa weight para que se expanda
+                    fontStyle = FontStyle(R.font.poppins)
+                )
 
-                Row (Modifier.padding(top = 18.dp)){
-                    Text( modifier = Modifier.align(Alignment.CenterVertically), text = "${it +1} º" + " Serie", fontSize = 18.sp)
-                    IconButton(onClick = { if (numberReps >0 )numberReps--},Modifier.align(Alignment.CenterVertically)) {
-                        Icon(painter = painterResource(id =R.drawable.remove_circle_24 ) , contentDescription ="remove" )
-                    }
-
-                    Text(text = numberReps.toString(), Modifier.align(Alignment.CenterVertically), fontSize = 18.sp)
-
-                    IconButton(onClick = {  if (numberReps<9)numberReps++},Modifier.align(Alignment.CenterVertically)) {
-                        Icon(imageVector = Icons.Filled.AddCircle, contentDescription ="add" )
-                    }
-                    Text(text = "Reps.", Modifier.align(Alignment.CenterVertically), fontSize = 18.sp)
-
-                    OutlinedTextField(value = kg, onValueChange = {kg = it},
-                        modifier = Modifier
-                            .width(100.dp)
-                            .align(Alignment.CenterVertically)
-                        , keyboardOptions = KeyboardOptions( keyboardType = KeyboardType.Number),
-                        suffix = { Text(text = "Kg")},
-                        maxLines = 1
-                    )
+                IconButton(onClick = { if (numberSeries > 0) numberSeries-- }) {
+                    Icon(painter = painterResource(id = R.drawable.remove_circle_24), contentDescription = "remove")
                 }
 
-                HorizontalDivider(modifier = Modifier
-                    .height(8.dp)
-                    .padding(top = 8.dp),
-                    color = colorResource(id = R.color.orange))
+                Text(text = numberSeries.toString(), fontSize = 18.sp,modifier= Modifier.align(Alignment.CenterVertically))
+
+                IconButton(onClick = { numberSeries++ }) {
+                    Icon(imageVector = Icons.Filled.AddCircle, contentDescription = "add")
+                }
+
+                Text(text = "Ser.", fontSize = 18.sp,modifier= Modifier.align(Alignment.CenterVertically))
             }
+
+            OutlinedTextField(
+                value = excerciseName,
+                onValueChange = { name -> excerciseName = name },
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .width(200.dp),
+                placeholder = { Text(text = "Nombre ejercicio..") }
+            )
         }
 
+        itemsIndexed(seriesAndReps) { index, data ->
+            // Fila para cada serie y controles para ajustar reps y peso
+            Row(Modifier.padding(top = 18.dp, start = 8.dp, end = 8.dp)) {
+                Text(
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    text = "${index + 1} º Serie", fontSize = 18.sp
+                )
+
+                IconButton(onClick = {
+                    val newReps = (data.reps.toIntOrNull() ?: 1).coerceAtLeast(1) - 1
+                    seriesAndReps[index] = data.copy(reps = newReps.toString())
+                }) {
+                    Icon(painter = painterResource(id = R.drawable.remove_circle_24), contentDescription = "remove")
+                }
+
+                // Mostrar el número de reps actual y actualizarlo en la lista
+                Text(
+                    text = data.reps,
+                    Modifier.align(Alignment.CenterVertically),
+                    fontSize = 18.sp
+                )
+
+                IconButton(onClick = {
+                    val newReps = (data.reps.toIntOrNull() ?: 0) + 1
+                    seriesAndReps[index] = data.copy(reps = newReps.toString())
+                }) {
+                    Icon(imageVector = Icons.Filled.AddCircle, contentDescription = "add")
+                }
+
+                Text(text = "Reps.", Modifier.align(Alignment.CenterVertically), fontSize = 18.sp)
+
+                OutlinedTextField(
+                    value = data.weght,
+                    onValueChange = { weight ->
+                        seriesAndReps[index] = data.copy(weght = weight)
+                    },
+                    modifier = Modifier
+                        .width(100.dp)
+                        .align(Alignment.CenterVertically),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    suffix = { Text(text = "Kg") },
+                    maxLines = 1
+                )
+            }
+
+            // Divider entre las series
+            Divider(
+                modifier = Modifier
+                    .height(1.dp)
+                    .padding(vertical = 8.dp),
+                color = colorResource(id = R.color.orange)
+            )
+        }
     }
 }
+
+
+
+
 
 @Composable
 fun MuscleGroupCard(group: String, image: Int,onClick : ()-> Unit, isSelected:Boolean) {
@@ -265,7 +323,7 @@ fun MuscleGroupCard(group: String, image: Int,onClick : ()-> Unit, isSelected:Bo
 }
 
 @Composable
-fun MyHeader(modifier: Modifier,nav: NavHostController) {
+fun MyHeader(modifier: Modifier,nav: NavHostController, routineDayData: RoutineDayData, excercisesPlanViewModel: ExcercisesPlanViewModel) {
 
     Row(modifier = modifier.fillMaxWidth()) {
         ConstraintLayout(Modifier.fillMaxWidth()) {
@@ -278,7 +336,7 @@ fun MyHeader(modifier: Modifier,nav: NavHostController) {
                         bottom.linkTo(parent.bottom)
                         top.linkTo(parent.top)
                     }
-                    .clickable {nav.popBackStack() }
+                    .clickable { nav.popBackStack() }
             )
             Text(
                 text = "Rutina", modifier = Modifier.constrainAs(title) {
@@ -296,7 +354,7 @@ fun MyHeader(modifier: Modifier,nav: NavHostController) {
                         end.linkTo(parent.end)
                         top.linkTo(parent.top)
                     }
-                    .clickable { }
+                    .clickable { excercisesPlanViewModel.saveDataRoutine(routineDayData) }
                     .size(24.dp)
             )
 

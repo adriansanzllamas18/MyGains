@@ -19,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.mygains.dashboard.ui.DashBoardViewModel
 import com.example.mygains.dashboard.ui.MyDashBoard
 import com.example.mygains.exercisesplan.ui.ExcercisesPlanCompossable
+import com.example.mygains.exercisesplan.ui.ExcercisesPlanViewModel
 import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.login.ui.LoginScreen
 import com.example.mygains.login.ui.LoginViewModel
@@ -41,6 +42,7 @@ class MainActivity : ComponentActivity() {
     private val userInfoViewModel: UserInfoViewModel by viewModels()
     private val splashViewModel: SplashViewModel by viewModels()
     private val dashBoardViewModel: DashBoardViewModel by viewModels()
+    private val excercisesPlanViewModel: ExcercisesPlanViewModel by viewModels()
 
     private lateinit var signInLauncher: ActivityResultLauncher<Intent>
 
@@ -71,7 +73,7 @@ class MainActivity : ComponentActivity() {
                     composable(Routes.Perfil.routes){ UserInfoComposable(nav = navigationController, userInfoViewModel = userInfoViewModel) }
                     composable(Routes.NewUser.routes){ NewUserComposable(newUserViewModel = newUserViewmodel, navigationController, onSignInClick = { newUserViewmodel.signInWithGoogle(this@MainActivity,signInLauncher, this@MainActivity)  }) }
                     composable(Routes.Plan.routes){ PlanCompossable(nav = navigationController) }
-                    composable(Routes.ExcercisesPlan.routes){ ExcercisesPlanCompossable(nav = navigationController) }
+                    composable(Routes.ExcercisesPlan.routes){ ExcercisesPlanCompossable(nav = navigationController, excercisesPlanViewModel = excercisesPlanViewModel) }
                 }
             }
         }
