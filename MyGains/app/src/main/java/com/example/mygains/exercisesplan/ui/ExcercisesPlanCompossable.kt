@@ -1,5 +1,6 @@
 package com.example.mygains.exercisesplan.ui
 
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -19,11 +20,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -32,7 +36,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -42,7 +49,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
@@ -51,6 +60,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.mygains.exercisesplan.data.MuscleGroupe
 import com.example.mygains.R
@@ -58,13 +69,21 @@ import com.example.mygains.exercisesplan.data.Exercises
 import com.example.mygains.exercisesplan.data.RoutineDayData
 import com.example.mygains.exercisesplan.data.SeriesAndReps
 import com.example.mygains.exercisesplan.data.ExcerciseType
+import com.example.mygains.extras.navigationroutes.Routes
+import com.example.mygains.login.ui.Loader
+import com.example.mygains.userinfo.data.WeightRegister
+import java.time.LocalDate
 
 
 @Composable
-fun ExcercisesPlanCompossable(nav: NavHostController, excercisesPlanViewModel: ExcercisesPlanViewModel) {
+fun ExcercisesPlanCompossable(nav: NavHostController) {
 
+    val excercisesPlanViewModel:ExcercisesPlanViewModel= hiltViewModel()
 
     val routineDayData by excercisesPlanViewModel._routineDayDataLife.observeAsState(initial = RoutineDayData() )
+    val result by excercisesPlanViewModel._saveResultLife.observeAsState(initial = null )
+    val isLoading by excercisesPlanViewModel._isLoadingLife.observeAsState(false)
+    val showAlert by excercisesPlanViewModel._isAlertLife.observeAsState(false)
 
     Column(
 
@@ -85,7 +104,32 @@ fun ExcercisesPlanCompossable(nav: NavHostController, excercisesPlanViewModel: E
                }
                .padding(16.dp), excercisesPlanViewModel,routineDayData)
        }
+
+
+
+        LaunchedEffect(result) {
+                if (result == true){
+                    nav.popBackStack()
+                }
+            }
     }
+
+        if (showAlert){
+            AlertDialog(
+                modifier = Modifier.fillMaxWidth(),
+                onDismissRequest = {},
+                confirmButton = {
+                    Button(onClick = {
+                        excercisesPlanViewModel.setAlert(false)
+                    }
+                    ) {
+                        Text(text = "Volver")
+                    }},
+                title = { Text(text = "Error")},
+                text = { Text(text = "Compruebe que todos los campos esten completos o intentelo de nuevo más tarde.")})
+        }
+
+    Loader(isLoading = isLoading)
 }
 
 @Composable
@@ -161,7 +205,9 @@ fun MyBodyLiftExcercises(modifier: Modifier,excercisesPlanViewModel: ExcercisesP
             }
         }
         //al principio como no hay nada seleccionado la vista de repeticiones y series no se muestra
-        selectedMuscleGroup?.let { MyExercisesSriesAndReps(modifier = Modifier.padding(top = 16.dp).fillMaxSize(), muscleGroupe = it, excercisesPlanViewModel = excercisesPlanViewModel, routineDayData = routineDayData ) }
+        selectedMuscleGroup?.let { MyExercisesSriesAndReps(modifier = Modifier
+            .padding(top = 16.dp)
+            .fillMaxSize(), muscleGroupe = it, excercisesPlanViewModel = excercisesPlanViewModel, routineDayData = routineDayData ) }
 
     }
 }
@@ -199,7 +245,7 @@ fun MyExercisesSriesAndReps(
         )
     }
 
-    LazyColumn(modifier = modifier.fillMaxSize()) { // Asegúrate de que LazyColumn ocupa todo el tamaño disponible
+    LazyColumn(modifier = modifier.fillMaxSize()) {
         item {
             // Parte de UI para el nombre del grupo muscular y el número de series
             Row(
@@ -208,7 +254,9 @@ fun MyExercisesSriesAndReps(
                 Text(
                     text = muscleGroupe.name,
                     fontSize = 24.sp,
-                    modifier = Modifier.weight(1f).align(Alignment.CenterVertically), // Usa weight para que se expanda
+                    modifier = Modifier
+                        .weight(1f)
+                        .align(Alignment.CenterVertically), // Usa weight para que se expanda
                     fontStyle = FontStyle(R.font.poppins)
                 )
 
@@ -243,7 +291,7 @@ fun MyExercisesSriesAndReps(
                     text = "${index + 1} º Serie", fontSize = 18.sp
                 )
 
-                IconButton(onClick = {
+                IconButton(modifier= Modifier.align(Alignment.CenterVertically),onClick = {
                     val newReps = (data.reps.toIntOrNull() ?: 1).coerceAtLeast(1) - 1
                     seriesAndReps[index] = data.copy(reps = newReps.toString())
                 }) {
@@ -257,7 +305,7 @@ fun MyExercisesSriesAndReps(
                     fontSize = 18.sp
                 )
 
-                IconButton(onClick = {
+                IconButton(modifier= Modifier.align(Alignment.CenterVertically),onClick = {
                     val newReps = (data.reps.toIntOrNull() ?: 0) + 1
                     seriesAndReps[index] = data.copy(reps = newReps.toString())
                 }) {
@@ -281,10 +329,10 @@ fun MyExercisesSriesAndReps(
             }
 
             // Divider entre las series
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier
                     .height(1.dp)
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = 16.dp),
                 color = colorResource(id = R.color.orange)
             )
         }

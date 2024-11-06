@@ -85,6 +85,10 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.48")
     kapt("com.google.dagger:hilt-android-compiler:2.48")
 
+    // Hilt para Compose (para la integración con Jetpack Compose)
+    implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")  // Para usar Hilt con Compose
+
+
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     implementation ("com.google.android.gms:play-services-fitness:21.0.0")

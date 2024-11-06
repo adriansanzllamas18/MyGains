@@ -102,11 +102,7 @@ fun MyPlanForDay(modifier: Modifier,nav: NavHostController) {
                 Modifier.size(120.dp).align(Alignment.CenterHorizontally).padding(8.dp))
             Text(text = "No hay entreno registrado para este dia...", Modifier.padding(8.dp))
             Button(onClick = {
-                nav.navigate(Routes.ExcercisesPlan.routes) {
-                    // Asegúrate de que no se pueda volver a esta pantalla
-                    popUpTo(Routes.Plan.routes) { inclusive = true }
-                }
-
+                nav.navigate(Routes.ExcercisesPlan.routes)
             }, Modifier.align(Alignment.CenterHorizontally)) {
                 Text(text = "Añadir")
             }

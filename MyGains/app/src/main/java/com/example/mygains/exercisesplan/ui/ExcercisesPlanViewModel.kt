@@ -19,20 +19,43 @@ class ExcercisesPlanViewModel @Inject constructor(private var excercisesPlanUseC
     private var _saveResult= MutableLiveData<Boolean>()
     var _saveResultLife:LiveData<Boolean> = _saveResult
 
+    private var _isAlert= MutableLiveData<Boolean>()
+    var _isAlertLife:LiveData<Boolean> = _isAlert
+
+    private var _isLoading= MutableLiveData<Boolean>()
+    var _isLoadingLife:LiveData<Boolean> = _isLoading
+
     private var _routineDayData= MutableLiveData<RoutineDayData>()
     var _routineDayDataLife:LiveData<RoutineDayData> = _routineDayData
 
 
+    fun setAlert(show:Boolean){
+        _isAlert.postValue(show)
+    }
+
+    fun resetResult(reset:Boolean){
+        _saveResult.postValue(reset)
+    }
+
+
 
     fun saveDataRoutine(routineDayData: RoutineDayData){
-        viewModelScope.launch(Dispatchers.IO) {
-            _saveResult.postValue(
-                excercisesPlanUseCase.saveDataRoutine(
-               routineDayData
-            )
-            )
-
+        _isLoading.postValue(true)
+        if (!routineDayData.isEmpty()){
+            viewModelScope.launch(Dispatchers.IO) {
+                if (excercisesPlanUseCase.saveDataRoutine(routineDayData)){
+                    _saveResult.postValue(true)
+                    _isLoading.postValue(false)
+                }else{
+                    _isLoading.postValue(false)
+                    _saveResult.postValue(false)
+                    _isAlert.postValue(true)
+                }
+            }
+        }else{
+            _isLoading.postValue(false)
+            _saveResult.postValue(false)
+            _isAlert.postValue(true)
         }
-
     }
 }

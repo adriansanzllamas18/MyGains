@@ -42,7 +42,6 @@ class MainActivity : ComponentActivity() {
     private val userInfoViewModel: UserInfoViewModel by viewModels()
     private val splashViewModel: SplashViewModel by viewModels()
     private val dashBoardViewModel: DashBoardViewModel by viewModels()
-    private val excercisesPlanViewModel: ExcercisesPlanViewModel by viewModels()
 
     private lateinit var signInLauncher: ActivityResultLauncher<Intent>
 
@@ -73,7 +72,7 @@ class MainActivity : ComponentActivity() {
                     composable(Routes.Perfil.routes){ UserInfoComposable(nav = navigationController, userInfoViewModel = userInfoViewModel) }
                     composable(Routes.NewUser.routes){ NewUserComposable(newUserViewModel = newUserViewmodel, navigationController, onSignInClick = { newUserViewmodel.signInWithGoogle(this@MainActivity,signInLauncher, this@MainActivity)  }) }
                     composable(Routes.Plan.routes){ PlanCompossable(nav = navigationController) }
-                    composable(Routes.ExcercisesPlan.routes){ ExcercisesPlanCompossable(nav = navigationController, excercisesPlanViewModel = excercisesPlanViewModel) }
+                    composable(Routes.ExcercisesPlan.routes){ ExcercisesPlanCompossable(nav = navigationController) }
                 }
             }
         }
