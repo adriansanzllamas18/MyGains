@@ -14,8 +14,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
@@ -26,10 +26,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
@@ -37,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.mygains.R
 import com.example.mygains.extras.navigationroutes.Routes
@@ -50,41 +57,86 @@ import java.time.YearMonth
 
 
 @Composable
-fun  PlanCompossable(nav: NavHostController) {
+fun PlanCompossable(nav: NavHostController) {
+    var selectedDay:String by remember { mutableStateOf(LocalDate.now().toString()) }
 
-    Column(
-        Modifier
+    var planViewModel:PlanViewModel = hiltViewModel()
+    planViewModel.getAllExcercisesForDay(date = selectedDay)
+
+
+    val routineList by planViewModel._routineDayListLife.observeAsState(initial = mutableListOf())
+
+    // Crear un estado para el desplazamiento de la lista
+    val lazyListState = rememberLazyListState()
+
+    // Usar un valor que cambie de acuerdo con el desplazamiento
+    val initialHeight = 500.dp // Altura inicial del calendario
+    val minHeight = 100.dp // Altura mínima del calendario
+
+    // Obtener la densidad de la pantalla para convertir píxeles a dp
+    val density = LocalDensity.current.density
+
+    // Mantener el valor de la altura con un remember para evitar recomposiciones innecesarias
+    val scrollOffset = remember { derivedStateOf { lazyListState.firstVisibleItemScrollOffset } }
+
+    // Ajustar la altura del calendario dependiendo del desplazamiento
+    val heightInPx = (initialHeight - (scrollOffset.value.dp / density) / 4).coerceAtLeast(minHeight)
+
+    // Convertir la altura de píxeles a dp
+    val newHeight = with(LocalDensity.current) { heightInPx }
+
+    LazyColumn(
+        state = lazyListState, // Pasar el estado de LazyList
+        modifier = Modifier
             .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.systemBars)) {
-        MyHeader(modifier = Modifier
-            .padding(16.dp),nav)
+            .windowInsetsPadding(WindowInsets.systemBars)
+    ) {
+        item {
+            MyHeader(
+                modifier = Modifier.padding(16.dp), nav
+            )
+        }
 
-        Box(Modifier.verticalScroll(rememberScrollState())){
-            ConstraintLayout(
-                Modifier
-                    .fillMaxSize()
-                    .padding(8.dp)) {
-                val (myplan, calendar) = createRefs()
-                MyWeekCalendar(modifier = Modifier
-                    .constrainAs(calendar) {
-                        top.linkTo(parent.top)
-                        end.linkTo(parent.end)
-                        start.linkTo(parent.start)
-                    }
-                    .padding(8.dp))
-                
-                MyPlanForDay(modifier = Modifier
-                    .constrainAs(myplan) {
-                        top.linkTo(calendar.bottom)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    }
-                    .padding(8.dp),nav)
+        item {
+            Box {
+                ConstraintLayout(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(8.dp)
+                ) {
+                    val (myplan, calendar) = createRefs()
+                    MyWeekCalendar(
+                        modifier = Modifier
+                            .constrainAs(calendar) {
+                                top.linkTo(parent.top)
+                                end.linkTo(parent.end)
+                                start.linkTo(parent.start)
+                            }
+                            .height(newHeight) // Establecer la altura dinámica del calendario
+                            .padding(8.dp)
+                        , selectedDay
+                    )
+                }
             }
         }
 
+        item {
+            TitleDateForList("",
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp))
+            HorizontalDivider(modifier = Modifier
+                .height(8.dp)
+                .padding(start = 16.dp, end = 16.dp),
+                color =Color(0xFFFCE5D8))
+            New(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp), routineList) // Lista de nuevos elementos
+        }
     }
 }
+
 
 @Composable
 fun MyPlanForDay(modifier: Modifier,nav: NavHostController) {
@@ -99,7 +151,10 @@ fun MyPlanForDay(modifier: Modifier,nav: NavHostController) {
 
         Card(colors = CardDefaults.cardColors(containerColor = Color.White)) {
             Image(painter = painterResource(id = R.drawable.capacitacion), contentDescription ="image",
-                Modifier.size(120.dp).align(Alignment.CenterHorizontally).padding(8.dp))
+                Modifier
+                    .size(120.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .padding(8.dp))
             Text(text = "No hay entreno registrado para este dia...", Modifier.padding(8.dp))
             Button(onClick = {
                 nav.navigate(Routes.ExcercisesPlan.routes)
@@ -112,8 +167,8 @@ fun MyPlanForDay(modifier: Modifier,nav: NavHostController) {
 }
 
 @Composable
-fun MyWeekCalendar(modifier: Modifier) {
-    val currentDate = remember { LocalDate.now() }
+fun MyWeekCalendar(modifier: Modifier, selectedDay: String) {
+
     val firstDayOfWeek = remember { firstDayOfWeekFromLocale() }
     val currentMonth = remember { YearMonth.now() }
     val startMonth = remember { currentMonth.minusMonths(100) }
@@ -145,7 +200,7 @@ fun MyWeekCalendar(modifier: Modifier) {
                         .padding(8.dp),
                     state = state,
                     monthHeader ={ MonthHeader(currentMonth =state.firstVisibleMonth.yearMonth ) },
-                    dayContent = { Day(it) }, // Mostrar el contenido de cada día
+                    dayContent = { Day(it,selectedDay= selectedDay) }, // Mostrar el contenido de cada día
                 )
             }
         }
@@ -170,11 +225,12 @@ fun MonthHeader(currentMonth: YearMonth) {
 }
 
 @Composable
-fun Day(day: CalendarDay, modifier: Modifier = Modifier) {
+fun Day(day: CalendarDay, modifier: Modifier = Modifier,selectedDay: String) {
     val isToday = day.date == LocalDate.now()
     val backgroundColor = if (isToday) colorResource(id = R.color.orange_low) else Color.Transparent
     val textColor = if (isToday) colorResource(id = R.color.orange) else if(day.position != DayPosition.MonthDate) Color.Gray else Color.Black
     val outDay = if (day.position == DayPosition.MonthDate) Color.White else Color.Gray
+
 
 
     Card(
@@ -237,7 +293,7 @@ fun MyHeader(modifier: Modifier,nav: NavHostController) {
                             bottom.linkTo(parent.bottom)
                             top.linkTo(parent.top)
                         }
-                        .clickable { nav.popBackStack()}
+                        .clickable { nav.popBackStack() }
                 )
                 Text(text = "Mi plan", modifier = Modifier.constrainAs(title){
                     start.linkTo(parent.start)
@@ -252,5 +308,18 @@ fun MyHeader(modifier: Modifier,nav: NavHostController) {
 
         }
 
+}
+
+@Composable
+fun TitleDateForList(day:String,modifier: Modifier){
+
+    Row(modifier) {
+        Text(
+            text = "Tu entreno de hoy",
+            fontSize = 24.sp,
+            modifier = Modifier.padding(8.dp),
+            fontStyle = FontStyle(R.font.poppins)
+        )
+    }
 }
 
