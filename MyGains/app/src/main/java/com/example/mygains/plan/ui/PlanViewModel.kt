@@ -13,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,19 +25,24 @@ class PlanViewModel @Inject constructor(var planUseCase: PlanUseCase):ViewModel(
     private var  _routineDayList = MutableLiveData<MutableList<RoutineDayData>>()
     var _routineDayListLife: LiveData<MutableList<RoutineDayData>> =_routineDayList
 
-    fun getAllExcercisesForDay(date:String){
-        viewModelScope.launch(Dispatchers.IO) {
+    private var  _isLoading = MutableLiveData<Boolean>()
+    var _isLoadingLife: LiveData<Boolean> =_isLoading
 
+    fun getAllExcercisesForDay(date:String){
+        _isLoading.postValue(true)
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 try {
-                    var result= planUseCase.getPlanForTheDay(date)
+                    val result= planUseCase.getPlanForTheDay(date)
                     _routineDayList.postValue(result)
                     Log.i("dataDay", result.toString())
+                    _isLoading.postValue(false)
                 }catch (er:Exception){
+                    _isLoading.postValue(false)
                     Log.e(er.cause.toString(),er.message.toString())
                 }
-
             }catch (er:Exception){
+                _isLoading.postValue(false)
                 Log.e(er.cause.toString(),er.message.toString())
             }
         }

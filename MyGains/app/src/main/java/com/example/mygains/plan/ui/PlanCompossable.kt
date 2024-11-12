@@ -1,5 +1,6 @@
 package com.example.mygains.plan.ui
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,8 +36,11 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TimePicker
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -57,21 +62,28 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.mygains.R
 import com.example.mygains.extras.navigationroutes.Routes
+import com.example.mygains.login.ui.Loader
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
+import kotlinx.coroutines.currentCoroutineContext
 import java.time.LocalDate
 import java.time.YearMonth
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlanCompossable(nav: NavHostController) {
-    var selectedDay:String by remember { mutableStateOf(LocalDate.now().toString()) }
 
     var planViewModel:PlanViewModel = hiltViewModel()
-    planViewModel.getAllExcercisesForDay(date = selectedDay)
+
+
+    var selectedDay:String by remember { mutableStateOf(LocalDate.now().toString()) }
+
+
+    val isLoading:Boolean by planViewModel._isLoadingLife.observeAsState(initial = false)
 
 
     val routineList by planViewModel._routineDayListLife.observeAsState(initial = mutableListOf())
@@ -95,13 +107,22 @@ fun PlanCompossable(nav: NavHostController) {
     // Convertir la altura de píxeles a dp
     val newHeight = with(LocalDensity.current) { heightInPx }
 
-    Box(Modifier.fillMaxSize()) {
+    LaunchedEffect(Unit) {
+        planViewModel.getAllExcercisesForDay(selectedDay)
+    }
+    PullToRefreshBox(modifier = Modifier.fillMaxSize()
+        , isRefreshing = isLoading,
+        onRefresh = {
+            planViewModel.getAllExcercisesForDay(selectedDay)
+        }
+    ) {
         LazyColumn(
             state = lazyListState, // Pasar el estado de LazyList
             modifier = Modifier
                 .fillMaxSize()
                 .windowInsetsPadding(WindowInsets.systemBars)
         ) {
+
             item {
                 MyHeader(
                     modifier = Modifier.padding(16.dp), nav
@@ -315,7 +336,7 @@ fun MyHeader(modifier: Modifier,nav: NavHostController) {
                             end.linkTo(parent.end)
                             top.linkTo(parent.top)
                         }
-                        .clickable {  nav.navigate(Routes.ExcercisesPlan.routes) }
+                        .clickable { nav.navigate(Routes.ExcercisesPlan.routes) }
                         .size(24.dp)
                 )
                 Text(text = "Mi plan", modifier = Modifier.constrainAs(title){
