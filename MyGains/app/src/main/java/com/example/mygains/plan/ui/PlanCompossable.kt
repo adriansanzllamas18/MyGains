@@ -1,6 +1,7 @@
 package com.example.mygains.plan.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,16 +16,25 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalBottomSheetDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -85,54 +95,58 @@ fun PlanCompossable(nav: NavHostController) {
     // Convertir la altura de píxeles a dp
     val newHeight = with(LocalDensity.current) { heightInPx }
 
-    LazyColumn(
-        state = lazyListState, // Pasar el estado de LazyList
-        modifier = Modifier
-            .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.systemBars)
-    ) {
-        item {
-            MyHeader(
-                modifier = Modifier.padding(16.dp), nav
-            )
-        }
+    Box(Modifier.fillMaxSize()) {
+        LazyColumn(
+            state = lazyListState, // Pasar el estado de LazyList
+            modifier = Modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.systemBars)
+        ) {
+            item {
+                MyHeader(
+                    modifier = Modifier.padding(16.dp), nav
+                )
+            }
 
-        item {
-            Box {
-                ConstraintLayout(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(8.dp)
-                ) {
-                    val (myplan, calendar) = createRefs()
-                    MyWeekCalendar(
-                        modifier = Modifier
-                            .constrainAs(calendar) {
-                                top.linkTo(parent.top)
-                                end.linkTo(parent.end)
-                                start.linkTo(parent.start)
-                            }
-                            .height(newHeight) // Establecer la altura dinámica del calendario
+            item {
+                Box {
+                    ConstraintLayout(
+                        Modifier
+                            .fillMaxSize()
                             .padding(8.dp)
-                        , selectedDay
-                    )
+                    ) {
+                        val (myplan, calendar) = createRefs()
+                        MyWeekCalendar(
+                            modifier = Modifier
+                                .constrainAs(calendar) {
+                                    top.linkTo(parent.top)
+                                    end.linkTo(parent.end)
+                                    start.linkTo(parent.start)
+                                }
+                                .height(newHeight) // Establecer la altura dinámica del calendario
+                                .padding(8.dp)
+                            , selectedDay
+                        )
+                    }
                 }
             }
-        }
 
-        item {
-            TitleDateForList("",
-                Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp))
-            HorizontalDivider(modifier = Modifier
-                .height(8.dp)
-                .padding(start = 16.dp, end = 16.dp),
-                color =Color(0xFFFCE5D8))
-            New(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp), routineList) // Lista de nuevos elementos
+
+
+            item {
+                TitleDateForList("",
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp))
+                HorizontalDivider(modifier = Modifier
+                    .height(8.dp)
+                    .padding(start = 16.dp, end = 16.dp),
+                    color =Color(0xFFFCE5D8))
+                ExercisesOfDayListComposable(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp), routineList) // Lista de nuevos elementos
+            }
         }
     }
 }
@@ -284,7 +298,7 @@ fun MyHeader(modifier: Modifier,nav: NavHostController) {
 
         Row(modifier= modifier.fillMaxWidth()) {
             ConstraintLayout(Modifier.fillMaxWidth()) {
-                val (close,title) = createRefs()
+                val (close,title,add) = createRefs()
 
                 Icon(imageVector =  Icons.Filled.Close, contentDescription ="atras",
                     Modifier
@@ -294,6 +308,15 @@ fun MyHeader(modifier: Modifier,nav: NavHostController) {
                             top.linkTo(parent.top)
                         }
                         .clickable { nav.popBackStack() }
+                )
+                Icon(painter = painterResource(id = R.drawable.add_exercise), contentDescription = "save",
+                    Modifier
+                        .constrainAs(add) {
+                            end.linkTo(parent.end)
+                            top.linkTo(parent.top)
+                        }
+                        .clickable {  nav.navigate(Routes.ExcercisesPlan.routes) }
+                        .size(24.dp)
                 )
                 Text(text = "Mi plan", modifier = Modifier.constrainAs(title){
                     start.linkTo(parent.start)
@@ -322,4 +345,3 @@ fun TitleDateForList(day:String,modifier: Modifier){
         )
     }
 }
-

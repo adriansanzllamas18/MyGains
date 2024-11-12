@@ -1,6 +1,6 @@
 package com.example.mygains.exercisesplan.ui
 
-import androidx.activity.viewModels
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -17,29 +17,30 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerColors
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -49,19 +50,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.mygains.exercisesplan.data.MuscleGroupe
 import com.example.mygains.R
@@ -69,10 +68,8 @@ import com.example.mygains.exercisesplan.data.Exercises
 import com.example.mygains.exercisesplan.data.RoutineDayData
 import com.example.mygains.exercisesplan.data.SeriesAndReps
 import com.example.mygains.exercisesplan.data.ExcerciseType
-import com.example.mygains.extras.navigationroutes.Routes
+import com.example.mygains.extras.utils.FormatterUtils
 import com.example.mygains.login.ui.Loader
-import com.example.mygains.userinfo.data.WeightRegister
-import java.time.LocalDate
 
 
 @Composable
@@ -85,6 +82,8 @@ fun ExcercisesPlanCompossable(nav: NavHostController) {
     val isLoading by excercisesPlanViewModel._isLoadingLife.observeAsState(false)
     val showAlert by excercisesPlanViewModel._isAlertLife.observeAsState(false)
 
+
+
     Column(
 
         Modifier
@@ -92,7 +91,7 @@ fun ExcercisesPlanCompossable(nav: NavHostController) {
             .windowInsetsPadding(WindowInsets.systemBars)) {
         MyHeader(modifier = Modifier
             .align(Alignment.CenterHorizontally)
-            .padding(16.dp),nav,routineDayData,excercisesPlanViewModel)
+            .padding(16.dp),nav,routineDayData,excercisesPlanViewModel,showAlert)
 
        ConstraintLayout {
            val (body) = createRefs()
@@ -143,6 +142,8 @@ fun MyBodyRoutineExercisesType(modifier: Modifier, excercisesPlanViewModel: Exce
         ExcerciseType("Fuerza",R.drawable.fuerza)
     )
     var expanded by remember { mutableStateOf(false) }
+
+
 
    routineDayData.exerciseType = selectedExcerciseType?.name ?: ""
     Column(modifier) {
@@ -370,12 +371,25 @@ fun MuscleGroupCard(group: String, image: Int,onClick : ()-> Unit, isSelected:Bo
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyHeader(modifier: Modifier,nav: NavHostController, routineDayData: RoutineDayData, excercisesPlanViewModel: ExcercisesPlanViewModel) {
+fun MyHeader(modifier: Modifier,nav: NavHostController, routineDayData: RoutineDayData, excercisesPlanViewModel: ExcercisesPlanViewModel,showAlert:Boolean) {
+
+    var expanded:Boolean by remember {
+        mutableStateOf(false)
+    }
+    var initialPiker by remember {
+        mutableStateOf(false)
+    }
+
+
+    if (expanded) initialPiker = true
+
+    val timeSelected = rememberTimePickerState()
 
     Row(modifier = modifier.fillMaxWidth()) {
         ConstraintLayout(Modifier.fillMaxWidth()) {
-            val (close, title,save) = createRefs()
+            val (close, title,save,hour,hourText) = createRefs()
 
             Icon(imageVector = Icons.Filled.Close, contentDescription = "atras",
                 Modifier
@@ -406,7 +420,74 @@ fun MyHeader(modifier: Modifier,nav: NavHostController, routineDayData: RoutineD
                     .size(24.dp)
             )
 
+            Icon(painter = painterResource(id = R.drawable.calendar_hour), contentDescription = "hour",
+                Modifier
+                    .constrainAs(hour) {
+                        end.linkTo(save.start)
+                        top.linkTo(parent.top)
+                    }
+                    .padding(end = 16.dp)
+                    .clickable {
+                        expanded = true
+                    }
+                    .size(24.dp),
+                tint = if (!initialPiker) Color.Red else Color.Black
+            )
+
+            if (initialPiker){
+                routineDayData.timeOfDay = FormatterUtils().formatHour(timeSelected)
+                Text(
+                    modifier = Modifier
+                        .constrainAs(hourText) {
+                            end.linkTo(hour.start)
+                            top.linkTo(parent.top)
+                        }
+                        .padding(end = 8.dp),
+                    color = colorResource(id = R.color.orange),
+                    text =FormatterUtils().formatHour(timeSelected),
+                )
+            }
+
         }
 
+    }
+
+    if (expanded){
+
+        ModalBottomSheet(
+            sheetState =  rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = colorResource(id = R.color.orange_low),
+            onDismissRequest = { expanded= false },
+            scrimColor = BottomSheetDefaults.ScrimColor,
+        ) {
+            Column(modifier = Modifier.align(Alignment.CenterHorizontally) ){
+                TimePicker(state = timeSelected,Modifier.align(Alignment.CenterHorizontally),
+                    colors = TimePickerColors(clockDialColor = colorResource(id = R.color.orange),
+                        selectorColor =colorResource(id = R.color.orange_low),
+                        containerColor = colorResource(id = R.color.orange),
+                        periodSelectorSelectedContentColor = colorResource(id = R.color.orange_low),
+                        clockDialUnselectedContentColor = colorResource(id = R.color.orange_low),
+                        clockDialSelectedContentColor = colorResource(id = R.color.orange),
+                        periodSelectorSelectedContainerColor = colorResource(id = R.color.black),
+                        periodSelectorUnselectedContainerColor = colorResource(id = R.color.orange),
+                        periodSelectorUnselectedContentColor = colorResource(id = R.color.orange_low),
+                        periodSelectorBorderColor = colorResource(id = R.color.black),
+                        timeSelectorUnselectedContainerColor = colorResource(id = R.color.black),
+                        timeSelectorSelectedContainerColor = colorResource(id = R.color.orange),
+                        timeSelectorUnselectedContentColor = colorResource(id = R.color.orange_low),
+                        timeSelectorSelectedContentColor = colorResource(id = R.color.orange_low) )
+                )
+                Log.i("hour",FormatterUtils().formatHour(timeSelected))
+                Icon(imageVector = Icons.Default.Info, contentDescription ="info",
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    tint = colorResource(id = R.color.orange))
+                Text(text = "Esta será la ahora  del día en la que empezarás el ejercicio , recuerda que si añades varios ejercicios en la misma hora estos aparecerán relacionados.",
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(16.dp),
+                    textAlign = TextAlign.Center,
+                    color = Color.Gray)
+            }
+        }
     }
 }
