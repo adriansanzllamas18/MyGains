@@ -28,9 +28,19 @@ class PlanViewModel @Inject constructor(var planUseCase: PlanUseCase):ViewModel(
     private var  _isLoading = MutableLiveData<Boolean>()
     var _isLoadingLife: LiveData<Boolean> =_isLoading
 
+    private var  _selectedDate = MutableLiveData<String>()
+    var _selectedDateLife: LiveData<String> =_selectedDate
+
+
+    fun setSelectedDate(date: String){
+        _selectedDate.postValue(date)
+        this.getAllExcercisesForDay(date)
+    }
+
     fun getAllExcercisesForDay(date:String){
         _isLoading.postValue(true)
         viewModelScope.launch(Dispatchers.IO) {
+            delay(1000)
             try {
                 try {
                     val result= planUseCase.getPlanForTheDay(date)

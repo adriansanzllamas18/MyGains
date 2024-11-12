@@ -13,17 +13,23 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.NavHostController
 import com.example.mygains.R
 import com.example.mygains.exercisesplan.data.RoutineDayData
 
@@ -131,6 +137,32 @@ fun ExercisesOfDayListComposable (modifier: androidx.compose.ui.Modifier, listEx
                 }
             }
         }
+        if (listExercises.isEmpty()){
+            MyPlanForDay(modifier = Modifier.align(Alignment.CenterHorizontally))
+        }
     }
+}
+
+@Composable
+fun MyPlanForDay(modifier: Modifier) {
+    Column(modifier) {
+
+        Card(colors = CardDefaults.cardColors(containerColor = Color.White)) {
+            Image(painter = painterResource(id = R.drawable.capacitacion), contentDescription ="image",
+                Modifier
+                    .size(120.dp)
+                    .align(Alignment.CenterHorizontally)
+                    .padding(8.dp))
+
+            Text(text = "No hay entreno registrado para este dia , puedes añadir tus ejercicios en el icono de la esquina superior derecha.",
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(16.dp),
+                textAlign = TextAlign.Center,
+                color = Color.Gray)
+
+        }
+    }
+
 }
 

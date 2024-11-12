@@ -77,10 +77,10 @@ import java.time.YearMonth
 @Composable
 fun PlanCompossable(nav: NavHostController) {
 
-    var planViewModel:PlanViewModel = hiltViewModel()
+    val planViewModel:PlanViewModel = hiltViewModel()
 
 
-    var selectedDay:String by remember { mutableStateOf(LocalDate.now().toString()) }
+    val selectedDay:String by planViewModel._selectedDateLife.observeAsState(initial = LocalDate.now().toString())
 
 
     val isLoading:Boolean by planViewModel._isLoadingLife.observeAsState(initial = false)
@@ -108,8 +108,11 @@ fun PlanCompossable(nav: NavHostController) {
     val newHeight = with(LocalDensity.current) { heightInPx }
 
     LaunchedEffect(Unit) {
-        planViewModel.getAllExcercisesForDay(selectedDay)
+        planViewModel.getAllExcercisesForDay(LocalDate.now().toString())
+        //esto es si quiero que cuando salga de la pantalla de ejercicios siga apareciendo la fecha actual
+        //planViewModel.setSelectedDate(LocalDate.now().toString())
     }
+
     PullToRefreshBox(modifier = Modifier.fillMaxSize()
         , isRefreshing = isLoading,
         onRefresh = {
@@ -146,7 +149,7 @@ fun PlanCompossable(nav: NavHostController) {
                                 }
                                 .height(newHeight) // Establecer la altura dinámica del calendario
                                 .padding(8.dp)
-                            , selectedDay
+                            , selectedDay,planViewModel
                         )
                     }
                 }
@@ -174,35 +177,7 @@ fun PlanCompossable(nav: NavHostController) {
 
 
 @Composable
-fun MyPlanForDay(modifier: Modifier,nav: NavHostController) {
-    Column(modifier) {
-        Text(
-            text = "Entreno",
-            fontSize = 24.sp,
-            modifier = Modifier.padding(8.dp),
-            fontStyle = FontStyle(R.font.poppins)
-        )
-
-
-        Card(colors = CardDefaults.cardColors(containerColor = Color.White)) {
-            Image(painter = painterResource(id = R.drawable.capacitacion), contentDescription ="image",
-                Modifier
-                    .size(120.dp)
-                    .align(Alignment.CenterHorizontally)
-                    .padding(8.dp))
-            Text(text = "No hay entreno registrado para este dia...", Modifier.padding(8.dp))
-            Button(onClick = {
-                nav.navigate(Routes.ExcercisesPlan.routes)
-            }, Modifier.align(Alignment.CenterHorizontally)) {
-                Text(text = "Añadir")
-            }
-        }
-    }
-
-}
-
-@Composable
-fun MyWeekCalendar(modifier: Modifier, selectedDay: String) {
+fun MyWeekCalendar(modifier: Modifier, selectedDay: String,planViewModel: PlanViewModel) {
 
     val firstDayOfWeek = remember { firstDayOfWeekFromLocale() }
     val currentMonth = remember { YearMonth.now() }
@@ -235,7 +210,7 @@ fun MyWeekCalendar(modifier: Modifier, selectedDay: String) {
                         .padding(8.dp),
                     state = state,
                     monthHeader ={ MonthHeader(currentMonth =state.firstVisibleMonth.yearMonth ) },
-                    dayContent = { Day(it,selectedDay= selectedDay) }, // Mostrar el contenido de cada día
+                    dayContent = { Day(it, selectedDate = selectedDay, planViewModel =planViewModel ) }, // Mostrar el contenido de cada día
                 )
             }
         }
@@ -260,8 +235,8 @@ fun MonthHeader(currentMonth: YearMonth) {
 }
 
 @Composable
-fun Day(day: CalendarDay, modifier: Modifier = Modifier,selectedDay: String) {
-    val isToday = day.date == LocalDate.now()
+fun Day(day: CalendarDay, modifier: Modifier = Modifier,planViewModel: PlanViewModel,selectedDate:String) {
+    val isToday = selectedDate == day.date.toString()
     val backgroundColor = if (isToday) colorResource(id = R.color.orange_low) else Color.Transparent
     val textColor = if (isToday) colorResource(id = R.color.orange) else if(day.position != DayPosition.MonthDate) Color.Gray else Color.Black
     val outDay = if (day.position == DayPosition.MonthDate) Color.White else Color.Gray
@@ -274,8 +249,8 @@ fun Day(day: CalendarDay, modifier: Modifier = Modifier,selectedDay: String) {
             .width(70.dp)
             .padding(4.dp)
             .clickable {
-                // Acción al hacer clic en un día
-                println("Fecha seleccionada: ${day.date}")
+                planViewModel.setSelectedDate(day.date.toString())
+                println("Fecha seleccionada: $selectedDate")
             },
         colors = CardDefaults.cardColors(containerColor = backgroundColor)
     ) {
