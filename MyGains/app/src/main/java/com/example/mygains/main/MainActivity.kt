@@ -19,7 +19,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.mygains.dashboard.ui.DashBoardViewModel
 import com.example.mygains.dashboard.ui.MyDashBoard
 import com.example.mygains.exercisesplan.ui.ExcercisesPlanCompossable
-import com.example.mygains.exercisesplan.ui.ExcercisesPlanViewModel
 import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.login.ui.LoginScreen
 import com.example.mygains.login.ui.LoginViewModel
@@ -71,8 +70,12 @@ class MainActivity : ComponentActivity() {
                     composable(Routes.Login.routes){ LoginScreen(loginViewModel = logingViewmodel, nav = navigationController ) }
                     composable(Routes.Perfil.routes){ UserInfoComposable(nav = navigationController, userInfoViewModel = userInfoViewModel) }
                     composable(Routes.NewUser.routes){ NewUserComposable(newUserViewModel = newUserViewmodel, navigationController, onSignInClick = { newUserViewmodel.signInWithGoogle(this@MainActivity,signInLauncher, this@MainActivity)  }) }
-                    composable(Routes.Plan.routes){ PlanCompossable(nav = navigationController) }
-                    composable(Routes.ExcercisesPlan.routes){ ExcercisesPlanCompossable(nav = navigationController) }
+                    composable(route = Routes.Plan.routes) { backStackEntry->
+                        PlanCompossable(nav = navigationController)
+                    }
+                    composable(Routes.ExcercisesPlan.routes){backStackEntry->
+                        ExcercisesPlanCompossable(nav = navigationController, backStackEntry.arguments?.getString("date").orEmpty())
+                    }
                 }
             }
         }

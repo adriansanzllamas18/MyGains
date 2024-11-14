@@ -73,7 +73,7 @@ import com.example.mygains.login.ui.Loader
 
 
 @Composable
-fun ExcercisesPlanCompossable(nav: NavHostController) {
+fun ExcercisesPlanCompossable(nav: NavHostController, date: String) {
 
     val excercisesPlanViewModel:ExcercisesPlanViewModel= hiltViewModel()
 
@@ -82,7 +82,8 @@ fun ExcercisesPlanCompossable(nav: NavHostController) {
     val isLoading by excercisesPlanViewModel._isLoadingLife.observeAsState(false)
     val showAlert by excercisesPlanViewModel._isAlertLife.observeAsState(false)
 
-
+    //asignamos a routinedata la fecha de la nav
+    routineDayData.date=date
 
     Column(
 

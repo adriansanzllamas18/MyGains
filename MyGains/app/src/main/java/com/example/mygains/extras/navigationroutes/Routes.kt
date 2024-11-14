@@ -8,6 +8,8 @@ package com.example.mygains.extras.navigationroutes
      object NewUser: Routes("newuser")
      object Splash: Routes("splash")
      object Plan: Routes("plan")
-     object ExcercisesPlan: Routes("excercisesplan")
+     object ExcercisesPlan: Routes("excercisesplan/{date}"){
+         fun createRout(date: String)="excercisesplan/$date"
+     }
 
  }

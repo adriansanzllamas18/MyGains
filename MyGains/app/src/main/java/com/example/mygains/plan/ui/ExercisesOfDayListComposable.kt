@@ -19,6 +19,10 @@ import androidx.compose.material3.Text
 
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,6 +34,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.mygains.R
 import com.example.mygains.exercisesplan.data.RoutineDayData
 
@@ -145,14 +154,28 @@ fun ExercisesOfDayListComposable (modifier: androidx.compose.ui.Modifier, listEx
 
 @Composable
 fun MyPlanForDay(modifier: Modifier) {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.nodata))
+    var isPlaying by remember {
+        mutableStateOf(true)
+    }
+    // Animación con progreso controlado
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = isPlaying // Añadido el control de reproducción
+    )
+
     Column(modifier) {
 
         Card(colors = CardDefaults.cardColors(containerColor = Color.White)) {
-            Image(painter = painterResource(id = R.drawable.capacitacion), contentDescription ="image",
-                Modifier
-                    .size(120.dp)
+            LottieAnimation(
+                composition = composition,
+                progress = progress,
+                modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .padding(8.dp))
+                    .padding(8.dp)
+                    .size(200.dp)
+            )
 
             Text(text = "No hay entreno registrado para este dia , puedes añadir tus ejercicios en el icono de la esquina superior derecha.",
                 modifier = Modifier

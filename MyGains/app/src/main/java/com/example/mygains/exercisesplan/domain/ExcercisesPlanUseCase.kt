@@ -17,7 +17,7 @@ class ExcercisesPlanUseCase @Inject constructor(private var firestore: FirebaseF
 
         var timeStamp= LocalDateTime.now().toString()
         val routineDayDataToSave= hashMapOf(
-            "date" to LocalDate.now().toString(),
+            "date" to routineDayData.date,
             "exerciseType" to routineDayData.exerciseType,
             "timeOfDay" to routineDayData.timeOfDay,
             "exercises" to routineDayData.exercises

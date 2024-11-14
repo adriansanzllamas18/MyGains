@@ -1,8 +1,6 @@
 package com.example.mygains.plan.ui
 
 import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,36 +15,23 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.ModalBottomSheetDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TimePicker
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -62,13 +47,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.mygains.R
 import com.example.mygains.extras.navigationroutes.Routes
-import com.example.mygains.login.ui.Loader
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
-import kotlinx.coroutines.currentCoroutineContext
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -78,7 +61,6 @@ import java.time.YearMonth
 fun PlanCompossable(nav: NavHostController) {
 
     val planViewModel:PlanViewModel = hiltViewModel()
-
 
     val selectedDay:String by planViewModel._selectedDateLife.observeAsState(initial = LocalDate.now().toString())
 
@@ -108,13 +90,14 @@ fun PlanCompossable(nav: NavHostController) {
     val newHeight = with(LocalDensity.current) { heightInPx }
 
     LaunchedEffect(Unit) {
-        planViewModel.getAllExcercisesForDay(LocalDate.now().toString())
+        planViewModel.getAllExcercisesForDay(selectedDay)
         //esto es si quiero que cuando salga de la pantalla de ejercicios siga apareciendo la fecha actual
         //planViewModel.setSelectedDate(LocalDate.now().toString())
     }
 
-    PullToRefreshBox(modifier = Modifier.fillMaxSize()
-        , isRefreshing = isLoading,
+
+    PullToRefreshBox(modifier = Modifier.fillMaxSize(),
+        isRefreshing = isLoading,
         onRefresh = {
             planViewModel.getAllExcercisesForDay(selectedDay)
         }
@@ -128,7 +111,7 @@ fun PlanCompossable(nav: NavHostController) {
 
             item {
                 MyHeader(
-                    modifier = Modifier.padding(16.dp), nav
+                    modifier = Modifier.padding(16.dp), nav,planViewModel,selectedDay
                 )
             }
 
@@ -282,15 +265,15 @@ fun Day(day: CalendarDay, modifier: Modifier = Modifier,planViewModel: PlanViewM
 }
 
 
-// Extensiones para obtener YearMonth desde LocalDate
-fun LocalDate.yearMonth(): YearMonth {
-    return YearMonth.of(this.year, this.monthValue)
-}
-
 
 
 @Composable
-fun MyHeader(modifier: Modifier,nav: NavHostController) {
+fun MyHeader(
+    modifier: Modifier,
+    nav: NavHostController,
+    planViewModel: PlanViewModel,
+    selectedDay: String
+) {
 
         Row(modifier= modifier.fillMaxWidth()) {
             ConstraintLayout(Modifier.fillMaxWidth()) {
@@ -311,7 +294,7 @@ fun MyHeader(modifier: Modifier,nav: NavHostController) {
                             end.linkTo(parent.end)
                             top.linkTo(parent.top)
                         }
-                        .clickable { nav.navigate(Routes.ExcercisesPlan.routes) }
+                        .clickable { nav.navigate(Routes.ExcercisesPlan.createRout(selectedDay)) }
                         .size(24.dp)
                 )
                 Text(text = "Mi plan", modifier = Modifier.constrainAs(title){
