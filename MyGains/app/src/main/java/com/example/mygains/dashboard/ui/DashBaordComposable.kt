@@ -2,11 +2,13 @@ package com.example.mygains.dashboard.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
@@ -52,7 +54,12 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.mygains.R
 import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.login.ui.LoginDivider
+import com.example.mygains.userinfo.BarcodeScannerScreen
 import com.example.mygains.userinfo.data.UserData
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions
+import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.common.InputImage
 
 @Composable
 fun MyDashBoard(nav:NavHostController, dashBoardViewModel: DashBoardViewModel){
@@ -93,7 +100,7 @@ fun MyDashBoard(nav:NavHostController, dashBoardViewModel: DashBoardViewModel){
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
-                .padding(16.dp))
+                .padding(16.dp),nav)
 
         }
         MyBottomNavigation(modifier=Modifier.constrainAs(bottomBar){
@@ -109,10 +116,10 @@ fun MyDashBoard(nav:NavHostController, dashBoardViewModel: DashBoardViewModel){
 }
 
 @Composable
-fun MyDashBoar(modifier: Modifier) {
+fun MyDashBoar(modifier: Modifier,nav: NavHostController) {
     Box(modifier) {
         ConstraintLayout(Modifier.fillMaxSize()) {
-            val (dailyPlan, title,counter) = createRefs()
+            val (dailyPlan, title,counter, scanner) = createRefs()
 
             Text(text = "Tu rutina de hoy", fontSize = 18.sp,fontFamily = FontFamily(Font(R.font.poppinsbold)), modifier = Modifier
                 .constrainAs(title) {
@@ -133,9 +140,30 @@ fun MyDashBoar(modifier: Modifier) {
                     start.linkTo(parent.start)
                 }
                 .padding(top = 16.dp))
+
+            MyGainsScaner(modifier = Modifier
+                .constrainAs(scanner) {
+                    top.linkTo(counter.bottom)
+                    start.linkTo(parent.start)
+                }
+                .padding(top = 16.dp), nav =nav )
         }
 
     }
+}
+
+@Composable
+fun MyGainsScaner(modifier: Modifier, nav: NavHostController) {
+    Box(modifier) {
+        Card(
+            modifier= Modifier.fillMaxWidth()
+                .height(100.dp)
+                .clickable { nav.navigate(Routes.GainsScanner.routes)}
+        ) {
+
+        }
+    }
+
 }
 
 @Composable
@@ -277,6 +305,8 @@ fun CaloriesAndSteps(modifier: Modifier){
                     color = Color.Black,fontFamily = FontFamily(Font(R.font.poppinsbold)))
             }
         }
+
+
 }
 
 @Composable
@@ -301,7 +331,7 @@ fun MyBottomNavigation(modifier: Modifier,nav: NavHostController, userData: User
             }
 
             NavigationBarItem(selected = false , onClick = {
-                nav.navigate(Routes.Home.routes)
+
             }, icon = { Icon(
                 imageVector = Icons.Default.Home,
                 contentDescription = "home"
@@ -314,4 +344,5 @@ fun MyBottomNavigation(modifier: Modifier,nav: NavHostController, userData: User
     }
 
 }
+
 

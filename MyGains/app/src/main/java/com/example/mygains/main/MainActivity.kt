@@ -25,6 +25,7 @@ import com.example.mygains.login.ui.LoginViewModel
 import com.example.mygains.newuser.ui.NewUserComposable
 import com.example.mygains.newuser.ui.NewUserViewModel
 import com.example.mygains.plan.ui.PlanCompossable
+import com.example.mygains.scanproducts.ui.ScanProductComposable
 import com.example.mygains.splashscreen.ui.SplashScreenComposable
 import com.example.mygains.splashscreen.ui.SplashViewModel
 import com.example.mygains.ui.theme.MyGainsTheme
@@ -76,6 +77,9 @@ class MainActivity : ComponentActivity() {
                     composable(Routes.ExcercisesPlan.routes){backStackEntry->
                         ExcercisesPlanCompossable(nav = navigationController, backStackEntry.arguments?.getString("date").orEmpty())
                     }
+
+                    composable(Routes.GainsScanner.routes){ ScanProductComposable()}
+
                 }
             }
         }

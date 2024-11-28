@@ -11,5 +11,5 @@ package com.example.mygains.extras.navigationroutes
      object ExcercisesPlan: Routes("excercisesplan/{date}"){
          fun createRout(date: String)="excercisesplan/$date"
      }
-
+     object GainsScanner: Routes("gainsscanner")
  }
