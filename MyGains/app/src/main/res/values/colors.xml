@@ -10,6 +10,7 @@
     <color name="orange">#CA5300</color>
     <color name="orange_low">#FFFCE5D8</color>
     <color name="azul_oscuro">#004080</color>
+    <color name="gray_claro">#FFE0E0E0</color>
 
 
 </resources>

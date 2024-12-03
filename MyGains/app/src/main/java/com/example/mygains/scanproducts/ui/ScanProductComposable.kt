@@ -3,6 +3,7 @@ package com.example.mygains.scanproducts.ui
 import android.Manifest
 import android.content.ClipData.Item
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -20,17 +21,22 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -39,6 +45,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.mygains.scanproducts.data.ProductResponse
 import com.example.mygains.userinfo.CameraPreview
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -46,6 +54,10 @@ import java.util.concurrent.Executors
 @Preview(showBackground = true)
 @Composable
 fun ScanProductComposable() {
+
+    var viewModel:ScanBarCodeViewModel = hiltViewModel()
+
+    viewModel.getProduct("8412700720096")
     LazyColumn(modifier = Modifier
         .fillMaxSize()
         .windowInsetsPadding(WindowInsets.systemBars)) {
@@ -66,8 +78,22 @@ fun ScanProductComposable() {
                 Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
-                    .size(400.dp))
+                    .size(400.dp),viewModel)
         }
+
+        item {
+            ModalProductComposable(viewModel)
+        }
+    }
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ModalProductComposable(viewModel: ScanBarCodeViewModel) {
+    val product by viewModel._ProductResponseLife.observeAsState(initial = null)
+    ModalBottomSheet(onDismissRequest = {  }, containerColor =Color.White) {
+        product?.let { ProductInfoBottomSheetComposable(it) }
     }
 }
 
@@ -89,15 +115,15 @@ fun MyTitleInfo(modifier: Modifier) {
 }
 
 @Composable
-fun MyScaner(modifier: Modifier) {
+fun MyScaner(modifier: Modifier,viewModel: ScanBarCodeViewModel) {
 
     Box(modifier) {
-        getCameraPermissions()
+        getCameraPermissions(viewModel)
     }
 }
 
 @Composable
-private fun getCameraPermissions(){
+private fun getCameraPermissions(viewModel: ScanBarCodeViewModel){
     val context = LocalContext.current
     var hasCameraPermission by remember {
         mutableStateOf(
@@ -121,11 +147,11 @@ private fun getCameraPermissions(){
     }
 
     if (hasCameraPermission) {
-        CameraPreview(cameraExecutor)
+        CameraPreview(cameraExecutor, viewModel = viewModel)
     } else {
        BarCodeComposable()
     }
-    
+
 }
 
 @Composable

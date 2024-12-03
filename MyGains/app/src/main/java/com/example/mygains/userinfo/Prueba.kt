@@ -27,6 +27,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.example.mygains.scanproducts.ui.ScanBarCodeViewModel
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
@@ -59,7 +60,7 @@ fun BarcodeScannerScreen() {
     }
 
     if (hasCameraPermission) {
-        CameraPreview(cameraExecutor)
+        //CameraPreview(cameraExecuto,)
     } else {
         Text("Permiso de cámara denegado")
     }
@@ -67,13 +68,14 @@ fun BarcodeScannerScreen() {
 
 @OptIn(ExperimentalGetImage::class)
 @Composable
-fun CameraPreview(cameraExecutor: ExecutorService) {
+fun CameraPreview(cameraExecutor: ExecutorService,viewModel: ScanBarCodeViewModel) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
     var code= remember {
         mutableStateOf("")
     }
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(
@@ -117,6 +119,7 @@ fun CameraPreview(cameraExecutor: ExecutorService) {
                                             Log.d("Barcode", "Producto EAN: $productId")
                                             if (productId != null) {
                                                 code.value = productId
+                                                viewModel.getProduct(productId)
                                                 imageProxy.close()
                                             }
                                         }
