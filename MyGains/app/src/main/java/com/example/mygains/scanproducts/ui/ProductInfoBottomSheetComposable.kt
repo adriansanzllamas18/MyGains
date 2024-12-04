@@ -233,7 +233,7 @@ fun BodyProduct(productResponse: ProductResponse) {
                         .constrainAs(protein) {
                             top.linkTo(proteinText.bottom)
                             start.linkTo(card.end)
-                            
+
                         }
                         .padding(8.dp), textAlign = TextAlign.Center, fontSize = 14.sp, color =  Color.Gray)
                 Text(text = "Carbs",

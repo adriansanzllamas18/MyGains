@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.captionBarPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
@@ -76,8 +77,7 @@ fun ScanProductComposable() {
             MyScaner(
                 Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
-                    .size(400.dp),viewModel)
+                    .padding(16.dp),viewModel)
         }
 
         item {
@@ -91,8 +91,12 @@ fun ScanProductComposable() {
 @Composable
 fun ModalProductComposable(viewModel: ScanBarCodeViewModel) {
     val product by viewModel._ProductResponseLife.observeAsState(initial = null)
-    ModalBottomSheet(onDismissRequest = {  }, containerColor =Color.White) {
-        product?.let { ProductInfoBottomSheetComposable(it) }
+    val showProduct by viewModel._ShowProductLife.observeAsState(initial = false)
+
+    if (showProduct){
+        ModalBottomSheet(onDismissRequest = { viewModel.showProduct(false)}, containerColor =Color.White) {
+            product?.let { ProductInfoBottomSheetComposable(it) }
+        }
     }
 }
 
@@ -148,7 +152,7 @@ private fun getCameraPermissions(viewModel: ScanBarCodeViewModel){
     if (hasCameraPermission) {
         CameraPreview(cameraExecutor, viewModel = viewModel)
     } else {
-       BarCodeComposable()
+       BarCodeComposable(viewModel)
     }
 
 }

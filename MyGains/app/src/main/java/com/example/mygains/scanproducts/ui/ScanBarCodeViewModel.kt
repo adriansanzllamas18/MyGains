@@ -25,6 +25,9 @@ class ScanBarCodeViewModel @Inject constructor( private var retrofit: Retrofit):
     private var _ProductResponse= MutableLiveData<ProductResponse> ()
     var _ProductResponseLife:MutableLiveData<ProductResponse> = _ProductResponse
 
+    private var _ShowProduct= MutableLiveData<Boolean> ()
+    var _ShowProductLife:MutableLiveData<Boolean> = _ShowProduct
+
     fun getProduct(codebar:String){
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -65,7 +68,7 @@ class ScanBarCodeViewModel @Inject constructor( private var retrofit: Retrofit):
                 jsonResponse?.getAsJsonObject("product")?.getAsJsonArray("allergens_tags")?.forEach {
                     ingredients_tags_list.add(it.asString)
                 }
-
+                _ShowProduct.postValue(true)
                 _ProductResponse.postValue(ProductResponse("", productName = productName, brand = brand, imageUrl = image, categories = "category", calories = kcl_per100, carbohydrates = carbohydrates_per100, fatTotal = fat_per100, fiber = fiber_per100, protein = proteins_per100, salt = salt_per100, saturatedFat = saturated_fat_per100, sugar = sugars_per100, nutriScore = nutriscore, productQuantity = "", servingSize = "", allergens = allegerns, novaGroup = novaGroup, ingredients_tags = ingredients_tags_list, ingredients_from_palm_oil_tags = mutableListOf(), ingredients_that_may_be_from_palm_oil_tags = mutableListOf(), ecoScore = ecoScore))
                 println(" completa: ${ProductResponse("", productName = productName, brand = brand, imageUrl = image, categories = "category", calories = kcl_per100, carbohydrates = carbohydrates_per100, fatTotal = fat_per100, fiber = fiber_per100, protein = proteins_per100, salt = salt_per100, saturatedFat = saturated_fat_per100, sugar = sugars_per100, nutriScore = nutriscore, productQuantity = "", servingSize = "", allergens = allegerns, novaGroup = novaGroup, ingredients_tags = mutableListOf(), ecoScore = ecoScore, ingredients_from_palm_oil_tags = mutableListOf(), ingredients_that_may_be_from_palm_oil_tags = mutableListOf())}")
 
@@ -73,6 +76,10 @@ class ScanBarCodeViewModel @Inject constructor( private var retrofit: Retrofit):
 
         }
 
+    }
+
+    fun showProduct(show:Boolean){
+        this._ShowProduct.postValue(show)
     }
 
 }
