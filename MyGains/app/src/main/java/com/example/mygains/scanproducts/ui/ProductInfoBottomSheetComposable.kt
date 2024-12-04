@@ -1,6 +1,7 @@
 package com.example.mygains.scanproducts.ui
 
 import android.content.ClipData.Item
+import androidx.compose.animation.defaultDecayAnimationSpec
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,6 +11,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -21,6 +24,7 @@ import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.ChipColors
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -188,7 +192,7 @@ fun BodyProduct(productResponse: ProductResponse) {
                     id = R.color.white
                 ), contentColor = Color.Black, disabledContentColor = Color.Transparent, disabledContainerColor = Color.Transparent)) {
                     Column(Modifier.padding(16.dp)) {
-                        Text(text = FormatterUtils().formatDouble(productResponse.calories?:0.0),
+                        Text(text = FormatterUtils().formatNumber((productResponse.calories?:0.0).toString()),
                             Modifier
                                 .align(Alignment.CenterHorizontally)
                                 .fillMaxWidth(),
@@ -200,7 +204,7 @@ fun BodyProduct(productResponse: ProductResponse) {
                     }
                 }
 
-                Text(text = FormatterUtils().formatDouble(productResponse.protein?:0.0)+" g",
+                Text(text =  FormatterUtils().formatNumber((productResponse.protein?:0.0).toString())+" g",
                     Modifier.constrainAs(proteinText){
                         start.linkTo(card.end)
                         bottom.linkTo(card.bottom)
@@ -208,14 +212,14 @@ fun BodyProduct(productResponse: ProductResponse) {
                         width = Dimension.percent(0.22f)
                     }, textAlign = TextAlign.Center, fontSize = 20.sp, fontWeight = FontWeight.Bold)
 
-                Text(text = FormatterUtils().formatDouble(productResponse.carbohydrates?:0.0)+" g",
+                Text(text =  FormatterUtils().formatNumber((productResponse.carbohydrates?:0.0).toString())+" g",
                     Modifier.constrainAs(carbsText){
                         start.linkTo(proteinText.end)
                         bottom.linkTo(card.bottom)
                         top.linkTo(parent.top)
                         width = Dimension.percent(0.22f)
                     }, textAlign = TextAlign.Center, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                Text(text = FormatterUtils().formatDouble(productResponse.fatTotal?:0.0)+" g",
+                Text(text =  FormatterUtils().formatNumber((productResponse.fatTotal?:0.0).toString())+" g",
                     Modifier.constrainAs(fatText){
                         start.linkTo(carbsText.end)
                         width = Dimension.percent(0.28f)
@@ -229,7 +233,7 @@ fun BodyProduct(productResponse: ProductResponse) {
                         .constrainAs(protein) {
                             top.linkTo(proteinText.bottom)
                             start.linkTo(card.end)
-                            width = Dimension.percent(0.22f)
+                            
                         }
                         .padding(8.dp), textAlign = TextAlign.Center, fontSize = 14.sp, color =  Color.Gray)
                 Text(text = "Carbs",
@@ -237,7 +241,7 @@ fun BodyProduct(productResponse: ProductResponse) {
                         .constrainAs(carbs) {
                             top.linkTo(carbsText.bottom)
                             start.linkTo(protein.end)
-                            width = Dimension.percent(0.22f)
+                            width = Dimension.percent(0.23f)
                         }
                         .padding(8.dp), textAlign = TextAlign.Center, fontSize = 14.sp, color =  Color.Gray)
                 Text(text = "Grasas",
@@ -245,7 +249,7 @@ fun BodyProduct(productResponse: ProductResponse) {
                         .constrainAs(fat) {
                             top.linkTo(fatText.bottom)
                             start.linkTo(carbs.end)
-                            width = Dimension.percent(0.22f)
+                            width = Dimension.percent(0.23f)
                         }
                         .padding(8.dp), textAlign = TextAlign.Center, fontSize = 14.sp, color =  Color.Gray)
 
@@ -265,7 +269,7 @@ fun BodyProduct(productResponse: ProductResponse) {
                         }
                         .padding(start = 16.dp, top = 16.dp), color =  Color.Gray, textAlign = TextAlign.Start, fontSize = 18.sp)
 
-                Text(text = FormatterUtils().formatDouble(productResponse.sugar?:0.0)+"g",
+                Text(text =  FormatterUtils().formatNumber((productResponse.sugar?:0.0).toString())+" g",
                     Modifier
                         .constrainAs(sugarText) {
                             end.linkTo(parent.end)
@@ -283,7 +287,7 @@ fun BodyProduct(productResponse: ProductResponse) {
                         }
                         .padding(start = 16.dp, top = 16.dp), color =  Color.Gray, textAlign = TextAlign.Start, fontSize = 18.sp)
 
-                Text(text = FormatterUtils().formatDouble(productResponse.fiber?:0.0)+"g",
+                Text(text = FormatterUtils().formatNumber((productResponse.fiber?:0.0).toString())+" g",
                     Modifier
                         .constrainAs(fibreText) {
                             end.linkTo(parent.end)
@@ -301,7 +305,7 @@ fun BodyProduct(productResponse: ProductResponse) {
                         }
                         .padding(start = 16.dp, top = 16.dp), color =  Color.Gray, textAlign = TextAlign.Start, fontSize = 18.sp)
 
-                Text(text = FormatterUtils().formatDouble(productResponse.salt?:0.0)+"g",
+                Text(text =  FormatterUtils().formatNumber((productResponse.salt?:0.0).toString())+" g",
                     Modifier
                         .constrainAs(saltText) {
                             end.linkTo(parent.end)
@@ -324,31 +328,49 @@ fun BodyProduct(productResponse: ProductResponse) {
 fun HeaderProduct(productResponse: ProductResponse) {
     Column(Modifier.fillMaxWidth()) {
 
-        Box (Modifier.align(Alignment.CenterHorizontally)){
+        Box(
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
+            // Card que actúa como sombra detrás de la imagen
             Card(
-                Modifier
-                    .size(120.dp)
-                    .align(Alignment.BottomCenter), shape = RoundedCornerShape(100.dp), colors = CardColors(containerColor = colorResource(
-                id = R.color.orange_low
-            ), contentColor = Color.Transparent, disabledContentColor = Color.Transparent, disabledContainerColor = Color.Transparent)) {
-            }
-            Image(modifier = Modifier
-                .size(150.dp),
+                modifier = Modifier
+                    .height(50.dp)
+                    .fillMaxWidth()
+                    .padding(start = 30.dp, end = 30.dp)
+                    .align(Alignment.Center)
+                    .offset(y = 50.dp),
+                shape = RoundedCornerShape(100.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = colorResource(id = R.color.orange_low),
+                    contentColor = Color.Transparent
+                ),
+                elevation = CardDefaults.cardElevation(6.dp)// Pequeña elevación para dar más efecto de sombra
+            ) {}
+
+            // Imagen del producto encima de la Card
+            Image(
+                modifier = Modifier
+                    .size(150.dp)  // Tamaño de la imagen más pequeño que la Card
+                    .align(Alignment.Center),  // Centrar la imagen respecto a la Card
                 contentScale = ContentScale.Fit,
                 painter = rememberAsyncImagePainter(productResponse.imageUrl),
-                contentDescription = "perfil",
+                contentDescription = "perfil"
             )
-
         }
 
+
         Text(text = productResponse.productName?:"",
-            modifier = Modifier.align(Alignment.CenterHorizontally).padding(8.dp),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(8.dp),
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
         Text(text = productResponse.brand?:"",
-            modifier = Modifier.align(Alignment.CenterHorizontally).padding(end = 8.dp, start = 8.dp),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(end = 8.dp, start = 8.dp),
             textAlign = TextAlign.Center
         )
 

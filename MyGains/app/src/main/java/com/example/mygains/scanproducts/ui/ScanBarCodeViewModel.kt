@@ -28,7 +28,7 @@ class ScanBarCodeViewModel @Inject constructor( private var retrofit: Retrofit):
     fun getProduct(codebar:String){
 
         viewModelScope.launch(Dispatchers.IO) {
-           var result= retrofit.create(ApiService::class.java).getProductInfo("product/3017620421006.json")
+           var result= retrofit.create(ApiService::class.java).getProductInfo("product/$codebar.json")
 
             if (result.isSuccessful){
                 val jsonResponse = result.body()

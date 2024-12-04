@@ -57,7 +57,6 @@ fun ScanProductComposable() {
 
     var viewModel:ScanBarCodeViewModel = hiltViewModel()
 
-    viewModel.getProduct("8412700720096")
     LazyColumn(modifier = Modifier
         .fillMaxSize()
         .windowInsetsPadding(WindowInsets.systemBars)) {

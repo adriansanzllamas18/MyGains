@@ -121,16 +121,33 @@ class FormatterUtils {
         }
     }
 
-    fun formatDouble(value: Double): String {
-        // Convertir a String con dos decimales, pero sin redondear
-        val formatted = "%f".format(value).substringBefore(".") + "." + value.toString().substringAfter(".").padEnd(2, '0').take(2)
-
-        // Si termina en ".00" o ".0", devolver solo la parte entera
-        return if (formatted.endsWith(".00") || formatted.endsWith(".0")) {
-            formatted.substringBefore(".")
+    fun formatNumber(input: String): String {
+        // Detectar si el separador decimal es una coma o punto y limpiar el input
+        val cleanedInput = if (input.contains(".") && input.contains(",")) {
+            // Formato europeo: 1.234,56 -> 1234.56
+            input.replace(".", "").replace(",", ".")
         } else {
-            formatted
+            // Formato americano: 1,234.56 -> 1234.56
+            input.replace(",", "")
+        }
+
+        // Convertir el valor a Double
+        val number = cleanedInput.toDoubleOrNull()
+
+        return if (number != null) {
+            // Verificar si el número es un entero (sin parte decimal significativa)
+            if (number % 1 == 0.0) {
+                // Devolver el número como entero
+                number.toInt().toString()
+            } else {
+                // Formatear a 2 decimales y cambiar el separador decimal a coma
+                String.format("%.2f", number).replace(".", ",")
+            }
+        } else {
+            "Número inválido"
         }
     }
+
+
 
 }
