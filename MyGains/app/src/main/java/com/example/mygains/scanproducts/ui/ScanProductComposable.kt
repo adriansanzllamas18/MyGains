@@ -1,6 +1,7 @@
 package com.example.mygains.scanproducts.ui
 
 import android.Manifest
+import android.app.Activity
 import android.content.ClipData.Item
 import android.content.pm.PackageManager
 import android.util.Log
@@ -22,11 +23,13 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -45,8 +49,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.mygains.R
 import com.example.mygains.scanproducts.data.ProductResponse
 import com.example.mygains.userinfo.CameraPreview
 import java.util.concurrent.ExecutorService
@@ -57,6 +63,7 @@ import java.util.concurrent.Executors
 fun ScanProductComposable() {
 
     var viewModel:ScanBarCodeViewModel = hiltViewModel()
+    val scanIcon by viewModel._ShowScanIconLife.observeAsState(initial = false)
 
     LazyColumn(modifier = Modifier
         .fillMaxSize()
@@ -66,7 +73,7 @@ fun ScanProductComposable() {
             MyScanHeader(
                 Modifier
                     .fillMaxWidth()
-                    .padding(16.dp))
+                    .padding(16.dp),viewModel,scanIcon)
         }
 
         item{
@@ -77,7 +84,7 @@ fun ScanProductComposable() {
             MyScaner(
                 Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),viewModel)
+                    .padding(16.dp),viewModel,scanIcon)
         }
 
         item {
@@ -118,20 +125,25 @@ fun MyTitleInfo(modifier: Modifier) {
 }
 
 @Composable
-fun MyScaner(modifier: Modifier,viewModel: ScanBarCodeViewModel) {
+fun MyScaner(modifier: Modifier,viewModel: ScanBarCodeViewModel,scanIcon: Boolean) {
 
     Box(modifier) {
-        getCameraPermissions(viewModel)
+        getCameraPermissions(viewModel,scanIcon)
     }
 }
 
 @Composable
-private fun getCameraPermissions(viewModel: ScanBarCodeViewModel){
+private fun getCameraPermissions(viewModel: ScanBarCodeViewModel,scanIcon: Boolean) {
+
     val context = LocalContext.current
     var hasCameraPermission by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
         )
+    }
+
+    val shouldShowRationale = remember {
+        ActivityCompat.shouldShowRequestPermissionRationale(context as Activity, Manifest.permission.CAMERA)
     }
 
     val cameraExecutor: ExecutorService = remember { Executors.newSingleThreadExecutor() }
@@ -144,26 +156,53 @@ private fun getCameraPermissions(viewModel: ScanBarCodeViewModel){
     )
 
     LaunchedEffect(Unit) {
-        if (!hasCameraPermission) {
+        if (!hasCameraPermission && !scanIcon) {
             launcher.launch(Manifest.permission.CAMERA)
         }
     }
-
-    if (hasCameraPermission) {
-        CameraPreview(cameraExecutor, viewModel = viewModel)
-    } else {
-       BarCodeComposable(viewModel)
+    LaunchedEffect(hasCameraPermission) {
+        viewModel.showScanIcon(true)
     }
 
+    if (hasCameraPermission) {
+        if (scanIcon){
+            CameraPreview(cameraExecutor, viewModel = viewModel)
+        }else{
+            BarCodeComposable(viewModel)
+        }
+
+    } else {
+        if (shouldShowRationale) {
+            AlertDialog(
+                onDismissRequest = { /* Close dialog if dismissed */ },
+                title = { Text("Permiso Necesario") },
+                text = { Text("La cámara es necesaria para escanear códigos de barras.") },
+                confirmButton = {
+                    TextButton(onClick = { launcher.launch(Manifest.permission.CAMERA) }) {
+                        Text("Permitir")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { }) {
+                        Text("Cancelar")
+                    }
+                }
+            )
+        } else if (scanIcon) {
+            launcher.launch(Manifest.permission.CAMERA)
+        } else {
+            BarCodeComposable(viewModel)
+        }
+    }
 }
 
-@Composable
-fun MyScanHeader(modifier: Modifier) {
 
+@Composable
+fun MyScanHeader(modifier: Modifier,viewModel: ScanBarCodeViewModel, scanIcon:Boolean) {
 
     Row(modifier= modifier) {
         ConstraintLayout(Modifier.fillMaxWidth()) {
-            val (close,title) = createRefs()
+            val (close,title,scan) = createRefs()
 
             Icon(imageVector =  Icons.Filled.Close, contentDescription ="atras",
                 Modifier
@@ -173,6 +212,21 @@ fun MyScanHeader(modifier: Modifier) {
                         top.linkTo(parent.top)
                     }
                     .clickable { }
+            )
+
+
+            Icon(painter = if (scanIcon)painterResource(id = R.drawable.scanner_bar_code)else{painterResource(id = R.drawable.keyboard)}
+                , contentDescription ="atras",
+                Modifier
+                    .constrainAs(scan) {
+                        end.linkTo(parent.end)
+                        bottom.linkTo(parent.bottom)
+                        top.linkTo(parent.top)
+                    }
+                    .size(24.dp)
+                    .clickable {
+                        viewModel.showScanIcon(!scanIcon)
+                    }
             )
             Text(text = "GainsScaner", modifier = Modifier.constrainAs(title){
                 start.linkTo(parent.start)

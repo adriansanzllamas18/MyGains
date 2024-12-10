@@ -24,9 +24,6 @@ import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
-import androidx.compose.material3.ChipColors
-import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +31,10 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -53,43 +54,83 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import coil.compose.rememberAsyncImagePainter
 import coil.request.Tags
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.mygains.R
 import com.example.mygains.extras.utils.FormatterUtils
 import com.example.mygains.scanproducts.data.ProductResponse
+import com.example.mygains.scanproducts.data.ProductResultResponse
 
 
 @Composable
-fun ProductInfoBottomSheetComposable(product: ProductResponse){
+fun ProductInfoBottomSheetComposable(product: ProductResultResponse){
 
 
-//   var product= ProductResponse(barcode="", productName="Cacaolat 0%", brand="Cacaolat", imageUrl="https://images.openfoodfacts.org/images/products/841/270/072/0096/front_es.27.400.jpg", categories="category", calories=53.0, protein=3.0, carbohydrates=4.9, sugar=4.6, fatTotal=2.3, saturatedFat=1.5, fiber=3.0, salt=0.15, nutriScore="a", novaGroup="4", servingSize="", productQuantity="", allergens="en:milk", ingredients_tags= arrayListOf(
-//       "en:may-contain-palm-oil","en:non-vegan","en:vegetarian-status-unknown"), ingredients_from_palm_oil_tags = mutableListOf(), ingredients_that_may_be_from_palm_oil_tags = mutableListOf())
     LazyColumn(modifier = Modifier
-        .fillMaxSize()
         .padding(8.dp)) {
-        item {
-            HeaderProduct(product)
-        }
 
-        item {
-            BodyProduct(product)
-        }
+        if (product.status=="1"){
+            item {
+                HeaderProduct(product.productResponse!!)
+            }
 
-        item {
-            if (!product.ingredients_tags.isNullOrEmpty()){
-                FormatterUtils().getMoreNutriInfo(product.ingredients_tags?: mutableListOf()).forEach {
-                    ProductTags(it)
+            item {
+                BodyProduct(product.productResponse!!)
+            }
+
+            item {
+                if (!product.productResponse!!.ingredients_tags.isNullOrEmpty()){
+                    FormatterUtils().getMoreNutriInfo(product.productResponse!!.ingredients_tags?: mutableListOf()).forEach {
+                        ProductTags(it)
+                    }
                 }
             }
-        }
 
-        item{
-            NutriScoreAndNova(product)
+            item{
+                NutriScoreAndNova(product.productResponse!!)
+            }
+
+        }else{
+            item {
+                ShowAnimationNotFound(product.status_verbose?:"Error")
+            }
         }
 
         item {
             Foot()
         }
+
+    }
+}
+
+@Composable
+fun ShowAnimationNotFound(textError: String) {
+    // Carga la composición del recurso Lottie
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.nofoundfoondanimation))
+
+    var isPlaying by remember {
+        mutableStateOf(true)
+    }
+    // Animación con progreso controlado
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = isPlaying // Añadido el control de reproducción
+    )
+
+    Column( Modifier
+        .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+
+        Text(text = textError, fontSize = 18.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+        LottieAnimation(
+            composition = composition,
+            progress = progress,
+            modifier = Modifier
+                .size(200.dp)
+        )
     }
 }
 

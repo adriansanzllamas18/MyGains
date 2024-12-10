@@ -36,7 +36,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,20 +48,22 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.mygains.R
 import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.login.ui.LoginDivider
-import com.example.mygains.userinfo.BarcodeScannerScreen
 import com.example.mygains.userinfo.data.UserData
-import com.google.mlkit.vision.barcode.BarcodeScannerOptions
-import com.google.mlkit.vision.barcode.BarcodeScanning
-import com.google.mlkit.vision.barcode.common.Barcode
-import com.google.mlkit.vision.common.InputImage
+
 
 @Composable
 fun MyDashBoard(nav:NavHostController, dashBoardViewModel: DashBoardViewModel){
@@ -111,8 +115,6 @@ fun MyDashBoard(nav:NavHostController, dashBoardViewModel: DashBoardViewModel){
     }
 
 
-
-
 }
 
 @Composable
@@ -154,12 +156,40 @@ fun MyDashBoar(modifier: Modifier,nav: NavHostController) {
 
 @Composable
 fun MyGainsScaner(modifier: Modifier, nav: NavHostController) {
+
+    // Carga la composición del recurso Lottie
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.scandasboardanimation))
+
+    var isPlaying by remember {
+        mutableStateOf(true)
+    }
+    // Animación con progreso controlado
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = isPlaying // Añadido el control de reproducción
+    )
+
     Box(modifier) {
         Card(
-            modifier= Modifier.fillMaxWidth()
+            modifier= Modifier
+                .fillMaxWidth()
                 .height(100.dp)
-                .clickable { nav.navigate(Routes.GainsScanner.routes)}
+                .clickable { nav.navigate(Routes.GainsScanner.routes) },
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFFFCE5D8))
         ) {
+            Row {
+                LottieAnimation(
+                    modifier = Modifier.padding(8.dp),
+                    composition = composition,
+                    progress = progress,
+                )
+                Text(text = "Escanea tus alimentos",
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+            
 
         }
     }

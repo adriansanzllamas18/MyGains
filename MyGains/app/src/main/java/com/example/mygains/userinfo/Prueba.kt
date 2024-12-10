@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
@@ -27,6 +28,12 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.example.mygains.R
 import com.example.mygains.scanproducts.ui.ScanBarCodeViewModel
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -35,36 +42,6 @@ import com.google.mlkit.vision.common.InputImage
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-@Composable
-fun BarcodeScannerScreen() {
-    val context = LocalContext.current
-    var hasCameraPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-        )
-    }
-
-    val cameraExecutor: ExecutorService = remember { Executors.newSingleThreadExecutor() }
-
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { granted ->
-            hasCameraPermission = granted
-        }
-    )
-
-    LaunchedEffect(Unit) {
-        if (!hasCameraPermission) {
-            launcher.launch(Manifest.permission.CAMERA)
-        }
-    }
-
-    if (hasCameraPermission) {
-        //CameraPreview(cameraExecuto,)
-    } else {
-        Text("Permiso de cámara denegado")
-    }
-}
 
 @OptIn(ExperimentalGetImage::class)
 @Composable
@@ -77,10 +54,10 @@ fun CameraPreview(cameraExecutor: ExecutorService,viewModel: ScanBarCodeViewMode
     }
 
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box() {
         AndroidView(
             modifier = Modifier
-                .size(600.dp)
+                .size(400.dp)
                 .fillMaxWidth(),
             factory = { ctx ->
                 val previewView = PreviewView(ctx) // Aquí aseguramos que PreviewView se detecta
@@ -152,30 +129,27 @@ fun CameraPreview(cameraExecutor: ExecutorService,viewModel: ScanBarCodeViewMode
             }
         )
 
-        // Dibujar el recuadro encima del PreviewView
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val rectWidth = 200.dp.toPx()
-            val rectHeight = 100.dp.toPx()
-            val centerX = size.width / 2
-            val centerY = size.height / 2
+        // Carga la composición del recurso Lottie
+        val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.scananimation))
 
-            // Crear el rectángulo en el centro de la vista
-            val rect = Rect(
-                centerX - rectWidth / 2,
-                centerY - rectHeight / 2,
-                centerX + rectWidth / 2,
-                centerY + rectHeight / 2
-            )
-
-            // Dibujar el borde del rectángulo
-            drawRect(
-                color = Color.Green,
-                topLeft = rect.topLeft,
-                size = rect.size,
-                style = Stroke(width = 4.dp.toPx()) // Grosor del borde
-            )
+        var isPlaying by remember {
+            mutableStateOf(true)
         }
-        Text(text = code.value, fontSize = 78.sp)
+        // Animación con progreso controlado
+        val progress by animateLottieCompositionAsState(
+            composition = composition,
+            iterations = LottieConstants.IterateForever,
+            isPlaying = isPlaying // Añadido el control de reproducción
+        )
+
+        LottieAnimation(
+            composition = composition,
+            progress = progress,
+            modifier = Modifier
+                .size(200.dp).align(Alignment.Center)
+        )
+
+
     }
 }
 

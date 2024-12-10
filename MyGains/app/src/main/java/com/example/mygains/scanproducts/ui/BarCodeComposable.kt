@@ -43,7 +43,6 @@ fun BarCodeComposable(viewModel: ScanBarCodeViewModel){
         mutableStateOf("")
     }
 
-    val buttonEnable by viewModel._ShowProductLife.observeAsState(initial = false)
 
     Box(Modifier.fillMaxSize()) {
         Card(
