@@ -13,14 +13,18 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.mygains.R
 import com.example.mygains.extras.navigationroutes.Routes
+import com.example.mygains.plan.ui.PlanViewModel
 import kotlinx.coroutines.delay
 
 
 @Composable
-fun SplashScreenComposable(navHostController: NavHostController, splashViewModel: SplashViewModel) {
+fun SplashScreenComposable(navHostController: NavHostController) {
+
+    val splashViewModel: SplashViewModel = hiltViewModel()
 
     val isAlreadyLoged:Boolean?  by splashViewModel.isAlreadyLogedLive.observeAsState(initial = null)
     splashViewModel.isAlreadyLoged()

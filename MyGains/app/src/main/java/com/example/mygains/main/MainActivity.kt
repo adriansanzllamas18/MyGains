@@ -22,6 +22,7 @@ import com.example.mygains.exercisesplan.ui.ExcercisesPlanCompossable
 import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.login.ui.LoginScreen
 import com.example.mygains.login.ui.LoginViewModel
+import com.example.mygains.navigation.NavigationWrapper
 import com.example.mygains.newuser.ui.NewUserComposable
 import com.example.mygains.newuser.ui.NewUserViewModel
 import com.example.mygains.plan.ui.PlanCompossable
@@ -37,11 +38,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val logingViewmodel: LoginViewModel by viewModels()
-    private val newUserViewmodel: NewUserViewModel by viewModels()
-    private val userInfoViewModel: UserInfoViewModel by viewModels()
-    private val splashViewModel: SplashViewModel by viewModels()
-    private val dashBoardViewModel: DashBoardViewModel by viewModels()
+
 
     private lateinit var signInLauncher: ActivityResultLauncher<Intent>
 
@@ -52,6 +49,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         // Registro del launcher para el resultado de inicio de sesión
+
+        //Modificar inyectando el viewmodel dentro de esta activity
+        /*
         signInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 val data: Intent? = result.data
@@ -60,27 +60,12 @@ class MainActivity : ComponentActivity() {
             }else{
                 newUserViewmodel.handleGoogleSignInResult(null)
             }
-        }
+
+        }*/
 
         setContent {
             MyGainsTheme {
-                val navigationController= rememberNavController()
-                NavHost(navController = navigationController, startDestination = "splash") {
-                    composable(Routes.Splash.routes){ SplashScreenComposable(navHostController = navigationController, splashViewModel = splashViewModel) }
-                    composable(Routes.Home.routes){ MyDashBoard(nav = navigationController,dashBoardViewModel) }
-                    composable(Routes.Login.routes){ LoginScreen(loginViewModel = logingViewmodel, nav = navigationController ) }
-                    composable(Routes.Perfil.routes){ UserInfoComposable(nav = navigationController, userInfoViewModel = userInfoViewModel) }
-                    composable(Routes.NewUser.routes){ NewUserComposable(newUserViewModel = newUserViewmodel, navigationController, onSignInClick = { newUserViewmodel.signInWithGoogle(this@MainActivity,signInLauncher, this@MainActivity)  }) }
-                    composable(route = Routes.Plan.routes) { backStackEntry->
-                        PlanCompossable(nav = navigationController)
-                    }
-                    composable(Routes.ExcercisesPlan.routes){backStackEntry->
-                        ExcercisesPlanCompossable(nav = navigationController, backStackEntry.arguments?.getString("date").orEmpty())
-                    }
-
-                    composable(Routes.GainsScanner.routes){ ScanProductComposable()}
-
-                }
+                NavigationWrapper()
             }
         }
 

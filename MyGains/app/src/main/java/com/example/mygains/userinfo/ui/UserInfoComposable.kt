@@ -69,6 +69,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.airbnb.lottie.compose.LottieAnimation
@@ -77,6 +78,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.mygains.R
+import com.example.mygains.plan.ui.PlanViewModel
 import com.example.mygains.userinfo.data.WeightRegister
 import com.example.mygains.userinfo.data.UserData
 
@@ -84,7 +86,10 @@ import java.time.LocalDate
 
 
 @Composable
-fun UserInfoComposable(nav: NavHostController, userInfoViewModel: UserInfoViewModel) {
+fun UserInfoComposable(nav: NavHostController) {
+
+    val userInfoViewModel: UserInfoViewModel = hiltViewModel()
+
     val result: UserData by userInfoViewModel.userLive.observeAsState(initial = UserData())
     userInfoViewModel.readUserInfo()
 

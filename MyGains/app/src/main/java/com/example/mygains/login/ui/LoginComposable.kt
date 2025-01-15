@@ -43,13 +43,17 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.mygains.R
 import com.example.mygains.extras.navigationroutes.Routes
+import com.example.mygains.plan.ui.PlanViewModel
 
 @Composable()
 //@Preview(showBackground = true)
-fun LoginScreen(loginViewModel: LoginViewModel, nav: NavHostController){
+fun LoginScreen( nav: NavHostController){
+    val loginViewModel: LoginViewModel = hiltViewModel()
+
     ConstraintLayout(modifier = Modifier
         .fillMaxSize()
         .windowInsetsPadding(WindowInsets.systemBars)) {

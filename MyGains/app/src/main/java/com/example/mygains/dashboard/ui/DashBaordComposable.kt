@@ -52,6 +52,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.airbnb.lottie.compose.LottieAnimation
@@ -62,12 +63,18 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.mygains.R
 import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.login.ui.LoginDivider
+import com.example.mygains.plan.ui.PlanViewModel
 import com.example.mygains.userinfo.data.UserData
 
 
 @Composable
-fun MyDashBoard(nav:NavHostController, dashBoardViewModel: DashBoardViewModel){
+fun MyDashBoard(nav:NavHostController){
+
+    val dashBoardViewModel: DashBoardViewModel = hiltViewModel()
+
+    //todo cambiar al init del viewmodel
     dashBoardViewModel.getUserData()
+
     val userData: UserData by dashBoardViewModel.userDataLive.observeAsState(initial = UserData())
 
     ConstraintLayout(modifier = Modifier
@@ -204,6 +211,7 @@ fun MyDailyPlan(modifier: Modifier, mutableList: MutableList<String>) {
     }, initialPage = 5)
 
    HorizontalPager(state = pagerState, pageSpacing = 8.dp, modifier = modifier) {
+       
        Card() {
            ConstraintLayout(
                Modifier
@@ -341,6 +349,7 @@ fun CaloriesAndSteps(modifier: Modifier){
 
 @Composable
 fun MyBottomNavigation(modifier: Modifier,nav: NavHostController, userData: UserData) {
+
     Surface(modifier, shape = RoundedCornerShape(topStart = 16.dp)) {
         NavigationBar( containerColor = Color(0xFFFCE5D8) ) {
 
