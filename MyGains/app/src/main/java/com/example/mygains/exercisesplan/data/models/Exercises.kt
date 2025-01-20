@@ -1,4 +1,4 @@
-package com.example.mygains.exercisesplan.data
+package com.example.mygains.exercisesplan.data.models
 
 data class Exercises(var muscle:String="", var seriesAndReps:MutableList<SeriesAndReps> = mutableListOf(), var excerciseName:String=""){
     fun excercisesListAnyEmpty():Boolean{

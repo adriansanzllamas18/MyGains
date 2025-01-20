@@ -62,12 +62,12 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.mygains.exercisesplan.data.MuscleGroupe
+import com.example.mygains.exercisesplan.data.models.MuscleGroupe
 import com.example.mygains.R
-import com.example.mygains.exercisesplan.data.Exercises
-import com.example.mygains.exercisesplan.data.RoutineDayData
-import com.example.mygains.exercisesplan.data.SeriesAndReps
-import com.example.mygains.exercisesplan.data.ExcerciseType
+import com.example.mygains.exercisesplan.data.models.Exercises
+import com.example.mygains.exercisesplan.data.models.RoutineDayData
+import com.example.mygains.exercisesplan.data.models.SeriesAndReps
+import com.example.mygains.exercisesplan.data.models.ExcerciseType
 import com.example.mygains.extras.utils.FormatterUtils
 import com.example.mygains.login.ui.Loader
 
@@ -374,7 +374,7 @@ fun MuscleGroupCard(group: String, image: Int,onClick : ()-> Unit, isSelected:Bo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyHeader(modifier: Modifier,nav: NavHostController, routineDayData: RoutineDayData, excercisesPlanViewModel: ExcercisesPlanViewModel,showAlert:Boolean) {
+fun MyHeader(modifier: Modifier, nav: NavHostController, routineDayData: RoutineDayData, excercisesPlanViewModel: ExcercisesPlanViewModel, showAlert:Boolean) {
 
     var expanded:Boolean by remember {
         mutableStateOf(false)

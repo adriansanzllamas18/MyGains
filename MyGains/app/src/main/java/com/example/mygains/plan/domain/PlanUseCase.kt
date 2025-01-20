@@ -1,6 +1,6 @@
 package com.example.mygains.plan.domain
 
-import com.example.mygains.exercisesplan.data.RoutineDayData
+import com.example.mygains.exercisesplan.data.models.RoutineDayData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
