@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -118,7 +119,7 @@ fun MyDashBoard(nav:NavHostController){
             bottom.linkTo(parent.bottom)
             start.linkTo(parent.start)
             end.linkTo(parent.end)
-        }, nav, userData =userData  )
+        }.padding(16.dp), nav, userData =userData  )
     }
 
 
@@ -180,7 +181,6 @@ fun MyGainsScaner(modifier: Modifier, nav: NavHostController) {
     Box(modifier) {
         Card(
             modifier= Modifier
-                .fillMaxWidth()
                 .height(100.dp)
                 .clickable { nav.navigate(Routes.GainsScanner.routes) },
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFFFCE5D8))
@@ -191,13 +191,7 @@ fun MyGainsScaner(modifier: Modifier, nav: NavHostController) {
                     composition = composition,
                     progress = progress,
                 )
-                Text(text = "Escanea tus alimentos",
-                    modifier = Modifier.align(Alignment.CenterVertically),
-                    fontWeight = FontWeight.Bold,
-                )
             }
-            
-
         }
     }
 
@@ -350,16 +344,15 @@ fun CaloriesAndSteps(modifier: Modifier){
 @Composable
 fun MyBottomNavigation(modifier: Modifier,nav: NavHostController, userData: UserData) {
 
-    Surface(modifier, shape = RoundedCornerShape(topStart = 16.dp)) {
+    Surface(modifier.height(70.dp), shape = RoundedCornerShape(16.dp)) {
         NavigationBar( containerColor = Color(0xFFFCE5D8) ) {
 
             if (userData.image?.isNotEmpty() == true){
                 NavigationBarItem(selected = false , onClick = { nav.navigate(Routes.Perfil.routes)
-                }, icon = { Image(modifier = Modifier.clip(CircleShape),
-                    contentScale = ContentScale.Crop,
-                    painter = rememberAsyncImagePainter(userData.image),
-                    contentDescription = "perfil"
-                )
+                }, icon = {
+                    AsyncImage(model = userData.image, contentDescription ="Perfil",
+                        modifier = Modifier.clip(CircleShape),
+                        contentScale = ContentScale.Crop)
                 })
             }else{
                 NavigationBarItem(selected = false , onClick = { nav.navigate(Routes.Perfil.routes)
