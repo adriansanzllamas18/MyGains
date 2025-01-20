@@ -12,7 +12,7 @@ import com.example.mygains.login.ui.LoginScreen
 import com.example.mygains.plan.ui.PlanCompossable
 import com.example.mygains.scanproducts.ui.ScanProductComposable
 import com.example.mygains.splashscreen.ui.SplashScreenComposable
-import com.example.mygains.userinfo.ui.UserInfoComposable
+import com.example.mygains.userinfo.ui.screens.UserInfoComposable
 
 
 //En esta pantalla alojamos toda la navegacion de las pantallas de la app

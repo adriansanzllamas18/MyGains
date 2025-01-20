@@ -46,7 +46,7 @@ import androidx.navigation.NavHostController
 import com.example.mygains.R
 import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.login.ui.Loader
-import com.example.mygains.userinfo.data.UserData
+import com.example.mygains.userinfo.data.models.UserData
 
 @Composable
 fun NewUserComposable(newUserViewModel: NewUserViewModel, navHostController: NavHostController, onSignInClick : () -> Unit ) {

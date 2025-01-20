@@ -48,14 +48,12 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -64,8 +62,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.mygains.R
 import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.login.ui.LoginDivider
-import com.example.mygains.plan.ui.PlanViewModel
-import com.example.mygains.userinfo.data.UserData
+import com.example.mygains.userinfo.data.models.UserData
 
 
 @Composable

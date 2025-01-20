@@ -4,9 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mygains.userinfo.data.WeightRegister
-import com.example.mygains.userinfo.data.UserData
-import com.example.mygains.userinfo.domain.UserInfoUseCase
+import com.example.mygains.userinfo.data.models.WeightRegister
+import com.example.mygains.userinfo.data.models.UserData
+import com.example.mygains.userinfo.domain.usecases.UserInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,7 +49,7 @@ class UserInfoViewModel @Inject constructor(private var userInfoUseCase: UserInf
 
     fun getWeightsByTime(since: String){
         viewModelScope.launch (Dispatchers.IO){
-             _listWeights.postValue(userInfoUseCase.getAllWeightsByTime(lastMonth = since))
+             _listWeights.postValue(userInfoUseCase.getAllWeightsByTime(since = since).toMutableList())
         }
     }
 

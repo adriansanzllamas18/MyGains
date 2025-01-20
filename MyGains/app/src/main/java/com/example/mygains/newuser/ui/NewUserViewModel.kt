@@ -14,7 +14,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.mygains.extras.utils.FormatterUtils
 import com.example.mygains.R
 import com.example.mygains.newuser.domain.NewUserUseCase
-import com.example.mygains.userinfo.data.UserData
+import com.example.mygains.userinfo.data.models.UserData
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions

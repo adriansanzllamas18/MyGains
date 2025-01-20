@@ -1,4 +1,4 @@
-package com.example.mygains.userinfo.ui
+package com.example.mygains.userinfo.ui.screens
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
@@ -78,9 +78,9 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.mygains.R
-import com.example.mygains.plan.ui.PlanViewModel
-import com.example.mygains.userinfo.data.WeightRegister
-import com.example.mygains.userinfo.data.UserData
+import com.example.mygains.userinfo.data.models.WeightRegister
+import com.example.mygains.userinfo.data.models.UserData
+import com.example.mygains.userinfo.ui.UserInfoViewModel
 
 import java.time.LocalDate
 
