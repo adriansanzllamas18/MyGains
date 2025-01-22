@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mygains.exercisesplan.data.models.RoutineDayData
-import com.example.mygains.plan.domain.PlanUseCase
+import com.example.mygains.plan.domain.usecases.PlanUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
