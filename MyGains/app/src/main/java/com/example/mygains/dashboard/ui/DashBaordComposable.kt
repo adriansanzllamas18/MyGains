@@ -96,7 +96,7 @@ fun MyDashBoard(nav:NavHostController){
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
-                .padding(24.dp), userData = userData, viewModel = dashBoardViewModel)
+                .padding(top = 34.dp,end = 24.dp, start = 24.dp, bottom = 24.dp), userData = userData, viewModel = dashBoardViewModel)
 
             LoginDivider(modifier = Modifier.constrainAs(divider){
                 top.linkTo(header.bottom)
@@ -112,11 +112,13 @@ fun MyDashBoard(nav:NavHostController){
                 .padding(16.dp),nav)
 
         }
-        MyBottomNavigation(modifier=Modifier.constrainAs(bottomBar){
-            bottom.linkTo(parent.bottom)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-        }.padding(16.dp), nav, userData =userData  )
+        MyBottomNavigation(modifier= Modifier
+            .constrainAs(bottomBar) {
+                bottom.linkTo(parent.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }
+            .padding(16.dp), nav, userData =userData  )
     }
 
 
@@ -273,7 +275,7 @@ fun MyDashBoardHeader(modifier: Modifier, viewModel: DashBoardViewModel, userDat
                 top.linkTo(parent.top)
             })
 
-            Icon(painter = painterResource(id = R.drawable.inbox), contentDescription ="box",
+            Icon(painter = painterResource(id = R.drawable.bandeja_de_entrada), contentDescription ="box",
                 Modifier
                     .constrainAs(buzon) {
                         end.linkTo(parent.end)
@@ -362,11 +364,13 @@ fun MyBottomNavigation(modifier: Modifier,nav: NavHostController, userData: User
             NavigationBarItem(selected = false , onClick = {
 
             }, icon = { Icon(
-                imageVector = Icons.Default.Home,
+                modifier = Modifier.size(24.dp),
+                painter = painterResource(id = R.drawable.hogar),
                 contentDescription = "home"
             )})
             NavigationBarItem(selected = false , onClick = { nav.navigate(Routes.Plan.routes) }, icon = { Icon(
-                imageVector = Icons.Default.DateRange,
+                modifier = Modifier.size(24.dp),
+                painter = painterResource(id = R.drawable.calendario_lineas_boligrafo),
                 contentDescription = "plan"
             )})
         }
