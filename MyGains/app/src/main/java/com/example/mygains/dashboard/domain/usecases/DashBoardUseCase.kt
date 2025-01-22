@@ -1,4 +1,4 @@
-package com.example.mygains.dashboard.domain
+package com.example.mygains.dashboard.domain.usecases
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
