@@ -68,6 +68,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -84,6 +85,7 @@ import com.example.mygains.dashboard.data.models.CaloriesStats
 import com.example.mygains.dashboard.data.models.MacronutrientStats
 import com.example.mygains.dashboard.ui.components.CircularProgressData
 import com.example.mygains.extras.navigationroutes.Routes
+import com.example.mygains.extras.utils.FormatterUtils
 import com.example.mygains.login.ui.LoginDivider
 import com.example.mygains.userinfo.data.models.UserData
 
@@ -232,7 +234,8 @@ fun MyDailyPlan(modifier: Modifier, mutableList: MutableList<Any>) {
         CaloriesStats(
             currentCalories = 1500,
             targetCalories = 2000,
-            burnedCalories = 300
+            burnedCalories = 300,
+            timeOfSleep = 7
         ),
         MacronutrientStats(
             currentFats = 50,
@@ -247,16 +250,14 @@ fun MyDailyPlan(modifier: Modifier, mutableList: MutableList<Any>) {
 
     HorizontalPager(state = rememberPagerState(pageCount = { stats.size }),
         modifier
-            .fillMaxWidth()
-            .height(200.dp),
-        contentPadding = PaddingValues(horizontal = 34.dp)
+            .fillMaxSize(),
+        contentPadding = PaddingValues(horizontal = 16.dp)
     )
     {position ->
 
         Card(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
+                .fillMaxSize()
                 .padding(end = 16.dp),
             colors = CardDefaults.cardColors(containerColor = Color(0xFFFCE5D8))
         ) {
@@ -281,9 +282,9 @@ fun MacronutrientStatsCard(stats: MacronutrientStats) {
         Row(modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically, // Centrado vertical
             horizontalArrangement = Arrangement.Center) {
-            CircularProgressData(current = stats.currentProteins?:0 , goal = stats.targetProteins?:0, type = "P")
-            CircularProgressData(current =stats.currentCarbs?:0 , goal =stats.targetCarbs?:0 , type = "H")
-            CircularProgressData(current = stats.currentFats?:0, goal = stats.targetFats?:0, type =  "G")
+            CircularProgressData(current = stats.currentProteins?:0 , goal = stats.targetProteins?:0, type = "P", sizeCircle = 60)
+            CircularProgressData(current =stats.currentCarbs?:0 , goal =stats.targetCarbs?:0 , type = "H", sizeCircle = 60)
+            CircularProgressData(current = stats.currentFats?:0, goal = stats.targetFats?:0, type =  "G", sizeCircle = 60)
         }
     }
 }
@@ -291,7 +292,39 @@ fun MacronutrientStatsCard(stats: MacronutrientStats) {
 
 @Composable
 fun CaloriesStatsCard(caloriesStats: CaloriesStats) {
+    Column(Modifier.padding(16.dp).fillMaxSize())
+    {
+        Text("Calorías", style = MaterialTheme.typography.titleMedium, color = Color.Black)
+        Spacer(modifier = Modifier.height(16.dp))
 
+        Row(modifier = Modifier.fillMaxWidth()) {
+            CircularProgressData(current = caloriesStats.currentCalories?:0 , goal = caloriesStats.targetCalories?:0, type = "C", sizeCircle = 100)
+            Column(Modifier.fillMaxWidth().padding(start = 16.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                CardStatsView(caloriesStats.currentCalories.toString(),"C")
+                CardStatsView(caloriesStats.targetCalories.toString(),"T")
+                CardStatsView(caloriesStats.burnedCalories.toString(),"E")
+                CardStatsView(caloriesStats.timeOfSleep.toString(),"S")
+            }
+        }
+
+    }
+}
+
+@Composable
+fun CardStatsView(stat:String, type:String) {
+    Row(Modifier.fillMaxWidth().padding(bottom = 4.dp)) {
+        Image(
+            painter = painterResource(id = FormatterUtils().getImageCardByType(type)),
+            contentDescription = "image",
+            modifier = Modifier.size(20.dp)
+        )
+        Text(
+            modifier = Modifier.padding(horizontal = 8.dp).fillMaxWidth(),
+            text = stat,
+            color = Color.Black,
+            fontSize = 14.sp,
+            textAlign = TextAlign.Start)
+    }
 }
 
 

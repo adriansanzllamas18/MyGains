@@ -32,7 +32,7 @@ import com.example.mygains.extras.utils.FormatterUtils
 
 
 @Composable
-fun CircularProgressData(goal:Int, current:Int, type:String){
+fun CircularProgressData(goal:Int, current:Int, type:String, sizeCircle:Int){
 
     val targetProgress = current.toFloat() / goal.toFloat() // Calcula el progreso como un porcentaje (0.0f a 1.0f)
 
@@ -46,13 +46,13 @@ fun CircularProgressData(goal:Int, current:Int, type:String){
     )
 
     Column(
-        modifier =Modifier.padding(8.dp),
+        modifier = Modifier.padding(8.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally)
     {
 
-        Box(modifier = Modifier.size(60.dp), contentAlignment = Alignment.Center) {
-            Canvas(modifier = Modifier.size(60.dp)) {
+        Box(modifier = Modifier.size(sizeCircle.dp), contentAlignment = Alignment.Center) {
+            Canvas(modifier = Modifier.size(sizeCircle.dp)) {
                 val strokeWidth = 8.dp.toPx() // Ancho del círculo y arco
                 val radius = size.minDimension / 2 - strokeWidth / 2 // Calcula el radio
 
@@ -74,7 +74,7 @@ fun CircularProgressData(goal:Int, current:Int, type:String){
 
             }
             Image(
-                modifier = Modifier.size(20.dp),
+                modifier = if (sizeCircle > 60)Modifier.size(40.dp) else Modifier.size(20.dp) ,
                 painter = painterResource(id =FormatterUtils().getImageCardByType(type)),
                 contentDescription = "icon" )
         }

@@ -6,4 +6,5 @@ data class CaloriesStats(
      val currentCalories: Int?=null,
      val targetCalories: Int?=null,
      val burnedCalories: Int?=null,
+     val timeOfSleep:Int?=null
 )

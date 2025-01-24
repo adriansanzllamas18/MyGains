@@ -152,7 +152,11 @@ class FormatterUtils {
         return when(type){
              "P" ->R.drawable.proteina
              "H" ->R.drawable.pan
-             else->R.drawable.grasas_trans
+             "G" ->R.drawable.grasas_trans
+             "T" ->R.drawable.target
+             "E" ->R.drawable.ejercicio
+             "S" ->R.drawable.sueno
+             else->R.drawable.calorias
         }
     }
 
