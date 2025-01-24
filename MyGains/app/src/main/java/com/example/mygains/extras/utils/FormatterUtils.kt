@@ -148,6 +148,12 @@ class FormatterUtils {
         }
     }
 
-
+    fun getImageCardByType(type:String):Int{
+        return when(type){
+             "P" ->R.drawable.proteina
+             "H" ->R.drawable.pan
+             else->R.drawable.grasas_trans
+        }
+    }
 
 }
