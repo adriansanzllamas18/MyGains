@@ -50,6 +50,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -68,6 +69,8 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -83,6 +86,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.mygains.R
 import com.example.mygains.dashboard.data.models.CaloriesStats
 import com.example.mygains.dashboard.data.models.MacronutrientStats
+import com.example.mygains.dashboard.ui.components.BannerInfo
 import com.example.mygains.dashboard.ui.components.CircularProgressData
 import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.extras.utils.FormatterUtils
@@ -101,15 +105,18 @@ fun MyDashBoard(nav: NavHostController) {
     dashBoardViewModel.getUserData()
 
     val userData: UserData by dashBoardViewModel.userDataLive.observeAsState(initial = UserData())
+    val state= rememberPullToRefreshState()
 
     PullToRefreshBox(
         modifier = Modifier
             .fillMaxSize()
             .windowInsetsPadding(WindowInsets.systemBars),
         isRefreshing = false, // Simula el estado de carga
+        state = state,
         onRefresh = {
             // TODO: Implementa la lógica de actualización
         }
+
     ) {
         // Estructura principal
         Column(
@@ -124,14 +131,11 @@ fun MyDashBoard(nav: NavHostController) {
                 item {
                     MyDashBoardHeader(
                         modifier = Modifier
-                            .padding(16.dp),
+                            .padding(horizontal = 16.dp),
                         userData = userData,
                         viewModel = dashBoardViewModel
                     )
-
-                    HorizontalDivider(color = colorResource(id = R.color.orange_low))
                 }
-
                 item {
                     MyDashBoardBody(
                         modifier = Modifier
@@ -159,7 +163,7 @@ fun MyDashBoard(nav: NavHostController) {
 fun MyDashBoardBody(modifier: Modifier,nav: NavHostController) {
     Box(modifier) {
         ConstraintLayout(Modifier.fillMaxSize()) {
-            val (dailyPlan, title,counter, scanner) = createRefs()
+            val (dailyPlan, title,currentTrain, scanner) = createRefs()
 
             Text(text = "Hoy", fontSize = 24.sp,fontFamily = FontFamily(Font(R.font.poppinsbold)), modifier = Modifier
                 .constrainAs(title) {
@@ -174,21 +178,30 @@ fun MyDashBoardBody(modifier: Modifier,nav: NavHostController) {
                 start.linkTo(parent.start)
             }, mutableListOf())
 
-            CaloriesAndSteps(modifier = Modifier
-                .constrainAs(counter) {
-                    top.linkTo(dailyPlan.bottom)
-                    start.linkTo(parent.start)
-                }
-                .padding(top = 16.dp))
+            TodayTarget(
+                Modifier
+                    .constrainAs(currentTrain) {
+                        top.linkTo(dailyPlan.bottom)
+                        start.linkTo(parent.start)
+                    }
+                    .padding(horizontal = 8.dp, vertical = 16.dp))
 
             MyGainsScaner(modifier = Modifier
                 .constrainAs(scanner) {
-                    top.linkTo(counter.bottom)
+                    top.linkTo(currentTrain.bottom)
                     start.linkTo(parent.start)
                 }
                 .padding(top = 16.dp), nav =nav )
         }
 
+    }
+}
+
+@Composable
+fun TodayTarget(modifier: Modifier) {
+
+    Box(modifier) {
+        BannerInfo(R.drawable.fuerza,{})
     }
 }
 
@@ -246,28 +259,41 @@ fun MyDailyPlan(modifier: Modifier, mutableList: MutableList<Any>) {
             targetCarbs = 250
         )
     )
+    Column(modifier.fillMaxSize()) {
 
+        HorizontalPager(state = rememberPagerState(pageCount = { stats.size }),
+            Modifier
+                .fillMaxSize(),
+            contentPadding = PaddingValues(horizontal = 16.dp)
+        )
+        {position ->
 
-    HorizontalPager(state = rememberPagerState(pageCount = { stats.size }),
-        modifier
-            .fillMaxSize(),
-        contentPadding = PaddingValues(horizontal = 16.dp)
-    )
-    {position ->
-
-        Card(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(end = 16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFFCE5D8))
-        ) {
-            when(val stat = stats[position]){
-                is CaloriesStats -> CaloriesStatsCard(stat)
-                is MacronutrientStats-> MacronutrientStatsCard(stat)
-                else -> {}
+            Card(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(end = 16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFFCE5D8))
+            ) {
+                when(val stat = stats[position]){
+                    is CaloriesStats -> CaloriesStatsCard(stat)
+                    is MacronutrientStats-> MacronutrientStatsCard(stat)
+                    else -> {}
+                }
             }
         }
+
+        Text(
+            modifier = Modifier.padding(8.dp),
+            text = "Siempre puedes modificar tus macros ajustandose a tus objetivos.",
+            fontSize = 12.sp,
+            color = Color.LightGray,
+            fontWeight = FontWeight.Bold,
+            fontFamily = FontFamily.SansSerif,
+            fontStyle = FontStyle.Italic,
+            textAlign = TextAlign.Center
+            )
     }
+
 
 }
 
@@ -292,14 +318,20 @@ fun MacronutrientStatsCard(stats: MacronutrientStats) {
 
 @Composable
 fun CaloriesStatsCard(caloriesStats: CaloriesStats) {
-    Column(Modifier.padding(16.dp).fillMaxSize())
+    Column(
+        Modifier
+            .padding(16.dp)
+            .fillMaxSize())
     {
         Text("Calorías", style = MaterialTheme.typography.titleMedium, color = Color.Black)
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(modifier = Modifier.fillMaxWidth()) {
             CircularProgressData(current = caloriesStats.currentCalories?:0 , goal = caloriesStats.targetCalories?:0, type = "C", sizeCircle = 100)
-            Column(Modifier.fillMaxWidth().padding(start = 16.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                 CardStatsView(caloriesStats.currentCalories.toString(),"C")
                 CardStatsView(caloriesStats.targetCalories.toString(),"T")
                 CardStatsView(caloriesStats.burnedCalories.toString(),"E")
@@ -312,14 +344,19 @@ fun CaloriesStatsCard(caloriesStats: CaloriesStats) {
 
 @Composable
 fun CardStatsView(stat:String, type:String) {
-    Row(Modifier.fillMaxWidth().padding(bottom = 4.dp)) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(bottom = 4.dp)) {
         Image(
             painter = painterResource(id = FormatterUtils().getImageCardByType(type)),
             contentDescription = "image",
             modifier = Modifier.size(20.dp)
         )
         Text(
-            modifier = Modifier.padding(horizontal = 8.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .fillMaxWidth(),
             text = stat,
             color = Color.Black,
             fontSize = 14.sp,
@@ -335,7 +372,7 @@ fun MyDashBoardHeader(modifier: Modifier, viewModel: DashBoardViewModel, userDat
 
     Box(modifier.fillMaxWidth()) {
         ConstraintLayout(Modifier.fillMaxWidth()) {
-            val (name, buzon,motivaion,handicon) = createRefs()
+            val (name, buzon,motivaion,handicon,divider) = createRefs()
             Text(text = "Hola ${userData.name}!", fontSize = 28.sp,fontFamily = FontFamily(Font(R.font.poppinsbold)), modifier = Modifier.constrainAs(name){
                 start.linkTo(parent.start)
                 top.linkTo(parent.top)
@@ -363,7 +400,14 @@ fun MyDashBoardHeader(modifier: Modifier, viewModel: DashBoardViewModel, userDat
                     }
                     .padding(top = 8.dp)
                     .size(25.dp))
+
+            HorizontalDivider(color = colorResource(id = R.color.orange_low), modifier = Modifier
+                .constrainAs(divider) {
+                    top.linkTo(motivaion.bottom)
+                }
+                .padding(vertical = 16.dp))
         }
+
     }
 }
 
