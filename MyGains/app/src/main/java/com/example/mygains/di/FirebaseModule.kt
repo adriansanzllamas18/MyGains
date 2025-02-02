@@ -29,4 +29,12 @@ class FirebaseModule {
     fun provideFirebaseFirestore():FirebaseFirestore{
         return Firebase.firestore
     }
+
+    @Singleton
+    @Provides
+    fun privideUidCurrentUser(): String? {
+        return FirebaseAuth.getInstance().uid
+    }
+
+
 }

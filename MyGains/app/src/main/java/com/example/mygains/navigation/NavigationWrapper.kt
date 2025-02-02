@@ -10,6 +10,7 @@ import com.example.mygains.exercisesplan.ui.ExcercisesPlanCompossable
 import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.login.ui.LoginScreen
 import com.example.mygains.plan.ui.PlanCompossable
+import com.example.mygains.routinedetail.ui.RoutineDetailCompossable
 import com.example.mygains.scanproducts.ui.ScanProductComposable
 import com.example.mygains.splashscreen.ui.SplashScreenComposable
 import com.example.mygains.userinfo.ui.screens.UserInfoComposable
@@ -35,6 +36,6 @@ fun  NavigationWrapper() {
         composable(Routes.ExcercisesPlan.routes){ backStackEntry->
             ExcercisesPlanCompossable(nav = navigationController, backStackEntry.arguments?.getString("date").orEmpty())
         }
-        composable(Routes.GainsScanner.routes){ ScanProductComposable() }
+        composable(Routes.GainsScanner.routes){ RoutineDetailCompossable() }
     }
 }
