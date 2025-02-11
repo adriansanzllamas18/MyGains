@@ -6,7 +6,7 @@ import com.example.mygains.routinedetail.domain.usecases.usecaseinterfaces.Routi
 import javax.inject.Inject
 
 class RoutineDetailUseCase @Inject constructor(val repositoryImpl: RoutineDetailRepositoryImpl):RoutineDetailUsecaseinterface {
-    override suspend fun getRoutineOfDay(currentDate: String):  MutableList<RoutineDetailModel> {
+    override suspend fun getRoutineOfDay(currentDate: String): RoutineDetailModel? {
         return repositoryImpl.getRoutineOfDay(currentDate)
     }
 

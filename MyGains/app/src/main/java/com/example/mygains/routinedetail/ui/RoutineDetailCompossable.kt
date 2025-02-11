@@ -1,7 +1,5 @@
 package com.example.mygains.routinedetail.ui
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -20,17 +19,15 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.State
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,8 +36,9 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.mygains.R
-import com.example.mygains.extras.utils.FormatterUtils
 import com.example.mygains.routinedetail.data.RoutineDetailModel
+import java.time.LocalDate
+import java.util.Date
 
 @Preview(showBackground = true)
 @Composable
@@ -49,12 +47,8 @@ fun RoutineDetailCompossable() {
 
     val routineDetailViewModel: RoutineDetailViewModel = hiltViewModel()
 
-    val routineDetailModel by  routineDetailViewModel.routineDetailModelLife.observeAsState(
-        mutableListOf<RoutineDetailModel>()
-    )
-
-    val sliderPosition by  routineDetailViewModel.currentPageLife.observeAsState(
-      0
+    val routineDetailModel =  routineDetailViewModel.routineDetailModelLife.observeAsState(
+        RoutineDetailModel()
     )
 
 
@@ -65,30 +59,25 @@ fun RoutineDetailCompossable() {
         state = rememberLazyListState()
         ) {
         item {
-          RoutineHeader()
+            RoutineHeader(routineDetailModel)
         }
 
         item {
-           RoutineSlider(routineDetailModel,routineDetailViewModel)
+            RoutineSlider()
         }
 
         item {
-                AnimatedVisibility(visible = routineDetailModel.isNotEmpty() ) {
-                    RoutineGlobalInfo(routineDetailModel,sliderPosition)
-            }
-
+            RoutineGlobalInfo()
         }
+
         item {
-            AnimatedVisibility(visible = routineDetailModel.isNotEmpty() ) {
-                RoutineExercises(routineDetailModel,sliderPosition)
-            }
+            RoutineExercises()
         }
     }
 }
 
 @Composable
-fun RoutineExercises(routineDetailModel: MutableList<RoutineDetailModel>,sliderPosition:Int) {
-
+fun RoutineExercises() {
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Center) {
         Text(
             text = "Ejercicios",
@@ -99,7 +88,7 @@ fun RoutineExercises(routineDetailModel: MutableList<RoutineDetailModel>,sliderP
             .fillMaxWidth()
             .horizontalScroll(rememberScrollState())) {
 
-         (1..6).forEach{
+            (1..6).forEach{
 
                 Card(
                     modifier = Modifier
@@ -112,36 +101,32 @@ fun RoutineExercises(routineDetailModel: MutableList<RoutineDetailModel>,sliderP
             }
         }
 
-        RoutineInfoExcercises(routineDetailModel,sliderPosition)
+        RoutineInfoExcercises()
     }
 }
 
 @Composable
-fun RoutineInfoExcercises(routineDetailModel: MutableList<RoutineDetailModel>,sliderPosition: Int) {
+fun RoutineInfoExcercises() {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Text(text = routineDetailModel[sliderPosition].routineDayModel?.exercises?.excerciseName?:"-----")
-        routineDetailModel[sliderPosition].routineDayModel?.exercises?.seriesAndReps?.let {seriesreps->
-                seriesreps.forEach {
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        Text(text = "Serie ${it.serie}º")
-                        Text(text = " Reps:${it.reps}")
-                        Text(text = "kg:${it.weght}")
-                    }
-                }
-            }
+        Text(text = "Nombre del ejercicio")
+        Row(modifier = Modifier.fillMaxWidth()) {
+            Text(text = "serie 1º")
+            Text(text = "Numero de repeticiones")
+            Text(text = "peso por serie")
+        }
     }
 }
 
 
 @Composable
-fun RoutineGlobalInfo(currentPage: MutableList<RoutineDetailModel>, sliderPosition: Int) {
+fun RoutineGlobalInfo() {
     Column(
         Modifier
             .fillMaxWidth()
             .padding(vertical = 16.dp)) {
         Row(Modifier.fillMaxWidth()) {
-            Text(text = "Rutina de ${currentPage[sliderPosition].routineDayModel?.exercises?.muscle?:""}", modifier = Modifier.weight(1f))
-            Text(text = currentPage[sliderPosition].date?:"") // Lunes 17, 18:00 pm todo cambiar formato
+            Text(text = "Rutina de Pecho", modifier = Modifier.weight(1f))
+            Text(text = "Lunes 17, 18:00 pm")
         }
         Row(Modifier.fillMaxWidth()) {
             Text(text = "PlayList", modifier = Modifier.weight(1f))
@@ -161,39 +146,30 @@ fun RoutineGlobalInfo(currentPage: MutableList<RoutineDetailModel>, sliderPositi
 }
 
 @Composable
-fun RoutineSlider(routineDetailModel: MutableList<RoutineDetailModel>,viewModel: RoutineDetailViewModel) {
-    val steSlider = rememberPagerState( pageCount = {routineDetailModel.size})
+fun RoutineSlider() {
     Column(modifier = Modifier
         .fillMaxWidth()
         .padding(vertical = 16.dp)) {
-
         HorizontalPager(
-            state = steSlider,
+            state = rememberPagerState( pageCount = {2}),
             modifier = Modifier.height(200.dp),
-            contentPadding = PaddingValues(8.dp)
-
+            contentPadding = PaddingValues(horizontal = 16.dp)
         ) {
 
-            viewModel.setSliderPosition(steSlider.currentPage)
             Card(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(end = 16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFFCE5D8)),
-                shape = RoundedCornerShape(16.dp), // Borde redondeado
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFFCE5D8))
             ) {
-                Image(painter = painterResource(
-                    id = FormatterUtils().getSliderImageByType(routineDetailModel[steSlider.currentPage].routineDayModel?.exerciseType?:"")),
-                    contentDescription = "imageSlider",
-                    contentScale = ContentScale.Crop)
-            }
 
+            }
         }
     }
 }
 
 @Composable
-fun RoutineHeader() {
+fun RoutineHeader(routineDetailModel: State<RoutineDetailModel?>) {
 
     Row(
         modifier = Modifier.fillMaxWidth(),

@@ -4,5 +4,5 @@ import com.example.mygains.routinedetail.data.RoutineDetailModel
 
 interface RoutineDetailUsecaseinterface {
 
-    suspend fun getRoutineOfDay(currentDate:String):  MutableList<RoutineDetailModel>
+    suspend fun getRoutineOfDay(currentDate:String): RoutineDetailModel?
 }

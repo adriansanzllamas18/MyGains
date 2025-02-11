@@ -160,12 +160,4 @@ class FormatterUtils {
         }
     }
 
-    fun getSliderImageByType(type:String):Int{
-        return when(type){
-            "Fuerza" ->R.drawable.fuerza_slider
-            "Cardio" ->R.drawable.cardio_slider
-            else->R.drawable.fuerza_slider
-        }
-    }
-
 }

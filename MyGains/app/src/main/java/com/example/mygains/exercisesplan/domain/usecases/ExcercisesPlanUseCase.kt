@@ -15,6 +15,12 @@ class ExcercisesPlanUseCase @Inject constructor(private val repository: Excercis
     override suspend fun saveDataRoutine(routineDayData: RoutineDayData):Boolean{
 
         var timeStamp= LocalDateTime.now().toString()
-        return repository.saveDataRoutine(timeStamp,routineDayData)
+        val routineDayDataToSave= hashMapOf(
+            "date" to routineDayData.date,
+            "exerciseType" to routineDayData.exerciseType,
+            "timeOfDay" to routineDayData.timeOfDay,
+            "exercises" to routineDayData.exercises
+        )
+        return repository.saveDataRoutine(timeStamp,routineDayDataToSave)
     }
 }
