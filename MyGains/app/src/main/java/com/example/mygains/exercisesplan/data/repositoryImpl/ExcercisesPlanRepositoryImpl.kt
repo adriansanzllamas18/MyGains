@@ -38,6 +38,7 @@ class ExcercisesPlanRepositoryImpl @Inject constructor(private var firestore: Fi
                     .document(timeStamp)//poner la fecha con hora
                     .set( routineDayDataToSave).await()
 
+                
                 firestore.collection("users")
                     .document(uid)
                     .collection("routineOfDay")
