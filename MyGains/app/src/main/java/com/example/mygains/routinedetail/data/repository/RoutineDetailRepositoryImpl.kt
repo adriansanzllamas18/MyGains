@@ -10,7 +10,7 @@ import okio.IOException
 import javax.inject.Inject
 
 class RoutineDetailRepositoryImpl @Inject constructor( var firestore: FirebaseFirestore, var uid: String?):RoutineDetailRepositoryInterface{
-    override suspend fun getRoutineOfDay(currentDate:String): RoutineDetailModel? {
+    override suspend fun getRoutineOfDay(currentDate:String): MutableList<RoutineDetailModel> {
 
        try {
 
@@ -25,11 +25,11 @@ class RoutineDetailRepositoryImpl @Inject constructor( var firestore: FirebaseFi
           if (result != null && !result.isEmpty) {
               return result.documents.mapNotNull { document->
                   document.toObject(RoutineDetailModel::class.java)
-              }.first()
-          } else return null
+              }.toMutableList()
+          } else return mutableListOf()
 
        }catch (ex: Exception){
-           return null
+           return mutableListOf()
        }
 
     }
