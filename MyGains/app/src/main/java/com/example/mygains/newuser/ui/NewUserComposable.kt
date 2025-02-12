@@ -2,6 +2,7 @@ package com.example.mygains.newuser.ui
 
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,8 +11,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -30,135 +33,125 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.mygains.R
 import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.login.ui.Loader
 import com.example.mygains.userinfo.data.models.UserData
 
 @Composable
-fun NewUserComposable(newUserViewModel: NewUserViewModel, navHostController: NavHostController, onSignInClick : () -> Unit ) {
+fun NewUserComposable( navHostController: NavHostController ) {
 
+
+    val newUserViewModel :NewUserViewModel = hiltViewModel()
     val result:String  by newUserViewModel.resultLive.observeAsState(initial = "")
-
-    ConstraintLayout(
-        Modifier
-            .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.systemBars)) {
-        val (header, body, footer, snack, googleSignIn, alert) = createRefs()
-        HeadScreen(
-            Modifier
-                .constrainAs(header) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                }
-                .padding(16.dp), navHostController)
-
-        BodyInfo(
-            Modifier
-                .constrainAs(body) {
-                    top.linkTo(header.bottom)
-                    start.linkTo(parent.start)
-                }
-                .padding(16.dp), newUserViewModel)
-
-        // Botón para iniciar sesión con Google
-        SignInScreen(onSignInClick = onSignInClick, modifier = Modifier.constrainAs(googleSignIn) {
-            top.linkTo(body.bottom)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-            bottom.linkTo(footer.top, margin = 16.dp)
-        })
+    val isLoading: Boolean by newUserViewModel.isLoadingLive.observeAsState(initial = false)
+    val isAlert by newUserViewModel.isAlertLive.observeAsState(initial = false)
 
 
-        Footer(
-            Modifier
-                .constrainAs(footer) {
-                    bottom.linkTo(parent.bottom)
-                }, newUserViewModel
-        )
+    Column(
+        Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars)) {
 
-        val isLoading: Boolean by newUserViewModel.isLoadingLive.observeAsState(initial = false)
-        Loader(isLoading = isLoading)
+        HeadScreen(navHostController)
 
-
-
-        val isAlert by newUserViewModel.isAlertLive.observeAsState(initial = false)
-
-        if (isAlert){
-            AlertDialog(modifier =  Modifier.constrainAs(alert){
-                top.linkTo(parent.top)
-                end.linkTo(parent.end)
-                top.linkTo(parent.top)
-                bottom.linkTo(parent.bottom)
-
-            },onDismissRequest = { newUserViewModel.showAlert(false)},
-                confirmButton = { Button(onClick = {
-                newUserViewModel.showAlert(false)
-            }
+        LazyColumn(
+            Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Cerrar")
-            }}
-                , title = { Text(text = "Error")},
-                text = { Text(text = result)},
-                icon = { Icon(imageVector = Icons.Default.Info , contentDescription ="error",
-                 tint = Color(LocalContext.current.getColor(R.color.orange)))}, containerColor =Color(0xFFFCE5D8))
-        }
 
-        val loginResult by newUserViewModel.loginResultLive.observeAsState(initial = null)
+            item {
+                RegisterAnimation()
+            }
 
 
-        LaunchedEffect(loginResult) {
-            if (loginResult == true) {
-                navHostController.navigate(Routes.Home.routes) {
-                    // Asegúrate de que no se pueda volver a esta pantalla
-                    popUpTo(Routes.Login.routes) { inclusive = true }
-                }
-            }else if(loginResult == false){
-                navHostController.navigate(Routes.Login.routes) {
-                    // Asegúrate de que no se pueda volver a esta pantalla
-                    popUpTo(Routes.NewUser.routes) { inclusive = true }
+            item {
+                BodyInfo(newUserViewModel)
+            }
+
+            item {
+                if (isAlert){
+                    AlertDialog(onDismissRequest = { newUserViewModel.showAlert(false)},
+                        confirmButton = { Button(onClick = {
+                            newUserViewModel.showAlert(false)
+                        }
+                        ) {
+                            Text(text = "Cerrar")
+                        }}
+                        , title = { Text(text = "Error")},
+                        text = { Text(text = result, textAlign = TextAlign.Center)},
+                        icon = { Icon(imageVector = Icons.Default.Info , contentDescription ="error",
+                            tint = Color(LocalContext.current.getColor(R.color.orange)))}, containerColor =Color(0xFFFCE5D8))
                 }
             }
+
+
+
+            /*Botón para iniciar sesión con Google
+            SignInScreen(onSignInClick = onSignInClick, modifier = Modifier.constrainAs(googleSignIn) {
+                top.linkTo(body.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                bottom.linkTo(footer.top, margin = 16.dp)
+            })*/
+
+            item {
+                Footer(newUserViewModel)
+            }
+
         }
     }
 
 
+    Loader(isLoading = isLoading)
+
 
 }
 
 @Composable
-fun Footer(modifier: Modifier, newUserViewModel: NewUserViewModel) {
+fun Footer( newUserViewModel: NewUserViewModel) {
 
     val buttonEnable : Boolean  by newUserViewModel.buttonLive.observeAsState(initial = false)
 
-    LoginButtonCreate(modifier,buttonEnable, newUserViewModel)
+    LoginButtonCreate(Modifier.fillMaxWidth(),buttonEnable, newUserViewModel)
 }
 
 @Composable
-fun BodyInfo(modifier: Modifier, newUserViewModel: NewUserViewModel) {
+fun BodyInfo(newUserViewModel: NewUserViewModel) {
 
     val user: UserData by newUserViewModel.userLive.observeAsState(initial = UserData())
     val isTextInfoVisible : Boolean  by newUserViewModel.textInfoLive.observeAsState(initial = false)
 
 
-    ConstraintLayout(modifier) {
+    ConstraintLayout(
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp)) {
         val (card,textinfo, icon) = createRefs()
         Card(Modifier.constrainAs(card){},elevation = CardDefaults.cardElevation(defaultElevation = 8.dp), colors = CardDefaults.cardColors(containerColor = Color(color =  0xFFFCE5D8))) {
-            Column(modifier) {
-                Text(text = "Crea tu cuenta", fontSize = 28.sp, fontStyle = FontStyle(R.font.poppinsbold), fontWeight = FontWeight.Bold, color = Color.Black)
+            Column(Modifier.fillMaxWidth()) {
                 NameText(user.name.toString()){newUserViewModel.onParamsChanged(user.copy(name = it))}
                 FirstNameText(user.first_name.toString()){newUserViewModel.onParamsChanged(user.copy(first_name = it))}
                 SecondNameText(user.second_name.toString()){newUserViewModel.onParamsChanged(user.copy(second_name = it))}
@@ -196,10 +189,27 @@ fun BodyInfo(modifier: Modifier, newUserViewModel: NewUserViewModel) {
 
 
 @Composable
-fun HeadScreen(modifier: Modifier, navHostController: NavHostController) {
-    Row(modifier) {
-        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription ="atras",
-            modifier= Modifier.clickable { navHostController.popBackStack() })
+fun HeadScreen(navHostController: NavHostController) {
+
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    )
+    {
+        Icon(painter = painterResource(id = R.drawable.angulo_izquierdo), contentDescription ="atras",
+            modifier= Modifier
+                .clickable { navHostController.popBackStack() }
+                .size(24.dp))
+        Text(
+            modifier = Modifier.padding(start = 16.dp),
+            text = "Crea tú cuenta",
+            fontSize = 28.sp,
+            fontStyle = FontStyle(R.font.poppinsbold),
+            fontWeight = FontWeight.Bold,
+            color = Color.Black
+        )
     }
 }
 
@@ -314,20 +324,38 @@ fun LoginButtonCreate(modifier: Modifier, isButtonEnable:Boolean, newUserViewMod
 
 }
 
+
+
 @Composable
-fun SignInScreen(onSignInClick: () -> Unit, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth() // Ocupar todo el ancho disponible
-            .padding(16.dp), // Aplicar padding
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = "O iniciar sesión con Google")
-        Spacer(modifier = Modifier.height(8.dp))
-        Button(onClick = onSignInClick, modifier = Modifier.fillMaxWidth()) {
-            Text(text = "Iniciar sesión con Google")
-        }
+fun RegisterAnimation() {
+
+    // Carga la composición del recurso Lottie
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.register_animation))
+
+    var isPlaying by remember {
+        mutableStateOf(true)
     }
+    // Animación con progreso controlado
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = isPlaying // Añadido el control de reproducción
+    )
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp)) {
+        // Renderiza la animación
+        LottieAnimation(
+            composition = composition,
+            progress = progress,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(8.dp)
+                .size(200.dp)
+        )
+    }
+
 }
 
 

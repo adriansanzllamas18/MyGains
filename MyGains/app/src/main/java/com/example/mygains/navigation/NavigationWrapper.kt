@@ -9,6 +9,7 @@ import com.example.mygains.dashboard.ui.MyDashBoard
 import com.example.mygains.exercisesplan.ui.ExcercisesPlanCompossable
 import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.login.ui.LoginScreen
+import com.example.mygains.newuser.ui.NewUserComposable
 import com.example.mygains.plan.ui.PlanCompossable
 import com.example.mygains.routinedetail.ui.RoutineDetailCompossable
 import com.example.mygains.scanproducts.ui.ScanProductComposable
@@ -27,6 +28,7 @@ fun  NavigationWrapper() {
         composable(Routes.Home.routes){ MyDashBoard(nav = navigationController) }
         composable(Routes.Login.routes){ LoginScreen(nav = navigationController ) }
         composable(Routes.Perfil.routes){ UserInfoComposable(nav = navigationController) }
+        composable(Routes.NewUser.routes){ NewUserComposable(navHostController = navigationController) }
 
         //refactorizar el apartado del resultactivity para el inicio de sesion con google
         //composable(Routes.NewUser.routes){ NewUserComposable(newUserViewModel = newUserViewmodel, navigationController, onSignInClick = { newUserViewmodel.signInWithGoogle(this@MainActivity,signInLauncher, this@MainActivity)  }) }

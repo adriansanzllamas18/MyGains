@@ -6,9 +6,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mygains.login.domain.LoginUseCase
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import okio.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -76,6 +79,31 @@ class LoginViewModel @Inject constructor(private var loginUseCase: LoginUseCase)
 
     fun showAlert(show: Boolean) {
         if (show) _isAlert.postValue(true) else  _isAlert.postValue(false)
+    }
+
+
+    fun loginWithGoogle(account: GoogleSignInAccount){
+
+        _isLoading.value= true
+
+        viewModelScope.launch(Dispatchers.IO) {
+            var idToken= account.idToken
+
+            if (idToken!= null){
+
+                try {
+
+                    // esto quiere decir que si no devuelve un objeto user es decir que devuelva null significa que ha ido mal el inicio de sesion
+                    _loginResult.postValue(loginUseCase.createUserWithGoogleCredentials(account) != null)
+                    _isLoading.postValue(false)
+
+                }catch (ex:IOException){
+                    _isLoading.postValue(false)
+                    showAlert(true)
+                    _error.postValue("Compruebe la conexión a internet , o intentelo más tarde")
+                }
+            }
+        }
     }
 
 

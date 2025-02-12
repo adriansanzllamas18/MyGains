@@ -1,16 +1,27 @@
 package com.example.mygains.login.ui
 
+import android.content.Intent
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -26,14 +37,19 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
@@ -47,95 +63,111 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.mygains.R
 import com.example.mygains.extras.navigationroutes.Routes
-import com.example.mygains.plan.ui.PlanViewModel
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import org.checkerframework.common.returnsreceiver.qual.This
 
 @Composable()
 //@Preview(showBackground = true)
 fun LoginScreen( nav: NavHostController){
     val loginViewModel: LoginViewModel = hiltViewModel()
 
-    ConstraintLayout(modifier = Modifier
-        .fillMaxSize()
-        .windowInsetsPadding(WindowInsets.systemBars)) {
-        val (header,divider,emailPass,enter,alert) = createRefs()
-        LoginTitle(modifier = Modifier
-            .constrainAs(header) {
-                top.linkTo(parent.top)
-                end.linkTo(parent.end)
-                start.linkTo(parent.start)
-            }
-            .padding(top = 200.dp))
-        LoginDivider(modifier = Modifier
-            .constrainAs(divider) {
-                top.linkTo(header.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }
-            .padding(24.dp))
+    var googleAccount: GoogleSignInAccount? by remember { mutableStateOf(null) }
 
-        LoginEmailPassword(Modifier.constrainAs(emailPass){
-            top.linkTo(divider.bottom)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-        },loginViewModel)
+    val isAlert by loginViewModel.isAlertLive.observeAsState(initial = false)
 
-        LoginButtonEnter(Modifier.constrainAs(enter){
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-            bottom.linkTo(parent.bottom)
-        },loginViewModel, nav)
+    val error by loginViewModel.errorLive.observeAsState(initial = "")
+
+    val isLoading:Boolean  by loginViewModel.isLoadingLive.observeAsState(initial = false)
 
 
-        val isAlert by loginViewModel.isAlertLive.observeAsState(initial = false)
+    // Resultado del inicio de sesión con Google
 
-        val error by loginViewModel.errorLive.observeAsState(initial = "")
-
-
-        if (isAlert){
-            AlertDialog(modifier =  Modifier.constrainAs(alert){
-                top.linkTo(parent.top)
-                end.linkTo(parent.end)
-                top.linkTo(parent.top)
-                bottom.linkTo(parent.bottom)
-
-            },onDismissRequest = { loginViewModel.showAlert(false)},
-                confirmButton = { Button(onClick = {
-                    loginViewModel.showAlert(false)
-                }
-                ) {
-                    Text(text = "Cerrar")
-                }}
-                , title = { Text(text = "Error")},
-                text = { Box(){
-                    Text(text = error, textAlign = TextAlign.Center)
-                }},
-                icon = { Icon(imageVector = Icons.Default.Info , contentDescription ="error",
-                    tint = Color(LocalContext.current.getColor(R.color.orange)))
-                }, containerColor =Color(0xFFFCE5D8))
-        }
-
-
-
-        val isLoading:Boolean  by loginViewModel.isLoadingLive.observeAsState(initial = false)
-        Loader(isLoading = isLoading)
-
-        // Observa el resultado de inicio de sesión
-        val loginResult: Boolean by loginViewModel.loginResultLive.observeAsState(initial = false)
-        //esto hace que una vez cambie solo se cree una vez
-        LaunchedEffect(loginResult) {
-            if (loginResult) {
-                nav.navigate(Routes.Home.routes) {
-                    // Asegúrate de que no se pueda volver a esta pantalla
-                    popUpTo("login") { inclusive = true }
-                }
+    val googleSignInLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            val account = task.result
+            if (account != null) {
+                googleAccount = account
+                loginViewModel.loginWithGoogle(account) // Usamos la cuenta para autenticarnos
+            } else {
+                loginViewModel.showAlert(true)
             }
         }
+    }
 
+        LazyColumn(modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .windowInsetsPadding(WindowInsets.systemBars),
+            state = rememberLazyListState(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        )  {
+
+            item {
+                LoginTitle()
+            }
+
+
+            item {
+                LoginDivider()
+            }
+
+
+            item {
+                LoginEmailPassword(loginViewModel)
+            }
+
+
+            item {
+                LoginButtonEnter(loginViewModel, nav)
+            }
+
+            item {
+                GoogleSignInButton (googleSignInLauncher)
+            }
+
+            item {
+                 if (isAlert){
+                     AlertDialog(modifier = Modifier.fillMaxWidth(),onDismissRequest = { loginViewModel.showAlert(false)},
+                         confirmButton = { Button(onClick = {
+                             loginViewModel.showAlert(false)
+                         }
+
+                         ) {
+                             Text(text = "Cerrar")
+                         }}
+                         , title = { Text(text = "Error")},
+                         text = { Box(){
+                             Text(text = error, textAlign = TextAlign.Center)
+                         }},
+                         icon = { Icon(imageVector = Icons.Default.Info , contentDescription ="error",
+                             tint = Color(LocalContext.current.getColor(R.color.orange)))
+                         }, containerColor =Color(0xFFFCE5D8))
+                 }
+             }
+
+        }
+
+    Loader(isLoading = isLoading)
+
+    // Observa el resultado de inicio de sesión
+    val loginResult: Boolean by loginViewModel.loginResultLive.observeAsState(initial = false)
+    //esto hace que una vez cambie solo se cree una vez
+    LaunchedEffect(loginResult) {
+        if (loginResult) {
+            nav.navigate(Routes.Home.routes) {
+                // Asegúrate de que no se pueda volver a esta pantalla
+                popUpTo("login") { inclusive = true }
+            }
+        }
     }
 }
 
 @Composable
-fun LoginButtonEnter(modifier: Modifier, loginViewModel: LoginViewModel, nav: NavHostController) {
+fun LoginButtonEnter( loginViewModel: LoginViewModel, nav: NavHostController) {
 
     val buttonEnable : Boolean  by loginViewModel.buttonLive.observeAsState(initial = false)
     val email:String  by loginViewModel.emailLive.observeAsState(initial = "")
@@ -143,7 +175,9 @@ fun LoginButtonEnter(modifier: Modifier, loginViewModel: LoginViewModel, nav: Na
 
 
 
-    Column(modifier = modifier){
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(top = 32.dp)){
         Text(text = "¿ Nuevo/a por aquí ? Empieza ahora.",
             Modifier
                 .align(Alignment.CenterHorizontally)
@@ -156,7 +190,7 @@ fun LoginButtonEnter(modifier: Modifier, loginViewModel: LoginViewModel, nav: Na
         Button(onClick = {
             loginViewModel.LogInWithEmailPassword(email,pass)
         }, modifier= Modifier
-            .padding(start = 24.dp, end = 24.dp, bottom = 24.dp)
+            .padding(start = 24.dp, end = 24.dp, bottom = 8.dp)
             .fillMaxWidth()
             ,enabled = buttonEnable,
             colors = ButtonDefaults.buttonColors(containerColor = Color(color = 0xFFCA5300 ))) {
@@ -169,7 +203,7 @@ fun LoginButtonEnter(modifier: Modifier, loginViewModel: LoginViewModel, nav: Na
 }
 
 @Composable
-fun LoginEmailPassword(modifier: Modifier , loginViewModel: LoginViewModel) {
+fun LoginEmailPassword( loginViewModel: LoginViewModel) {
 
     val email:String  by loginViewModel.emailLive.observeAsState(initial = "")
     val pass:String  by loginViewModel.passLive.observeAsState(initial = "")
@@ -178,7 +212,7 @@ fun LoginEmailPassword(modifier: Modifier , loginViewModel: LoginViewModel) {
     // var email = rememberSaveable{ mutableStateOf("") }
     //var pass = rememberSaveable{ mutableStateOf("") }
 
-    Column(modifier) {
+        Column(Modifier.fillMaxWidth()) {
         MyEmailText(email){loginViewModel.onLoginChanged(email= it, pass = pass)}
         MyPassText(pass) { loginViewModel.onLoginChanged(email= email, pass = it)}
         MyTitleForgot(Modifier.align(Alignment.End))
@@ -230,8 +264,10 @@ fun MyEmailText(email: String, onTextChange: (String) -> Unit) {
 }
 
 @Composable
-fun LoginDivider(modifier: Modifier) {
-    Box(modifier = modifier){
+fun LoginDivider() {
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .padding(24.dp)){
         HorizontalDivider(modifier = Modifier
             .height(8.dp),
             color =Color(0xFFFCE5D8))
@@ -240,9 +276,14 @@ fun LoginDivider(modifier: Modifier) {
 
 
 @Composable
-fun LoginTitle(modifier: Modifier) {
-    Box(modifier = modifier ){
-        Text(text = "MyGains", fontSize = 34.sp, fontFamily = FontFamily(Font(R.font.poppins)), color = Color(0xFFCA5300))
+fun LoginTitle() {
+    Box(modifier = Modifier
+        .fillMaxWidth(), contentAlignment = Alignment.Center){
+        Text(text = "MyGains",
+            fontSize = 34.sp,
+            fontFamily = FontFamily(Font(R.font.poppins)),
+            color = Color(0xFFCA5300)
+        )
     }
 }
 
@@ -268,6 +309,42 @@ fun Loader(isLoading:Boolean){
         }
     }
 }
+
+
+@Composable
+fun GoogleSignInButton(googleAccount: ManagedActivityResultLauncher<Intent, ActivityResult>) {
+
+    val context= LocalContext.current
+
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 24.dp, end = 24.dp),
+            onClick = {
+                val signInIntent = GoogleSignIn.getClient(
+                    context,
+                    GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestIdToken("730789139932-b7p0pv037h8si8afh7vchkoj9anknah1.apps.googleusercontent.com") // Web Client ID
+                        .requestEmail()
+                        .build()
+                ).signInIntent
+
+                googleAccount.launch(signInIntent)
+
+            }) {
+            Row() {
+                Image(
+                    painter = painterResource(id = R.drawable.google),
+                    contentDescription ="google icon",
+                    modifier = Modifier.size(24.dp)
+                )
+                Text("Comenzar con  Google", modifier = Modifier.padding(start = 16.dp))
+            }
+
+        }
+
+}
+
 
 
 

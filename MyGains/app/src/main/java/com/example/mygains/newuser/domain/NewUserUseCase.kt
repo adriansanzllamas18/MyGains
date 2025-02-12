@@ -1,39 +1,48 @@
 package com.example.mygains.newuser.domain
 
+import android.accounts.NetworkErrorException
 import android.util.Log
+import com.example.mygains.base.BaseAuthError
+import com.example.mygains.base.BaseResponse
 import com.example.mygains.userinfo.data.models.UserData
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.tasks.Task
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.gson.internal.bind.util.ISO8601Utils
 import kotlinx.coroutines.tasks.await
+import okio.IOException
 import javax.inject.Inject
 
 class NewUserUseCase @Inject constructor(private var  firebaseAuth: FirebaseAuth,private var db:FirebaseFirestore) {
 
-    suspend fun createUserWithEmailPass(userData: UserData): AuthResult? {
-        return firebaseAuth.createUserWithEmailAndPassword(userData.email,userData.pass).await()
-    }
-
-    suspend fun createUserWithGoogleCredentials(account: GoogleSignInAccount?): FirebaseUser? {
-        // Asegúrate de que account no sea nulo y de que el idToken esté disponible
-        val idToken = account?.idToken ?: throw IllegalArgumentException("El idToken es nulo. Verifica la configuración de Google Sign-In.")
-
-        // Crear credenciales de Firebase
-        val credential = GoogleAuthProvider.getCredential(idToken, null)
-
-        // Iniciar sesión con las credenciales
+    suspend fun createUserWithEmailPass(userData: UserData): BaseResponse<String> {
         return try {
-            firebaseAuth.signInWithCredential(credential).await().user
+            firebaseAuth.createUserWithEmailAndPassword(userData.email,userData.pass).await()
+            BaseResponse.Success("Se ha creado con exito.")
+        } catch (e: FirebaseAuthUserCollisionException) {
+        BaseResponse.Error(BaseAuthError.EmailAlreadyExists)
+        } catch (e: FirebaseAuthInvalidCredentialsException) {
+        BaseResponse.Error(BaseAuthError.InvalidCredentials)
+        } catch (e: FirebaseAuthInvalidUserException) {
+        BaseResponse.Error(BaseAuthError.UserNotFound)
+        } catch (e: FirebaseNetworkException) {
+        BaseResponse.Error(BaseAuthError.NetworkError)
         } catch (e: Exception) {
-            Log.e("FirebaseAuth", "Error durante la autenticación: ${e.message}")
-            null // Retorna null en caso de error
+        BaseResponse.Error(BaseAuthError.UnknownError(e.message))
         }
-    }
 
+    }
 
     // Guardar información del usuario en Firestore
     suspend fun saveInfoUser(userData: UserData): Boolean {
