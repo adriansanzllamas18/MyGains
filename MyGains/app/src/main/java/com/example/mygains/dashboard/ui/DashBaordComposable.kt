@@ -201,7 +201,7 @@ fun MyDashBoardBody(modifier: Modifier,nav: NavHostController) {
 fun TodayTarget(modifier: Modifier) {
 
     Box(modifier) {
-        BannerInfo(R.drawable.fuerza,{})
+        BannerInfo(R.drawable.banner_dashboard_calendar,{})
     }
 }
 
