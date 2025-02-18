@@ -1,7 +1,9 @@
 package com.example.mygains.splashscreen.ui
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,9 +16,12 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import com.example.mygains.R
 import com.example.mygains.extras.navigationroutes.Routes
+import com.example.mygains.navigation.AfterAuthNavigationWrapper
+import com.example.mygains.navigation.BeforeAuthNavigationWrapper
 import com.example.mygains.plan.ui.PlanViewModel
 import kotlinx.coroutines.delay
 
@@ -27,18 +32,24 @@ fun SplashScreenComposable(navHostController: NavHostController) {
     val splashViewModel: SplashViewModel = hiltViewModel()
 
     val isAlreadyLoged:Boolean?  by splashViewModel.isAlreadyLogedLive.observeAsState(initial = null)
-    splashViewModel.isAlreadyLoged()
+
+
+
+   /*LaunchedEffect podría ejecutarse antes de que isAlreadyLoged tenga un valor,
+    lo que provoca una navegación errónea, por lo que nos aseguramos que solo sea true o false*/
     LaunchedEffect(isAlreadyLoged) {
 
-        if (isAlreadyLoged==true){
-            delay(2000)
-            navHostController.navigate(Routes.Home.routes){
-                popUpTo(Routes.Splash.routes) { inclusive = true }
-            }
-        }else if (isAlreadyLoged==false){
-            delay(2000)
-            navHostController.navigate(Routes.Login.routes){
-                popUpTo(Routes.Splash.routes) { inclusive = true }
+        if (isAlreadyLoged !=null){
+            if (isAlreadyLoged==true){
+                delay(2000)
+                navHostController.navigate(Routes.Home.routes){
+                    popUpTo(Routes.Splash.routes) { inclusive = true }
+                }
+            }else if (isAlreadyLoged==false){
+                delay(2000)
+                navHostController.navigate(Routes.Login.routes){
+                    popUpTo(Routes.Splash.routes) { inclusive = true }
+                }
             }
         }
 

@@ -14,8 +14,9 @@ import javax.inject.Inject
 @HiltViewModel
 class DashBoardViewModel @Inject constructor(private var infoUseCase: UserInfoUseCase):ViewModel() {
 
-        private val _UserData= MutableLiveData<UserData>()
+    private val _UserData= MutableLiveData<UserData>()
     val userDataLive : LiveData<UserData> = _UserData
+
 
 
     fun getUserData(){
