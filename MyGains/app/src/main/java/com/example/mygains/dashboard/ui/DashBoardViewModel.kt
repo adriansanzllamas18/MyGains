@@ -19,6 +19,10 @@ class DashBoardViewModel @Inject constructor(private var infoUseCase: UserInfoUs
 
 
 
+    init {
+        getUserData()
+    }
+
     fun getUserData(){
          viewModelScope.launch(Dispatchers.IO) {
              _UserData.postValue(infoUseCase.readUserInfo())

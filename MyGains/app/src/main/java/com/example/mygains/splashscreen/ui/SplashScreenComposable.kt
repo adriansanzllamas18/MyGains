@@ -41,14 +41,24 @@ fun SplashScreenComposable(navHostController: NavHostController) {
 
         if (isAlreadyLoged !=null){
             if (isAlreadyLoged==true){
-                delay(2000)
+                delay(100)
                 navHostController.navigate(Routes.Home.routes){
-                    popUpTo(Routes.Splash.routes) { inclusive = true }
+                    popUpTo(Routes.Splash.routes){
+                        saveState=true
+                        inclusive=true
+                    }
+                    launchSingleTop=true
+                    restoreState=true
                 }
             }else if (isAlreadyLoged==false){
-                delay(2000)
+                delay(100)
                 navHostController.navigate(Routes.Login.routes){
-                    popUpTo(Routes.Splash.routes) { inclusive = true }
+                    popUpTo(Routes.Splash.routes){
+                        saveState=true
+                        inclusive=true
+                    }
+                    launchSingleTop=true
+                    restoreState=true
                 }
             }
         }

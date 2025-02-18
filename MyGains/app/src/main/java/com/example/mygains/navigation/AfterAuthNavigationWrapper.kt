@@ -1,5 +1,8 @@
 package com.example.mygains.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -21,7 +24,17 @@ fun AfterAuthNavigationWrapper(
 ) {
 
 
-    NavHost(navController = nav, startDestination = Routes.Home.routes, modifier = modifier) {
+    NavHost(
+        navController = nav,
+        startDestination = Routes.Home.routes,
+        modifier = modifier,
+        enterTransition = {
+            slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(500))
+        },
+        exitTransition = {
+            slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(500))
+        }
+    ) {
         composable(Routes.Home.routes){ MyDashBoard(nav) }
         composable(Routes.Perfil.routes){ UserInfoComposable(nav = nav) }
         //refactorizar el apartado del resultactivity para el inicio de sesion con google

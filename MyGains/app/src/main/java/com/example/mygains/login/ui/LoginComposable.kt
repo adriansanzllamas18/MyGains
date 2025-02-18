@@ -158,11 +158,10 @@ fun LoginScreen( nav: NavHostController){
     //esto hace que una vez cambie solo se cree una vez
     LaunchedEffect(loginResult) {
         if (loginResult) {
-            nav.navigate(Routes.Home.routes) {
-                // Asegúrate de que no se pueda volver a esta pantalla
-                popUpTo("login") { inclusive = true }
+            nav.navigate(Routes.Home.routes){
+                    popUpTo(Routes.Login.routes) { inclusive = true }
+                }
             }
-        }
     }
 }
 
@@ -182,7 +181,17 @@ fun LoginButtonEnter( loginViewModel: LoginViewModel, nav: NavHostController) {
             Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(16.dp)
-                .clickable { nav.navigate(Routes.NewUser.routes) },
+                .clickable {
+                    nav.navigate(Routes.NewUser.routes){
+
+                        popUpTo(Routes.Login.routes) { // Mantiene Login en la pila  ya que el splash lo hemos borrado desde su screen
+                            inclusive = false // No borra Login, para que su estado se mantenga
+                            saveState = true // Guarda su estado para restaurarlo al volver
+                        }
+                        launchSingleTop = true // Evita duplicar NewUser
+                        restoreState = true // Restaura el estado si ya se visitó antes
+                    }
+                           },
             color = Color(0xFFCA5300),
             textDecoration = TextDecoration.Underline,
 

@@ -200,7 +200,16 @@ fun HeadScreen(navHostController: NavHostController) {
     {
         Icon(painter = painterResource(id = R.drawable.angulo_izquierdo), contentDescription ="atras",
             modifier= Modifier
-                .clickable { navHostController.popBackStack() }
+                .clickable {
+                    navHostController.navigate(Routes.Login.routes){
+                        popUpTo(Routes.Login.routes) { // Mantiene Login en la pila y ya que el splash lo hemos borrado desde su screen
+                            inclusive = false
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
                 .size(24.dp))
         Text(
             modifier = Modifier.padding(start = 16.dp),

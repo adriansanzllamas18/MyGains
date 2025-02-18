@@ -60,6 +60,7 @@ fun MyApp() {
 
     val navController = rememberNavController()
     // El wrapper de antes de la autenticación (Splash, Login, etc.)
+
     BeforeAuthNavigationWrapper(
         modifier = Modifier.fillMaxWidth(),
         nav = navController
