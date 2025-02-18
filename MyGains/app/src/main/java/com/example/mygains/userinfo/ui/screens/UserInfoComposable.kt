@@ -99,7 +99,6 @@ fun UserInfoComposable(nav: NavHostController) {
         modifier = Modifier
             .padding(16.dp)
             .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.systemBars)
     ) {
 
         UserInfoHeader(

@@ -7,6 +7,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
@@ -42,6 +44,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -74,6 +77,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -109,8 +113,7 @@ fun MyDashBoard(nav: NavHostController) {
 
     PullToRefreshBox(
         modifier = Modifier
-            .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.systemBars),
+            .fillMaxSize(),
         isRefreshing = false, // Simula el estado de carga
         state = state,
         onRefresh = {
@@ -144,16 +147,6 @@ fun MyDashBoard(nav: NavHostController) {
                     )
                 }
             }
-
-            // Navegación inferior anclada al fondo
-            MyBottomNavigation(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(80.dp)
-                    .padding(8.dp),
-                nav = nav,
-                userData = userData
-            )
         }
     }
 }
@@ -163,7 +156,7 @@ fun MyDashBoard(nav: NavHostController) {
 fun MyDashBoardBody(modifier: Modifier,nav: NavHostController) {
     Box(modifier) {
         ConstraintLayout(Modifier.fillMaxSize()) {
-            val (dailyPlan, title,currentTrain, scanner) = createRefs()
+            val (dailyPlan, title,currentTrain, gymrat) = createRefs()
 
             Text(text = "Hoy", fontSize = 24.sp,fontFamily = FontFamily(Font(R.font.poppinsbold)), modifier = Modifier
                 .constrainAs(title) {
@@ -186,15 +179,39 @@ fun MyDashBoardBody(modifier: Modifier,nav: NavHostController) {
                     }
                     .padding(horizontal = 8.dp, vertical = 16.dp))
 
-            MyGainsScaner(modifier = Modifier
-                .constrainAs(scanner) {
+            GymRatBasics(modifier = Modifier
+                .constrainAs(gymrat) {
                     top.linkTo(currentTrain.bottom)
                     start.linkTo(parent.start)
                 }
-                .padding(top = 16.dp), nav =nav )
+                .padding(top = 16.dp),nav)
         }
 
     }
+}
+
+@Composable
+fun GymRatBasics(modifier: Modifier,nav: NavHostController){
+
+    Column(modifier) {
+        Text(
+            text = "GymRat",
+            fontSize = 24.sp,fontFamily = FontFamily(Font(R.font.poppinsbold)),
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        Row {
+            MyGainsScaner( nav = nav )
+            MySuplementation()
+        }
+
+
+    }
+
+}
+
+@Composable
+fun MySuplementation() {
+
 }
 
 @Composable
@@ -206,10 +223,10 @@ fun TodayTarget(modifier: Modifier) {
 }
 
 @Composable
-fun MyGainsScaner(modifier: Modifier, nav: NavHostController) {
+fun MyGainsScaner( nav: NavHostController) {
 
     // Carga la composición del recurso Lottie
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.scandasboardanimation))
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.scanner_dashboard))
 
     var isPlaying by remember {
         mutableStateOf(true)
@@ -221,18 +238,30 @@ fun MyGainsScaner(modifier: Modifier, nav: NavHostController) {
         isPlaying = isPlaying // Añadido el control de reproducción
     )
 
-    Box(modifier) {
+    Box(Modifier.fillMaxWidth()) {
         Card(
             modifier= Modifier
-                .height(100.dp)
                 .clickable { nav.navigate(Routes.GainsScanner.routes) },
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFFFCE5D8))
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFFCE5D8))
         ) {
-            Row {
+            Row(
+                Modifier.padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
                 LottieAnimation(
-                    modifier = Modifier.padding(8.dp),
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(50.dp),
                     composition = composition,
                     progress = progress,
+                )
+                
+                Text(
+                    text = "Escanear alimentos",
+                    fontSize = 16.sp ,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Black
                 )
             }
         }
@@ -447,44 +476,6 @@ fun CaloriesAndSteps(modifier: Modifier){
             }
         }
 
-
-}
-
-@Composable
-fun MyBottomNavigation(modifier: Modifier,nav: NavHostController, userData: UserData) {
-
-    Surface(modifier.height(70.dp), shape = RoundedCornerShape(16.dp)) {
-        NavigationBar( containerColor = Color(0xFFFCE5D8) ) {
-
-            if (userData.image?.isNotEmpty() == true){
-                NavigationBarItem(selected = false , onClick = { nav.navigate(Routes.Perfil.routes)
-                }, icon = {
-                    AsyncImage(model = userData.image, contentDescription ="Perfil",
-                        modifier = Modifier.clip(CircleShape),
-                        contentScale = ContentScale.Crop)
-                })
-            }else{
-                NavigationBarItem(selected = false , onClick = { nav.navigate(Routes.Perfil.routes)
-                }, icon = { Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "perfil"
-                )})
-            }
-
-            NavigationBarItem(selected = false , onClick = {
-
-            }, icon = { Icon(
-                modifier = Modifier.size(24.dp),
-                painter = painterResource(id = R.drawable.hogar),
-                contentDescription = "home"
-            )})
-            NavigationBarItem(selected = false , onClick = { nav.navigate(Routes.Plan.routes) }, icon = { Icon(
-                modifier = Modifier.size(24.dp),
-                painter = painterResource(id = R.drawable.calendario_lineas_boligrafo),
-                contentDescription = "plan"
-            )})
-        }
-    }
 
 }
 

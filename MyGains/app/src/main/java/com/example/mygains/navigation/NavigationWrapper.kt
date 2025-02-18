@@ -2,6 +2,8 @@ package com.example.mygains.navigation
 
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -12,18 +14,16 @@ import com.example.mygains.login.ui.LoginScreen
 import com.example.mygains.newuser.ui.NewUserComposable
 import com.example.mygains.plan.ui.PlanCompossable
 import com.example.mygains.routinedetail.ui.RoutineDetailCompossable
-import com.example.mygains.scanproducts.ui.ScanProductComposable
 import com.example.mygains.splashscreen.ui.SplashScreenComposable
 import com.example.mygains.userinfo.ui.screens.UserInfoComposable
 
 
 //En esta pantalla alojamos toda la navegacion de las pantallas de la app
 @Composable
-fun  NavigationWrapper() {
+fun  NavigationWrapper(modifier: Modifier, navigationController:NavHostController) {
 
-    val navigationController= rememberNavController()
 
-    NavHost(navController = navigationController, startDestination = "splash") {
+    NavHost(navController = navigationController, startDestination = "splash", modifier = modifier) {
         composable(Routes.Splash.routes){ SplashScreenComposable(navHostController = navigationController) }
         composable(Routes.Home.routes){ MyDashBoard(nav = navigationController) }
         composable(Routes.Login.routes){ LoginScreen(nav = navigationController ) }
