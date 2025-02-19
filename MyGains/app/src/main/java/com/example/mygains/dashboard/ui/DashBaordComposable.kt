@@ -89,7 +89,7 @@ fun MyDashBoard(nav: NavHostController) {
     val state= rememberPullToRefreshState()
 
 
-        PullToRefreshBox(
+    PullToRefreshBox(
             modifier = Modifier
                 .fillMaxSize(),
             isRefreshing = false, // Simula el estado de carga
@@ -417,44 +417,6 @@ fun MyDashBoardHeader(modifier: Modifier, viewModel: DashBoardViewModel, userDat
 
     }
 }
-
-@Composable
-fun CaloriesAndSteps(modifier: Modifier){
-    Row(modifier = modifier){
-            Card(
-                Modifier
-                    .weight(1f)
-                    .padding(end = 4.dp), elevation = CardDefaults.cardElevation(defaultElevation = 8.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFFFCE5D8))) {
-                Text(text = "Pasos",
-                    Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(top = 8.dp),
-                    color = Color.Black,fontFamily = FontFamily(Font(R.font.poppinsbold)))
-                Text(text = "20000000",
-                    Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(top = 8.dp, bottom = 8.dp),
-                    color = Color.Black,fontFamily = FontFamily(Font(R.font.poppinsbold)))
-            }
-
-            Card(
-                Modifier
-                    .weight(1f)
-                    .padding(start = 4.dp), elevation = CardDefaults.cardElevation(defaultElevation = 8.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFFFCE5D8))) {
-                Text(text = "Caloías",
-                    Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(top = 8.dp),
-                    color = Color.Black,fontFamily = FontFamily(Font(R.font.poppinsbold)))
-                Text(text = "8000kcl",
-                    Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(top = 8.dp, bottom = 8.dp),
-                    color = Color.Black,fontFamily = FontFamily(Font(R.font.poppinsbold)))
-            }
-        }
-}
-
 
 
 

@@ -3,6 +3,7 @@ package com.example.mygains.dashboard.ui
 import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -20,27 +21,38 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.example.mygains.R
+import com.example.mygains.dashboard.data.models.BottomBarItem
+import com.example.mygains.dashboard.data.models.BottomFloatingItemBar
 import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.navigation.AfterAuthNavigationWrapper
+import com.example.mygains.userinfo.data.models.UserData
 
 
 @Composable
 fun HomeScreen() {
 
     val navHostController= rememberNavController()
+
+    var dashBoardViewModel:DashBoardViewModel= hiltViewModel()
+    val imageUser  by dashBoardViewModel.userDataLive.observeAsState(UserData())
+
     Scaffold(bottomBar = {
-        MyBottomNavigation(navHostController )
+        MyBottomNavigation(navHostController,imageUser.image?:"")
     }) {innerPading->
         Box{ AfterAuthNavigationWrapper(nav = navHostController, modifier = Modifier.padding(innerPading)) }
     }
@@ -48,198 +60,80 @@ fun HomeScreen() {
 
 
 @Composable
-fun MyBottomNavigation(nav: NavHostController) {
+fun MyBottomNavigation(nav: NavHostController, image: String) {
 
 
     val navBackStackEntry by nav.currentBackStackEntryAsState()
     val currentDestination= navBackStackEntry ?.destination
 
+    val itemList = mutableListOf(
+        BottomBarItem.Profile(image),
+        BottomBarItem.Home(),
+        BottomBarItem.Plan()
+    )
+    val floatingItemList= mutableListOf(
+        BottomFloatingItemBar.Profile(image),
+        BottomFloatingItemBar.Home(),
+        BottomFloatingItemBar.Plan()
+    )
+
     Box(
         modifier = Modifier
             .fillMaxWidth(),
-        contentAlignment = Alignment.BottomCenter
+        contentAlignment = Alignment.TopCenter
     ) {
         // FAB dinámico basado en currentComposable
-        when (currentDestination?.route) {
-
-            Routes.Perfil.routes -> {
-                FloatingActionButton(
-                    onClick = { },
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .offset(x = 40.dp, y = (-25).dp)
-                        .zIndex(1f)
-                        .size(80.dp)
-                        .border(
-                            width = 4.dp,
-                            color = Color.White,
-                            shape = CircleShape
-                        ),
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    shape = CircleShape
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "perfil",
-                        modifier = Modifier.size(24.dp)
-                    )
+        floatingItemList.forEach {
+                if (currentDestination?.route== it.rout){
+                    FloatingActionButton(
+                        onClick = { },
+                        modifier = it.modifier.align(it.alignment),
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        shape = CircleShape
+                    ){
+                        it.icon.invoke()
+                    }
                 }
-            }
-            Routes.Home.routes -> {
-                FloatingActionButton(
-                    onClick = { },
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .offset(y = (-25).dp)
-                        .zIndex(1f)
-                        .size(80.dp)
-                        .border(
-                            width = 4.dp,
-                            color = Color.White,
-                            shape = CircleShape
-                        ),
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    shape = CircleShape
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.hogar),
-                        contentDescription = "home",
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-            }
-            Routes.Plan.routes -> {
-                FloatingActionButton(
-                    onClick = { },
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .offset(x = 120.dp, y = (-25).dp)
-                        .zIndex(1f)
-                        .size(80.dp)
-                        .border(
-                            width = 4.dp,
-                            color = Color.White,
-                            shape = CircleShape
-                        ),
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    shape = CircleShape
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.calendario_lineas_boligrafo),
-                        contentDescription = "plan",
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-            }
         }
-
         // BottomBar
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp)
         ) {
+
             NavigationBar(
                 containerColor = Color(0xFFFCE5D8)
             ) {
-                // Perfil
-                if (currentDestination?.route == Routes.Perfil.routes) {
-                    NavigationBarItem(
-                        selected = false,
-                        onClick = { },
-                        icon = { Box(modifier = Modifier.size(24.dp)) }
-                    )
-                } else {
-                    NavigationBarItem(
-                        selected = false,
-                        onClick = {
-                            nav.navigate(Routes.Perfil.routes){
-                                // Solo elimina pantallas de la pila que estén por encima
-                                nav.graph.startDestinationRoute?.let { rout ->
-                                    popUpTo(rout) {
-                                        saveState = true
+                itemList.forEach {
+                    if (currentDestination?.route == it.rout) {
+                        NavigationBarItem(
+                            selected = false,
+                            onClick = { },
+                            icon = { Box(modifier = Modifier.size(24.dp)) }
+                        )
+                    } else {
+                        NavigationBarItem(
+                            selected = false,
+                            onClick = {
+                                nav.navigate(it.rout) {
+                                    // Solo elimina pantallas de la pila que estén por encima
+                                    nav.graph.startDestinationRoute?.let { rout ->
+                                        popUpTo(rout) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
                                 }
-                            }
-                            nav.currentBackStackEntry?.destination?.hierarchy?.forEach {
-                                Log.i("entry",it.route.toString())
-                            }
-
-                        },
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "perfil"
-                            )
-                        }
-                    )
-                }
-
-                // Home
-                if (currentDestination?.route== Routes.Home.routes) {
-                    NavigationBarItem(
-                        selected = false,
-                        onClick = { },
-                        icon = { Box(modifier = Modifier.size(24.dp)) }
-                    )
-                } else {
-                    NavigationBarItem(
-                        selected = false,
-                        onClick = {
-                            nav.navigate(Routes.Home.routes){
-                                // Solo elimina pantallas de la pila que estén por encima
-                                nav.graph.startDestinationRoute?.let { rout ->
-                                    popUpTo(rout) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
+                                nav.currentBackStackEntry?.destination?.hierarchy?.forEach {
+                                    Log.i("entry", it.route.toString())
                                 }
-                            }
 
+                            },
 
-                        },
-                        icon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.hogar),
-                                contentDescription = "home",
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    )
-                }
-
-                // Plan
-                if (currentDestination?.route == Routes.Plan.routes) {
-                    NavigationBarItem(
-                        selected = false,
-                        onClick = { },
-                        icon = { Box(modifier = Modifier.size(24.dp)) }
-                    )
-                } else {
-                    NavigationBarItem(
-                        selected = false,
-                        onClick = {
-                            nav.navigate(Routes.Plan.routes) {
-                                // Solo elimina pantallas de la pila que estén por encima
-                                nav.graph.startDestinationRoute?.let { rout ->
-                                    popUpTo(rout) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            }
-                        },
-                        icon = {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                painter = painterResource(id = R.drawable.calendario_lineas_boligrafo),
-                                contentDescription = "plan"
-                            )
-                        }
-                    )
+                            icon = it.icon
+                        )
+                    }
                 }
             }
         }
