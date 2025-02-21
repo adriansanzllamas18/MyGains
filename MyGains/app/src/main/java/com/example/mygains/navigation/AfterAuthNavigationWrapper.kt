@@ -1,6 +1,8 @@
 package com.example.mygains.navigation
 
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
@@ -29,10 +31,16 @@ fun AfterAuthNavigationWrapper(
         startDestination = Routes.Home.routes,
         modifier = modifier,
         enterTransition = {
-            slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(500))
+            slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(500)) + fadeIn(tween(500))
         },
         exitTransition = {
-            slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(500))
+            slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(500)) + fadeOut(tween(500))
+        },
+        popEnterTransition = {
+            slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(500)) + fadeIn(tween(500))
+        },
+        popExitTransition = {
+            slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(500)) + fadeOut(tween(500))
         }
     ) {
         composable(Routes.Home.routes){ MyDashBoard(nav) }
