@@ -11,6 +11,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.mygains.createroutineprocess.ui.screens.TypeOfTrainingScreen
 import com.example.mygains.dashboard.ui.MyDashBoard
 import com.example.mygains.exercisesplan.ui.ExcercisesPlanCompossable
 import com.example.mygains.extras.navigationroutes.Routes
@@ -53,6 +54,6 @@ fun AfterAuthNavigationWrapper(
         composable(Routes.ExcercisesPlan.routes){ backStackEntry->
             ExcercisesPlanCompossable(nav = nav, backStackEntry.arguments?.getString("date").orEmpty())
         }
-        composable(Routes.GainsScanner.routes){ RoutineDetailCompossable() }
+        composable(Routes.GainsScanner.routes){ TypeOfTrainingScreen() }
     }
 }

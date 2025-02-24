@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.mygains.createroutineprocess.data.repositoryimpl.CreateRoutineRepositoryImpl
 import com.example.mygains.userinfo.data.models.UserData
 import com.example.mygains.userinfo.domain.usecases.UserInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,7 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DashBoardViewModel @Inject constructor(private var infoUseCase: UserInfoUseCase):ViewModel() {
+class DashBoardViewModel @Inject constructor(private var infoUseCase: UserInfoUseCase,var createRoutineRepositoryImpl: CreateRoutineRepositoryImpl):ViewModel() {
 
     private val _UserData= MutableLiveData<UserData>()
     val userDataLive : LiveData<UserData> = _UserData
@@ -22,6 +23,7 @@ class DashBoardViewModel @Inject constructor(private var infoUseCase: UserInfoUs
     init {
         getUserData()
     }
+
 
     fun getUserData(){
          viewModelScope.launch(Dispatchers.IO) {
