@@ -1,6 +1,8 @@
 package com.example.mygains.extras.navigationroutes
 
- sealed class Routes(val routes: String) {
+import com.example.mygains.createroutineprocess.ui.CreateRoutineViewModel
+
+sealed class Routes(val routes: String) {
 
      object Home: Routes("home")
      object Perfil: Routes("perfil")
@@ -12,4 +14,12 @@ package com.example.mygains.extras.navigationroutes
          fun createRout(date: String)="excercisesplan/$date"
      }
      object GainsScanner: Routes("gainsscanner")
- }
+
+     object InfoTypeOfWorkout: Routes("excercisesplan/{muscle_id}"){
+         fun createRout(muscle_id: String)="excercisesplan/$muscle_id"
+     }
+
+    object WorkOuts: Routes("worouts")
+    object TypesWorkOuts: Routes("typesworouts")
+
+}

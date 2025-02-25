@@ -219,7 +219,7 @@ fun MyGainsScaner( nav: NavHostController) {
     Box(Modifier.fillMaxWidth()) {
         Card(
             modifier= Modifier
-                .clickable { nav.navigate(Routes.GainsScanner.routes) },
+                .clickable { nav.navigate(Routes.GainsScanner.routes)},
             colors = CardDefaults.cardColors(containerColor = Color(0xFFFCE5D8))
         ) {
             Row(

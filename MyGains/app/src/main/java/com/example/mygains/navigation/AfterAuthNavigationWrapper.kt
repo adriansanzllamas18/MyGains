@@ -7,16 +7,17 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import com.example.mygains.createroutineprocess.ui.CreateRoutineViewModel
+import com.example.mygains.createroutineprocess.ui.screens.InfoTypeOfWorkout
 import com.example.mygains.createroutineprocess.ui.screens.TypeOfTrainingScreen
 import com.example.mygains.dashboard.ui.MyDashBoard
 import com.example.mygains.exercisesplan.ui.ExcercisesPlanCompossable
 import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.plan.ui.PlanCompossable
-import com.example.mygains.routinedetail.ui.RoutineDetailCompossable
 import com.example.mygains.userinfo.ui.screens.UserInfoComposable
 
 
@@ -26,6 +27,7 @@ fun AfterAuthNavigationWrapper(
     nav: NavHostController
 ) {
 
+    val createRoutineViewModel: CreateRoutineViewModel = hiltViewModel()
 
     NavHost(
         navController = nav,
@@ -54,6 +56,10 @@ fun AfterAuthNavigationWrapper(
         composable(Routes.ExcercisesPlan.routes){ backStackEntry->
             ExcercisesPlanCompossable(nav = nav, backStackEntry.arguments?.getString("date").orEmpty())
         }
-        composable(Routes.GainsScanner.routes){ TypeOfTrainingScreen() }
+        composable(Routes.GainsScanner.routes){ TypeOfTrainingScreen(nav,createRoutineViewModel = createRoutineViewModel)}
+        composable(Routes.TypesWorkOuts.routes){ TypeOfTrainingScreen(nav,createRoutineViewModel) }
+        composable(Routes.InfoTypeOfWorkout.routes) { backStackEntry->
+            InfoTypeOfWorkout(nav , backStackEntry.arguments?.getString("muscle_id").orEmpty(),createRoutineViewModel)
+        }
     }
 }

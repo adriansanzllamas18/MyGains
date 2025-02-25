@@ -106,7 +106,6 @@ fun PlanCompossable(nav: NavHostController) {
             state = lazyListState, // Pasar el estado de LazyList
             modifier = Modifier
                 .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.systemBars)
         ) {
 
             item {
@@ -277,17 +276,8 @@ fun MyHeader(
 
         Row(modifier= modifier.fillMaxWidth()) {
             ConstraintLayout(Modifier.fillMaxWidth()) {
-                val (close,title,add) = createRefs()
+                val (title,add) = createRefs()
 
-                Icon(imageVector =  Icons.Filled.Close, contentDescription ="atras",
-                    Modifier
-                        .constrainAs(close) {
-                            start.linkTo(parent.start)
-                            bottom.linkTo(parent.bottom)
-                            top.linkTo(parent.top)
-                        }
-                        .clickable { nav.popBackStack() }
-                )
                 Icon(painter = painterResource(id = R.drawable.add_exercise), contentDescription = "save",
                     Modifier
                         .constrainAs(add) {

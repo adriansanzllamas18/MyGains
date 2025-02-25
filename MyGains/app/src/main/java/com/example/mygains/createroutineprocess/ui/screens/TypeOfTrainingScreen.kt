@@ -10,27 +10,27 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -48,28 +48,27 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.airbnb.lottie.model.content.CircleShape
 import com.example.mygains.R
 import com.example.mygains.createroutineprocess.data.models.TypeOfWorkOutModel
 import com.example.mygains.createroutineprocess.ui.CreateRoutineViewModel
-import kotlinx.coroutines.delay
+import com.example.mygains.extras.navigationroutes.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
 @Composable
-fun TypeOfTrainingScreen() {
+fun TypeOfTrainingScreen(nav: NavHostController, createRoutineViewModel: CreateRoutineViewModel) {
 
-    val viewModel:CreateRoutineViewModel = hiltViewModel()
-    val workouts by viewModel.workoutsLive.observeAsState(initial = mutableListOf())
+    val workouts by createRoutineViewModel.workoutsLive.observeAsState(initial = mutableListOf())
 
+    LaunchedEffect(Unit) {
+        createRoutineViewModel.getAllWorkOuts()
+    }
 
     PullToRefreshBox(
         modifier = Modifier
@@ -81,18 +80,14 @@ fun TypeOfTrainingScreen() {
     {
         LazyColumn {
             item {
-                MyTypeOfTrainingHeader()
-            }
-
-            item {
-                MyTypeOfTrainingBody(workouts)
+                MyTypeOfTrainingBody(workouts,nav)
             }
         }
     }
 }
 
 @Composable
-fun MyTypeOfTrainingBody(data: MutableList<TypeOfWorkOutModel>) {
+fun MyTypeOfTrainingBody(data: MutableList<TypeOfWorkOutModel>,nav: NavHostController) {
 
     if (data.isEmpty()){
         ShimmerCard()
@@ -101,6 +96,10 @@ fun MyTypeOfTrainingBody(data: MutableList<TypeOfWorkOutModel>) {
             Card(modifier = Modifier
                 .fillMaxWidth()
                 .height(300.dp)
+                .clickable {
+                    if (!typeofworkoutmodel.id_workout.isNullOrEmpty())
+                        nav.navigate(Routes.InfoTypeOfWorkout.createRout(typeofworkoutmodel.id_workout!!))
+                }
                 .padding(vertical = 16.dp),
                 shape = RoundedCornerShape(12)
             ) {
@@ -137,30 +136,6 @@ fun MyTypeOfTrainingBody(data: MutableList<TypeOfWorkOutModel>) {
 
 
 }
-
-
-@Composable
-fun MyTypeOfTrainingHeader() {
-    Row(
-       modifier =  Modifier.fillMaxWidth()
-    )
-    {
-        Icon(
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .size(24.dp),
-            painter = painterResource(id = R.drawable.angulo_izquierdo) ,
-            contentDescription = "BackButton"
-        )
-
-        Text(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            text = "Entrenaminetos",
-            fontSize = 32.sp
-        )
-    }
-}
-
 
 
 
@@ -233,3 +208,5 @@ fun ShimmerCard() {
     }
 
 }
+
+

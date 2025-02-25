@@ -101,10 +101,6 @@ fun UserInfoComposable(nav: NavHostController) {
             .fillMaxSize()
     ) {
 
-        UserInfoHeader(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            nav, result
-        )
         // Este Container será desplazable
         Box(modifier = Modifier.weight(1f)) {
             // ConstraintLayout para organizar el contenido

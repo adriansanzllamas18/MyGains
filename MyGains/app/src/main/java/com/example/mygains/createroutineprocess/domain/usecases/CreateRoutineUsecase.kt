@@ -1,10 +1,9 @@
-package com.example.mygains.createroutineprocess.domain
+package com.example.mygains.createroutineprocess.domain.usecases
 
 import com.example.mygains.base.BaseResponse
+import com.example.mygains.createroutineprocess.data.models.InfoTypeOfWorkOutModel
 import com.example.mygains.createroutineprocess.data.models.TypeOfWorkOutModel
 import com.example.mygains.createroutineprocess.data.repositoryimpl.CreateRoutineRepositoryImpl
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import javax.inject.Inject
 
 class CreateRoutineUsecase @Inject constructor(var createRoutineRepositoryImpl: CreateRoutineRepositoryImpl) {
@@ -12,5 +11,9 @@ class CreateRoutineUsecase @Inject constructor(var createRoutineRepositoryImpl: 
 
     suspend fun getAllWorkouts(): BaseResponse<MutableList<TypeOfWorkOutModel>>{
         return createRoutineRepositoryImpl.getAllTrainingData()
+    }
+
+    suspend fun getAllInfoWorkOuts(workout_id: String):BaseResponse<MutableList<InfoTypeOfWorkOutModel>>{
+        return createRoutineRepositoryImpl.getAllInfoWorkOuts(workout_id)
     }
 }
