@@ -33,20 +33,21 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.mygains.createroutineprocess.data.models.InfoTypeOfWorkOutModel
 import com.example.mygains.createroutineprocess.ui.CreateRoutineViewModel
+import com.example.mygains.extras.navigationroutes.Routes
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InfoTypeOfWorkout(
     nav: NavHostController,
-    muscle_id: String,
+    workout_id: String,
     createRoutineViewModel: CreateRoutineViewModel
 ) {
 
     val list by createRoutineViewModel.infoWorkoutsLive.observeAsState(initial = mutableListOf())
 
     LaunchedEffect(Unit) {
-        createRoutineViewModel.getAllInfoWorkOuts(muscle_id)
+        createRoutineViewModel.getAllInfoWorkOuts(workout_id)
     }
 
     PullToRefreshBox(
@@ -57,27 +58,28 @@ fun InfoTypeOfWorkout(
             .padding(16.dp)
     ) {
         Column {
-            MyBodyInfoWorkOut(list)
+            MyBodyInfoWorkOut(list,nav)
         }
 
     }
 }
 
 @Composable
-fun MyBodyInfoWorkOut(infolist:MutableList<InfoTypeOfWorkOutModel>) {
+fun MyBodyInfoWorkOut(infolist:MutableList<InfoTypeOfWorkOutModel>,nav: NavHostController) {
 
     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-        items(infolist){
+        items(infolist){data->
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
                     .padding(vertical = 16.dp, horizontal = 8.dp),
-                shape = RoundedCornerShape(12)
+                shape = RoundedCornerShape(12),
+                onClick = {nav.navigate(Routes.Exercises.createRout(data.muscle_id?:""))}
             ) {
                 Box(contentAlignment = Alignment.BottomStart) {
                     AsyncImage(
-                        model = it.image,
+                        model = data.image,
                         contentDescription = "Character Of the day",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
@@ -94,7 +96,7 @@ fun MyBodyInfoWorkOut(infolist:MutableList<InfoTypeOfWorkOutModel>) {
                     )
 
                     Text(
-                        it.muscleName ?: "",
+                        data.muscleName ?: "",
                         fontSize = 20.sp,
                         maxLines = 1,
                         minLines = 1,

@@ -12,6 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.mygains.createroutineprocess.ui.CreateRoutineViewModel
+import com.example.mygains.createroutineprocess.ui.screens.ExercisesToAddRoutine
 import com.example.mygains.createroutineprocess.ui.screens.InfoTypeOfWorkout
 import com.example.mygains.createroutineprocess.ui.screens.TypeOfTrainingScreen
 import com.example.mygains.dashboard.ui.MyDashBoard
@@ -59,7 +60,11 @@ fun AfterAuthNavigationWrapper(
         composable(Routes.GainsScanner.routes){ TypeOfTrainingScreen(nav,createRoutineViewModel = createRoutineViewModel)}
         composable(Routes.TypesWorkOuts.routes){ TypeOfTrainingScreen(nav,createRoutineViewModel) }
         composable(Routes.InfoTypeOfWorkout.routes) { backStackEntry->
-            InfoTypeOfWorkout(nav , backStackEntry.arguments?.getString("muscle_id").orEmpty(),createRoutineViewModel)
+            InfoTypeOfWorkout(nav , backStackEntry.arguments?.getString("workout_id").orEmpty(),createRoutineViewModel)
+        }
+
+        composable(Routes.Exercises.routes) { backStackEntry->
+            ExercisesToAddRoutine(nav , backStackEntry.arguments?.getString("muscle_id").orEmpty(),createRoutineViewModel)
         }
     }
 }

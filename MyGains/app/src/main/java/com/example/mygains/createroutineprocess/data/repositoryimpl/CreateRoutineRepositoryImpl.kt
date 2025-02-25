@@ -3,6 +3,7 @@ package com.example.mygains.createroutineprocess.data.repositoryimpl
 import com.example.mygains.base.BaseAuthError
 import com.example.mygains.base.BaseResponse
 import com.example.mygains.createroutineprocess.data.models.InfoTypeOfWorkOutModel
+import com.example.mygains.createroutineprocess.data.models.StrengthExerciseModel
 import com.example.mygains.createroutineprocess.data.models.TypeOfWorkOutModel
 import com.example.mygains.createroutineprocess.domain.repositoryInterfaces.CreateRoutineRepositoryInterface
 import com.google.firebase.auth.FirebaseAuth
@@ -13,6 +14,7 @@ import javax.inject.Inject
 
 class CreateRoutineRepositoryImpl @Inject constructor(var firestore: FirebaseFirestore, var firebaseAuth: FirebaseAuth):
     CreateRoutineRepositoryInterface {
+
     override suspend fun getAllTrainingData(): BaseResponse<MutableList<TypeOfWorkOutModel>> {
       return try {
           val data =  firestore.collection("workouts").get().await()
@@ -28,6 +30,15 @@ class CreateRoutineRepositoryImpl @Inject constructor(var firestore: FirebaseFir
             return BaseResponse.Success(result.toObjects(InfoTypeOfWorkOutModel::class.java))
 
         }catch (ex: IOException){
+            return BaseResponse.Error(BaseAuthError.UnknownError(ex.message))
+        }
+    }
+
+    override suspend fun getAllExercises(muscle_id: String): BaseResponse<MutableList<StrengthExerciseModel>> {
+        try {
+            val data= firestore.collection("exercises").whereEqualTo("muscle_group_id", muscle_id).get().await()
+            return BaseResponse.Success(data.toObjects(StrengthExerciseModel::class.java))
+        }catch (ex:Exception){
             return BaseResponse.Error(BaseAuthError.UnknownError(ex.message))
         }
     }

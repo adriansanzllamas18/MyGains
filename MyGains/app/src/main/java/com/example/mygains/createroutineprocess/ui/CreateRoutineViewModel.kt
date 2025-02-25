@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mygains.base.BaseResponse
 import com.example.mygains.createroutineprocess.data.models.InfoTypeOfWorkOutModel
+import com.example.mygains.createroutineprocess.data.models.StrengthExerciseModel
 import com.example.mygains.createroutineprocess.data.models.TypeOfWorkOutModel
 import com.example.mygains.createroutineprocess.domain.usecases.CreateRoutineUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,6 +26,10 @@ class CreateRoutineViewModel @Inject constructor(
     private var _infoWorkouts = MutableLiveData<MutableList<InfoTypeOfWorkOutModel>>()
     val infoWorkoutsLive: MutableLiveData<MutableList<InfoTypeOfWorkOutModel>> = _infoWorkouts
 
+    private var _exercises = MutableLiveData<MutableList<StrengthExerciseModel>>()
+    val exercisesLive: MutableLiveData<MutableList<StrengthExerciseModel>> = _exercises
+
+
 
 
     fun getAllWorkOuts(){
@@ -42,6 +47,15 @@ class CreateRoutineViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             when(val result = createRoutineUsecase.getAllInfoWorkOuts(workout_id)){
                 is BaseResponse.Success->{_infoWorkouts.postValue(result.data)}
+                is BaseResponse.Error->{}
+            }
+        }
+    }
+
+    fun getAllExercises(muscle_id:String){
+        viewModelScope.launch (Dispatchers.IO){
+            when(val result = createRoutineUsecase.getAllExercises(muscle_id)){
+                is BaseResponse.Success->{_exercises.postValue(result.data)}
                 is BaseResponse.Error->{}
             }
         }
