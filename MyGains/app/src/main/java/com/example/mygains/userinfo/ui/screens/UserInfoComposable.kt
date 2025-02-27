@@ -1,5 +1,7 @@
 package com.example.mygains.userinfo.ui.screens
 
+import android.content.Context
+import android.util.DisplayMetrics
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,6 +27,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,6 +42,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -93,67 +98,57 @@ fun UserInfoComposable(nav: NavHostController) {
     val result: UserData by userInfoViewModel.userLive.observeAsState(initial = UserData())
     userInfoViewModel.readUserInfo()
 
-
-    // Usamos un Column que será desplazable
-    Column(
+    // Usamos LazyColumn en lugar de Column para una lista desplazable
+    LazyColumn(
         modifier = Modifier
             .padding(16.dp)
-            .fillMaxSize()
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        // Este Container será desplazable
-        Box(modifier = Modifier.weight(1f)) {
-            // ConstraintLayout para organizar el contenido
-            ConstraintLayout(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()) // Habilitar desplazamiento
-            ) {
-                val (header, image, infotitle, info, progress) = createRefs()
-
-                UserInfoImage(
-                    modifier = Modifier
-                        .constrainAs(image) {
-                            top.linkTo(header.bottom)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        }
-                        .padding(24.dp),
-                    result
-                )
-
-                UserInfoTitle(
-                    modifier = Modifier
-                        .constrainAs(infotitle) {
-                            top.linkTo(image.bottom)
-                            start.linkTo(parent.start)
-                        }
-                        .padding(top = 24.dp, bottom = 24.dp)
-                )
-
-                UserInfiCardView(
-                    modifier = Modifier.constrainAs(info) {
-                        top.linkTo(infotitle.bottom)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    },
-                    result,userInfoViewModel
-                )
-
-                UserDailyProgress(
-                    modifier = Modifier
-                        .constrainAs(progress) {
-                            top.linkTo(info.bottom)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        }
-                        .padding(top = 24.dp, bottom = 24.dp), userInfoViewModel
-                )
-            }
+        // Header, Imagen, Títulos y demás contenidos se agregan como items en LazyColumn
+        item {
+            // Aquí puedes agregar tu header, si es necesario
+            // Por ejemplo, si tienes un encabezado con título o una imagen de portada.
+            Text(
+                text = "Información del Usuario",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
         }
 
+        // Imagen del Usuario
+        item {
+            UserInfoImage(
+                userData = result
+            )
+        }
+
+        // Título de Información del Usuario
+        item {
+            UserInfoTitle(
+                modifier = Modifier.padding(top = 24.dp, bottom = 24.dp)
+            )
+        }
+
+        // Información adicional en tarjeta
+        item {
+            UserInfiCardView(
+                userData = result,
+                infoViewModel = userInfoViewModel
+            )
+        }
+
+        // Progreso diario del usuario
+        item {
+            UserDailyProgress(
+                modifier = Modifier.padding(top = 24.dp, bottom = 24.dp).fillMaxWidth(),
+                userInfoViewModel = userInfoViewModel
+            )
+        }
     }
 }
+
 
 @Composable
 fun UserDailyProgress(modifier: Modifier, userInfoViewModel: UserInfoViewModel) {
@@ -207,168 +202,189 @@ fun UserDailyProgress(modifier: Modifier, userInfoViewModel: UserInfoViewModel) 
                 colors = CardDefaults.cardColors(containerColor = Color.Transparent),
                 shape = RoundedCornerShape(28.dp)
             ) {
-                ConstraintLayout {
-                    val (title, grafico, selectedPoint) = createRefs()
-
-                    Text(
-                        color = Color.Black,
-                        text = "Gráfico de Peso",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                    shape = RoundedCornerShape(28.dp)
+                ) {
+                    Column(
                         modifier = Modifier
-                            .constrainAs(title) {
-                                start.linkTo(parent.start)
-                            }
+                            .fillMaxWidth()
                             .padding(16.dp)
-                    )
-
-                    if (pointTextSelectedText.isNotEmpty()) {
+                    ) {
+                        // Título
                         Text(
-                            color = colorResource(id = R.color.orange),
-                            text = "$pointTextSelectedText kg",
+                            color = Color.Black,
+                            text = "Gráfico de Peso",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier
-                                .constrainAs(selectedPoint) {
-                                    end.linkTo(parent.end)
-                                }
-                                .padding(16.dp)
+                                .padding(bottom = 16.dp) // Espaciado entre el título y el gráfico
                         )
-                    }
 
-                    val dataPoints = mutableListOf<Float>(0f) // Puntos de datos para el gráfico
-                    listweights.forEach { dataPoints.add(it.weight.toFloat()) }
-
-                    // Establecemos los colores y tamaños
-                    val lineColor = colorResource(id = R.color.orange)
-                    val circleColor = colorResource(id = R.color.black)
-                    val strokeWidth = 5f
-
-                    // Animación para el tamaño de los puntos
-                    val infiniteTransition = rememberInfiniteTransition()
-                    val animatedRadii = dataPoints.mapIndexed { index, _ ->
-                        infiniteTransition.animateFloat(
-                            initialValue = 6f, // Tamaño inicial del círculo
-                            targetValue = 14f, // Tamaño máximo del círculo
-                            animationSpec = infiniteRepeatable(
-                                animation = tween(1200, easing = FastOutSlowInEasing),
-                                repeatMode = RepeatMode.Reverse
-                            ), label = ""
-                        )
-                    }
-
-                    // Crear un estado de scroll
-                    val scrollState = rememberScrollState()
-
-                    // Usar LaunchedEffect para desplazar al final del gráfico cuando se cargue
-                    LaunchedEffect(key1 = dataPoints.size) {
-                        scrollState.animateScrollTo(scrollState.maxValue)
-                        // Inicialmente mostrar el último valor
-                        pointTextSelectedText = dataPoints.last().toString()
-                        selectedPointIndex = dataPoints.size - 1 // Seleccionar el último punto por defecto
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .constrainAs(grafico) {
-                                top.linkTo(title.bottom)
+                        // Mostrar el texto del punto seleccionado si no está vacío
+                        if (pointTextSelectedText.isNotEmpty()) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 16.dp), // Espaciado entre el texto del punto y el gráfico
+                                horizontalArrangement = Arrangement.End // Alinear a la derecha
+                            ) {
+                                Text(
+                                    color = colorResource(id = R.color.orange),
+                                    text = "$pointTextSelectedText kg",
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
-                            .horizontalScroll(scrollState) // Permitir desplazamiento horizontal
-                    ) {
-                        Canvas(
-                            Modifier
-                                .padding(end = 8.dp)
-                                .width((dataPoints.size * 20).dp) // Ancho dinámico según la cantidad de puntos
-                                .height(300.dp) // Altura fija del gráfico
-                                .pointerInput(Unit) {
-                                    detectTapGestures { offset ->
-                                        // Detectar cuál punto está más cerca de la posición tocada
-                                        val closestIndex = findClosestPointIndex(
-                                            offset.x,
-                                            offset.y,
-                                            dataPoints,
-                                            size.width.toFloat(),
-                                            size.height.toFloat()
-                                        )
-                                        selectedPointIndex = closestIndex
-                                        // Actualizar el texto del punto seleccionado
-                                        pointTextSelectedText = dataPoints[selectedPointIndex!!].toString()
+                        }
+
+                        // Puntos de datos para el gráfico
+                        val dataPoints = mutableListOf<Float>(0f) // Añadir 0 como primer punto
+                        listweights.forEach { dataPoints.add(it.weight.toFloat()) }
+
+                        // Colores y tamaños
+                        val lineColor = colorResource(id = R.color.orange)
+                        val circleColor = colorResource(id = R.color.black)
+                        val strokeWidth = 5f
+
+                        // Animación para el tamaño de los puntos
+                        val infiniteTransition = rememberInfiniteTransition()
+                        val animatedRadii = dataPoints.mapIndexed { index, _ ->
+                            infiniteTransition.animateFloat(
+                                initialValue = 6f, // Tamaño inicial del círculo
+                                targetValue = 14f, // Tamaño máximo del círculo
+                                animationSpec = infiniteRepeatable(
+                                    animation = tween(1200, easing = FastOutSlowInEasing),
+                                    repeatMode = RepeatMode.Reverse
+                                ), label = ""
+                            )
+                        }
+
+                        // Crear un estado de scroll
+                        val scrollState = rememberScrollState()
+
+                        // Usar LaunchedEffect para desplazar al final del gráfico cuando se cargue
+                        LaunchedEffect(key1 = dataPoints.size) {
+                            scrollState.animateScrollTo(scrollState.maxValue)
+                            // Inicialmente mostrar el último valor
+                            pointTextSelectedText = dataPoints.last().toString()
+                            selectedPointIndex = dataPoints.size - 1 // Seleccionar el último punto por defecto
+                        }
+
+                        // Usamos un Box para contener el gráfico y permitir el scroll horizontal
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()  // El Box debe ocupar el ancho completo
+                                .height(300.dp)  // Altura del gráfico
+                                .horizontalScroll(scrollState) // Permitir desplazamiento horizontal
+                        ) {
+                            Canvas(
+                                modifier = Modifier
+                                    .width((listweights.size*100).dp)
+                                    .height(300.dp)  // Altura fija
+                                    .pointerInput(Unit) {
+                                        detectTapGestures { offset ->
+                                            // Detectar cuál punto está más cerca de la posición tocada
+                                            val closestIndex = findClosestPointIndex(
+                                                offset.x,
+                                                offset.y,
+                                                dataPoints,
+                                                size.width.toFloat(),
+                                                size.height.toFloat()
+                                            )
+                                            selectedPointIndex = closestIndex
+                                            // Actualizar el texto del punto seleccionado
+                                            pointTextSelectedText = dataPoints[selectedPointIndex!!].toString()
+                                        }
+                                    }
+                            ) {
+                                // Obtener el tamaño del canvas
+                                val canvasWidth = size.width
+                                val canvasHeight = size.height
+
+                                // Dibujar un fondo degradado
+                                val brush = Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color.Transparent,
+                                        Color(0xFFFFFCE5D8),
+                                        Color.Transparent
+                                    ),
+                                    startY = 0f,
+                                    endY = canvasHeight
+                                )
+                                drawRect(brush = brush)
+
+                                // Normalizamos los datos para ajustarlos al Canvas
+                                val maxDataPoint = dataPoints.maxOrNull() ?: 1f
+                                val minDataPoint = dataPoints.minOrNull() ?: 0f
+
+                                // Cálculo de la separación horizontal - IMPORTANTE: Ahora usamos el ancho completo
+                                val xStart = 0f  // Iniciamos desde el borde izquierdo
+                                val xEnd = canvasWidth  // Terminamos en el borde derecho
+
+                                // Función para calcular la posición X de cada punto basado en su índice
+                                val calculateX = { index: Int ->
+                                    if (dataPoints.size <= 1) {
+                                        canvasWidth / 2f // Si solo hay un punto, lo centramos
+                                    } else {
+                                        xStart + (xEnd - xStart) * (index.toFloat() / (dataPoints.size - 1))
                                     }
                                 }
-                        ) {
-                            // Obtener el tamaño del canvas
-                            val canvasWidth = size.width
-                            val canvasHeight = size.height
 
-                            // Dibujar un fondo degradado
-                            val brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    Color.Transparent,
-                                    Color(0xFFFFFCE5D8),
-                                    Color.Transparent
-                                ),
-                                startY = 0f,
-                                endY = canvasHeight
-                            )
-                            drawRect(brush = brush)
+                                // Crear un camino (Path) para la línea curva
+                                val path = Path()
 
-                            // Normalizar los datos para ajustarlos al Canvas
-                            val maxDataPoint = dataPoints.maxOrNull() ?: 1f
-                            val minDataPoint = dataPoints.minOrNull() ?: 0f
+                                // Movemos al primer punto
+                                val firstX = calculateX(0)
+                                val firstY = canvasHeight * (1 - (dataPoints[0] - minDataPoint) / (maxDataPoint - minDataPoint))
+                                path.moveTo(firstX, firstY)
 
-                            // Calculamos la separación horizontal entre puntos
-                            val spacing = canvasWidth / (dataPoints.size - 1)
+                                // Dibujar líneas curvas entre los puntos usando curvas Bézier
+                                for (i in 0 until dataPoints.size - 1) {
+                                    val x1 = calculateX(i)
+                                    val y1 = canvasHeight * (1 - (dataPoints[i] - minDataPoint) / (maxDataPoint - minDataPoint))
+                                    val x2 = calculateX(i + 1)
+                                    val y2 = canvasHeight * (1 - (dataPoints[i + 1] - minDataPoint) / (maxDataPoint - minDataPoint))
 
-                            // Creamos el camino (Path) para la línea curva
-                            val path = Path()
-                            path.moveTo(
-                                0f,
-                                canvasHeight * (1 - (dataPoints[0] - minDataPoint) / (maxDataPoint - minDataPoint))
-                            )
+                                    val controlPointX1 = (x1 + x2) / 2
+                                    val controlPointY1 = y1
+                                    val controlPointX2 = (x1 + x2) / 2
+                                    val controlPointY2 = y2
 
-                            // Dibujamos líneas curvas entre los puntos usando curvas Bézier
-                            for (i in 0 until dataPoints.size - 1) {
-                                val x1 = i * spacing
-                                val y1 = canvasHeight * (1 - (dataPoints[i] - minDataPoint) / (maxDataPoint - minDataPoint))
-                                val x2 = (i + 1) * spacing
-                                val y2 = canvasHeight * (1 - (dataPoints[i + 1] - minDataPoint) / (maxDataPoint - minDataPoint))
+                                    path.cubicTo(
+                                        controlPointX1,
+                                        controlPointY1,
+                                        controlPointX2,
+                                        controlPointY2,
+                                        x2,
+                                        y2
+                                    )
+                                }
 
-                                val controlPointX1 = (x1 + x2) / 2
-                                val controlPointY1 = y1
-                                val controlPointX2 = (x1 + x2) / 2
-                                val controlPointY2 = y2
-
-                                path.cubicTo(
-                                    controlPointX1,
-                                    controlPointY1,
-                                    controlPointX2,
-                                    controlPointY2,
-                                    x2,
-                                    y2
+                                // Dibujamos la línea curva
+                                drawPath(
+                                    path = path,
+                                    color = lineColor,
+                                    style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
                                 )
-                            }
 
-                            // Dibujamos la línea curva
-                            drawPath(
-                                path = path,
-                                color = lineColor,
-                                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
-                            )
+                                // Dibujamos los círculos en los puntos
+                                dataPoints.forEachIndexed { index, dataPoint ->
+                                    val x = calculateX(index)
+                                    val y = canvasHeight * (1 - (dataPoint - minDataPoint) / (maxDataPoint - minDataPoint))
 
-                            // Dibujamos los círculos en los puntos
-                            dataPoints.forEachIndexed { index, dataPoint ->
-                                val x = index * spacing
-                                val y = canvasHeight * (1 - (dataPoint - minDataPoint) / (maxDataPoint - minDataPoint))
-
-                                drawCircle(
-                                    color = if (selectedPointIndex == index || index == dataPoints.size - 1) Color(color = 0xFFCA5300) else circleColor,
-                                    radius = if (selectedPointIndex == index) 8.dp.toPx() else animatedRadii[index].value, // Usa el radio animado
-                                    center = Offset(x, y)
-                                )
+                                    // Dibuja el círculo
+                                    drawCircle(
+                                        color = if (selectedPointIndex == index || index == dataPoints.size - 1) Color(color = 0xFFCA5300) else circleColor,
+                                        radius = if (selectedPointIndex == index) 8.dp.toPx() else animatedRadii[index].value,
+                                        center = Offset(x, y)
+                                    )
+                                }
                             }
                         }
                     }
                 }
+
             }
         } else {
             LottieExample(Modifier.fillMaxWidth())
@@ -387,13 +403,13 @@ fun UserInfoTitle(modifier: Modifier) {
 }
 
 @Composable
-fun UserInfiCardView(modifier: Modifier, userData: UserData, infoViewModel: UserInfoViewModel) {
+fun UserInfiCardView(userData: UserData, infoViewModel: UserInfoViewModel) {
 
 
     var isAlert by remember{mutableStateOf(false)}
     var showSaveButton by remember{mutableStateOf(false)}
 
-    Card(modifier= modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(defaultElevation = 8.dp), colors = CardDefaults.cardColors(containerColor = colorResource(
+    Card(modifier= Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(defaultElevation = 8.dp), colors = CardDefaults.cardColors(containerColor = colorResource(
         id = R.color.orange_low
     )), onClick = {isAlert = true}, shape = RoundedCornerShape(28.dp)
     ) {
@@ -479,47 +495,26 @@ fun UserInfiCardView(modifier: Modifier, userData: UserData, infoViewModel: User
 }
 
 @Composable
-fun UserInfoImage(modifier: Modifier , userData: UserData) {
-    Box(modifier = modifier){
-        ConstraintLayout(){
-            val (name,image,email) = createRefs()
+fun UserInfoImage( userData: UserData) {
+    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
             if (userData.image!!.isNotEmpty()){
                 Image(painter = rememberAsyncImagePainter(userData.image), contentDescription = "image",
                     Modifier
                         .size(180.dp)
-                        .constrainAs(image) {
-                            top.linkTo(parent.top)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        }
                         .clip(CircleShape),
                     contentScale = ContentScale.Crop)
             }else{
                 Image(imageVector = Icons.Filled.AccountCircle, contentDescription = "image",
                     Modifier
-                        .size(180.dp)
-                        .constrainAs(image) {
-                            top.linkTo(parent.top)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        })
+                        .size(180.dp))
             }
 
 
-            Text(text = userData.name + " " + userData.first_name +" " +userData.second_name, Modifier.constrainAs(name){
-                top.linkTo(image.bottom)
-                start.linkTo(image.start)
-                end.linkTo(image.end)
-            }, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(text = userData.name + " " + userData.first_name +" " +userData.second_name
+                , fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
-            Text(text = userData.email, Modifier.constrainAs(email){
-                top.linkTo(name.bottom)
-                start.linkTo(name.start)
-                end.linkTo(name.end)
-            }, fontSize = 18.sp, color = Color(color = 0xFFCA5300))
+            Text(text = userData.email, fontSize = 18.sp, color = Color(color = 0xFFCA5300))
         }
-    }
-
 }
 
 @Composable
@@ -618,6 +613,13 @@ fun findClosestPointIndex(tapX: Float, tapY: Float, dataPoints: List<Float>, can
     }
 
     return null // Si no se encuentra un punto cercano
+}
+
+fun getScreenWidth(context: Context): Int {
+    val displayMetrics = DisplayMetrics()
+    val display = context.getSystemService(Context.WINDOW_SERVICE) as android.view.WindowManager
+    display.defaultDisplay.getMetrics(displayMetrics)
+    return displayMetrics.widthPixels
 }
 
 

@@ -71,17 +71,6 @@ import coil.compose.AsyncImage
 import com.example.mygains.R
 import com.example.mygains.createroutineprocess.data.models.StrengthExerciseModel
 import com.example.mygains.createroutineprocess.ui.CreateRoutineViewModel
-import ir.ehsannarmani.compose_charts.ColumnChart
-import ir.ehsannarmani.compose_charts.LineChart
-import ir.ehsannarmani.compose_charts.RowChart
-import ir.ehsannarmani.compose_charts.models.AnimationMode
-import ir.ehsannarmani.compose_charts.models.BarProperties
-import ir.ehsannarmani.compose_charts.models.Bars
-import ir.ehsannarmani.compose_charts.models.DividerProperties
-import ir.ehsannarmani.compose_charts.models.DotProperties
-import ir.ehsannarmani.compose_charts.models.DrawStyle
-import ir.ehsannarmani.compose_charts.models.GridProperties
-import ir.ehsannarmani.compose_charts.models.Line
 import kotlinx.coroutines.launch
 
 
@@ -321,45 +310,8 @@ fun ExerciseDetailAndConfigRoutineDialog(viewModel: CreateRoutineViewModel,stren
 
 
                 item {
-                        ColumnChart(
-                            modifier = Modifier
-                                .height(180.dp)
-                                .width(200.dp)
-                                .padding(horizontal = 8.dp),
-                            data = remember {
-                                listOf(
-                                    Bars(
-                                        label = "14 feb",
-                                        values = listOf(
-                                            Bars.Data(label = "kg máx", value = 50.0, color = Brush.verticalGradient(colors = listOf(Color(0xFF6C0BA9), Color(0xFF9A05EB)))),
-                                            Bars.Data(label = "Reps", value = 70.0, color = SolidColor(Color.Red)),
-                                        ),
-                                    ),
-                                    Bars(
-                                        label = " 15Feb",
-                                        values = listOf(
-                                            Bars.Data(label = "kg máx", value = 80.0, color = Brush.verticalGradient(colors = listOf(Color(0xFF6C0BA9), Color(0xFF9A05EB)))),
-                                            Bars.Data(label = "Reps", value = 60.0, color = SolidColor(Color.Red)),
-                                        ),
-                                    )
-                                )
-                            },
-                            barProperties = BarProperties(
-                                cornerRadius = Bars.Data.Radius.Circular(6.dp),
-                                spacing = 2.dp,
-                                thickness = 25.dp
-                            ),
-                            gridProperties = GridProperties(
-                                enabled = false
-                            ),
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
-                            ),
-                        )
+
                 }
-
-
             }
         }
     }
