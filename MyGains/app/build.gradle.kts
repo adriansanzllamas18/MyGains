@@ -10,12 +10,12 @@ plugins {
 
 android {
     namespace = "com.example.mygains"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.mygains"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -123,7 +123,10 @@ dependencies {
     // Conversor JSON (Gson es uno de los más comunes)
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation ("com.squareup.okhttp3:logging-interceptor:4.9.0")
+    implementation ("com.patrykandpatrick.vico:compose:1.12.0") // Esta es una versión reciente, pero verifica si hay una más actualizada
 
+
+    implementation("io.github.ehsannarmani:compose-charts:0.1.2")
 
 
 }

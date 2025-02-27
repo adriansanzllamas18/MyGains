@@ -323,7 +323,7 @@ fun Loader(isLoading:Boolean){
 @Composable
 fun GoogleSignInButton(googleAccount: ManagedActivityResultLauncher<Intent, ActivityResult>) {
 
-    val context= LocalContext.current
+    val context = LocalContext.current
 
         Button(
             modifier = Modifier
