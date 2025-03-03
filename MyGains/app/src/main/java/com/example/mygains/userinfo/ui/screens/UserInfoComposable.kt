@@ -59,8 +59,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.LinearGradientShader
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -86,6 +88,20 @@ import com.example.mygains.R
 import com.example.mygains.userinfo.data.models.WeightRegister
 import com.example.mygains.userinfo.data.models.UserData
 import com.example.mygains.userinfo.ui.UserInfoViewModel
+import com.patrykandpatrick.vico.compose.axis.horizontal.bottomAxis
+import com.patrykandpatrick.vico.compose.chart.Chart
+import com.patrykandpatrick.vico.compose.chart.line.lineChart
+import com.patrykandpatrick.vico.compose.chart.line.lineSpec
+import com.patrykandpatrick.vico.compose.component.shapeComponent
+import com.patrykandpatrick.vico.compose.component.textComponent
+import com.patrykandpatrick.vico.compose.dimensions.dimensionsOf
+import com.patrykandpatrick.vico.core.axis.AxisPosition
+import com.patrykandpatrick.vico.core.axis.formatter.AxisValueFormatter
+import com.patrykandpatrick.vico.core.chart.line.LineChart
+import com.patrykandpatrick.vico.core.component.shape.Shapes
+import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShader
+import com.patrykandpatrick.vico.core.entry.entryModelOf
+import com.patrykandpatrick.vico.core.entry.entryOf
 
 import java.time.LocalDate
 
@@ -102,9 +118,7 @@ fun UserInfoComposable(nav: NavHostController) {
     LazyColumn(
         modifier = Modifier
             .padding(16.dp)
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxSize()
     ) {
         // Header, Imagen, Títulos y demás contenidos se agregan como items en LazyColumn
         item {
@@ -142,7 +156,7 @@ fun UserInfoComposable(nav: NavHostController) {
         // Progreso diario del usuario
         item {
             UserDailyProgress(
-                modifier = Modifier.padding(top = 24.dp, bottom = 24.dp).fillMaxWidth(),
+                modifier = Modifier.padding(top = 24.dp, bottom = 24.dp),
                 userInfoViewModel = userInfoViewModel
             )
         }
@@ -191,201 +205,77 @@ fun UserDailyProgress(modifier: Modifier, userInfoViewModel: UserInfoViewModel) 
 
         if (listweights.isNotEmpty()) {
 
-            var pointTextSelectedText by remember {
-                mutableStateOf("")
+            val dateWeightList = listweights.map { it.date to it.weight }
+            // Extraer etiquetas y valores
+            val labels = dateWeightList.map { it.first }
+
+            // Formateador de valores para el eje X
+            val xAxisFormatter = AxisValueFormatter<AxisPosition.Horizontal.Bottom> { value, _ ->
+                labels.getOrNull(value.toInt()) ?: ""
             }
 
-            // Estado para almacenar el índice del punto seleccionado
-            var selectedPointIndex by remember { mutableStateOf<Int?>(null) }
+            // Configurar el eje X en el gráfico de Vico
+            val bottomAxis = bottomAxis(valueFormatter = xAxisFormatter, label = textComponent(
+                color = Color.Black, // Color del texto
+                padding = dimensionsOf(horizontal = 3.dp, vertical = 2.dp),
+                margins = dimensionsOf(bottom = 4.dp), )
+            )
 
-            Card(
-                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                shape = RoundedCornerShape(28.dp)
-            ) {
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                    shape = RoundedCornerShape(28.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
-                        // Título
-                        Text(
-                            color = Color.Black,
-                            text = "Gráfico de Peso",
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                                .padding(bottom = 16.dp) // Espaciado entre el título y el gráfico
+            val entries = dateWeightList.mapIndexed { index, (_, weight) ->
+                entryOf(x = index.toFloat(), y = weight.toFloat())
+            }
+
+            val model = entryModelOf(entries)
+
+            // Personalización de los puntos (dots)
+            val pointComponent = shapeComponent(
+                shape = Shapes.pillShape,
+                color = Color(0xFFCA5300),
+                strokeWidth = 2.dp,
+                strokeColor = Color.White
+            )
+
+            // Etiqueta que aparecerá encima de cada punto
+            val labelComponent = textComponent(
+                color = Color.DarkGray,
+                background = shapeComponent(
+                    shape = Shapes.pillShape,
+                    color = Color.White.copy(alpha = 0.8f),
+                    strokeWidth = 1.dp,
+                    strokeColor = Color.LightGray
+                ),
+                padding = dimensionsOf(horizontal = 4.dp, vertical = 2.dp),
+                margins = dimensionsOf(bottom = 4.dp),
+                textSize = 10.sp
+            )
+
+            // Shader dinámico con la firma correcta
+            val dynamicShader = DynamicShader { _, left, top, right, bottom ->
+                LinearGradientShader(
+                    from = Offset(left, top),   // Comienza en la parte superior izquierda
+                    to = Offset(left, bottom),  // Termina en la parte inferior izquierda
+                    colors = listOf(Color(0xFFCA5300).copy(alpha = 0.5f), Color.Transparent), // Azul a transparente
+                    colorStops = listOf(0f, 1f), // Degradado de arriba a abajo
+                    tileMode = TileMode.Clamp
+                )
+            }
+            Chart(
+                chart = lineChart(
+                    lines = listOf(
+                        lineSpec(
+                            lineColor = Color(0xFFCA5300),
+                            lineBackgroundShader = dynamicShader,
+                            point = pointComponent,
+                            pointSize = 8.dp,
+                            dataLabel = labelComponent,
                         )
-
-                        // Mostrar el texto del punto seleccionado si no está vacío
-                        if (pointTextSelectedText.isNotEmpty()) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 16.dp), // Espaciado entre el texto del punto y el gráfico
-                                horizontalArrangement = Arrangement.End // Alinear a la derecha
-                            ) {
-                                Text(
-                                    color = colorResource(id = R.color.orange),
-                                    text = "$pointTextSelectedText kg",
-                                    fontSize = 24.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-
-                        // Puntos de datos para el gráfico
-                        val dataPoints = mutableListOf<Float>(0f) // Añadir 0 como primer punto
-                        listweights.forEach { dataPoints.add(it.weight.toFloat()) }
-
-                        // Colores y tamaños
-                        val lineColor = colorResource(id = R.color.orange)
-                        val circleColor = colorResource(id = R.color.black)
-                        val strokeWidth = 5f
-
-                        // Animación para el tamaño de los puntos
-                        val infiniteTransition = rememberInfiniteTransition()
-                        val animatedRadii = dataPoints.mapIndexed { index, _ ->
-                            infiniteTransition.animateFloat(
-                                initialValue = 6f, // Tamaño inicial del círculo
-                                targetValue = 14f, // Tamaño máximo del círculo
-                                animationSpec = infiniteRepeatable(
-                                    animation = tween(1200, easing = FastOutSlowInEasing),
-                                    repeatMode = RepeatMode.Reverse
-                                ), label = ""
-                            )
-                        }
-
-                        // Crear un estado de scroll
-                        val scrollState = rememberScrollState()
-
-                        // Usar LaunchedEffect para desplazar al final del gráfico cuando se cargue
-                        LaunchedEffect(key1 = dataPoints.size) {
-                            scrollState.animateScrollTo(scrollState.maxValue)
-                            // Inicialmente mostrar el último valor
-                            pointTextSelectedText = dataPoints.last().toString()
-                            selectedPointIndex = dataPoints.size - 1 // Seleccionar el último punto por defecto
-                        }
-
-                        // Usamos un Box para contener el gráfico y permitir el scroll horizontal
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()  // El Box debe ocupar el ancho completo
-                                .height(300.dp)  // Altura del gráfico
-                                .horizontalScroll(scrollState) // Permitir desplazamiento horizontal
-                        ) {
-                            Canvas(
-                                modifier = Modifier
-                                    .width((listweights.size*100).dp)
-                                    .height(300.dp)  // Altura fija
-                                    .pointerInput(Unit) {
-                                        detectTapGestures { offset ->
-                                            // Detectar cuál punto está más cerca de la posición tocada
-                                            val closestIndex = findClosestPointIndex(
-                                                offset.x,
-                                                offset.y,
-                                                dataPoints,
-                                                size.width.toFloat(),
-                                                size.height.toFloat()
-                                            )
-                                            selectedPointIndex = closestIndex
-                                            // Actualizar el texto del punto seleccionado
-                                            pointTextSelectedText = dataPoints[selectedPointIndex!!].toString()
-                                        }
-                                    }
-                            ) {
-                                // Obtener el tamaño del canvas
-                                val canvasWidth = size.width
-                                val canvasHeight = size.height
-
-                                // Dibujar un fondo degradado
-                                val brush = Brush.verticalGradient(
-                                    colors = listOf(
-                                        Color.Transparent,
-                                        Color(0xFFFFFCE5D8),
-                                        Color.Transparent
-                                    ),
-                                    startY = 0f,
-                                    endY = canvasHeight
-                                )
-                                drawRect(brush = brush)
-
-                                // Normalizamos los datos para ajustarlos al Canvas
-                                val maxDataPoint = dataPoints.maxOrNull() ?: 1f
-                                val minDataPoint = dataPoints.minOrNull() ?: 0f
-
-                                // Cálculo de la separación horizontal - IMPORTANTE: Ahora usamos el ancho completo
-                                val xStart = 0f  // Iniciamos desde el borde izquierdo
-                                val xEnd = canvasWidth  // Terminamos en el borde derecho
-
-                                // Función para calcular la posición X de cada punto basado en su índice
-                                val calculateX = { index: Int ->
-                                    if (dataPoints.size <= 1) {
-                                        canvasWidth / 2f // Si solo hay un punto, lo centramos
-                                    } else {
-                                        xStart + (xEnd - xStart) * (index.toFloat() / (dataPoints.size - 1))
-                                    }
-                                }
-
-                                // Crear un camino (Path) para la línea curva
-                                val path = Path()
-
-                                // Movemos al primer punto
-                                val firstX = calculateX(0)
-                                val firstY = canvasHeight * (1 - (dataPoints[0] - minDataPoint) / (maxDataPoint - minDataPoint))
-                                path.moveTo(firstX, firstY)
-
-                                // Dibujar líneas curvas entre los puntos usando curvas Bézier
-                                for (i in 0 until dataPoints.size - 1) {
-                                    val x1 = calculateX(i)
-                                    val y1 = canvasHeight * (1 - (dataPoints[i] - minDataPoint) / (maxDataPoint - minDataPoint))
-                                    val x2 = calculateX(i + 1)
-                                    val y2 = canvasHeight * (1 - (dataPoints[i + 1] - minDataPoint) / (maxDataPoint - minDataPoint))
-
-                                    val controlPointX1 = (x1 + x2) / 2
-                                    val controlPointY1 = y1
-                                    val controlPointX2 = (x1 + x2) / 2
-                                    val controlPointY2 = y2
-
-                                    path.cubicTo(
-                                        controlPointX1,
-                                        controlPointY1,
-                                        controlPointX2,
-                                        controlPointY2,
-                                        x2,
-                                        y2
-                                    )
-                                }
-
-                                // Dibujamos la línea curva
-                                drawPath(
-                                    path = path,
-                                    color = lineColor,
-                                    style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
-                                )
-
-                                // Dibujamos los círculos en los puntos
-                                dataPoints.forEachIndexed { index, dataPoint ->
-                                    val x = calculateX(index)
-                                    val y = canvasHeight * (1 - (dataPoint - minDataPoint) / (maxDataPoint - minDataPoint))
-
-                                    // Dibuja el círculo
-                                    drawCircle(
-                                        color = if (selectedPointIndex == index || index == dataPoints.size - 1) Color(color = 0xFFCA5300) else circleColor,
-                                        radius = if (selectedPointIndex == index) 8.dp.toPx() else animatedRadii[index].value,
-                                        center = Offset(x, y)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
-            }
+                    ),
+                    spacing = 80.dp,
+                    pointPosition = LineChart.PointPosition.Center
+                ),
+                model = model,
+                bottomAxis = bottomAxis
+            )
         } else {
             LottieExample(Modifier.fillMaxWidth())
         }

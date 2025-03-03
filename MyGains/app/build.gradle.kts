@@ -101,6 +101,9 @@ dependencies {
 
     implementation ("io.coil-kt:coil-compose:2.4.0")
 
+
+    implementation ("com.github.bumptech.glide:glide:4.13.0")
+
     // The compose calendar library for Android
     implementation("com.kizitonwose.calendar:compose:2.6.0")
 
@@ -125,6 +128,9 @@ dependencies {
     implementation ("com.squareup.okhttp3:logging-interceptor:4.9.0")
 
     implementation ("com.github.tehras:charts:0.2.4-alpha") // ComposeCharts
+
+    implementation("com.patrykandpatrick.vico:compose:1.6.4")
+    implementation("com.patrykandpatrick.vico:compose-m3:1.6.4")
 
 
 }

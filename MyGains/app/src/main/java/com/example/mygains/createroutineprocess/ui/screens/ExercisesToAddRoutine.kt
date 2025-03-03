@@ -2,13 +2,19 @@ package com.example.mygains.createroutineprocess.ui.screens
 
 
 import android.content.ClipData.Item
+import android.graphics.Paint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.horizontalScroll
@@ -27,9 +33,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AssistChip
@@ -38,6 +46,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
@@ -45,6 +54,7 @@ import androidx.compose.material3.SelectableChipColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
@@ -55,15 +65,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.LinearGradientShader
 import androidx.compose.ui.graphics.PathSegment
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.drawscope.DrawContext
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -71,6 +90,29 @@ import coil.compose.AsyncImage
 import com.example.mygains.R
 import com.example.mygains.createroutineprocess.data.models.StrengthExerciseModel
 import com.example.mygains.createroutineprocess.ui.CreateRoutineViewModel
+import com.example.mygains.createroutineprocess.ui.components.ListInfoComponents
+import com.example.mygains.createroutineprocess.ui.components.TitleAndImageIconComponent
+import com.example.mygains.exercisesplan.data.models.Exercises
+import com.example.mygains.extras.navigationroutes.Routes
+import com.github.tehras.charts.line.LineChartData
+import com.patrykandpatrick.vico.compose.axis.horizontal.bottomAxis
+import com.patrykandpatrick.vico.compose.axis.vertical.startAxis
+import com.patrykandpatrick.vico.compose.chart.Chart
+import com.patrykandpatrick.vico.compose.chart.line.lineChart
+import com.patrykandpatrick.vico.compose.chart.line.lineSpec
+import com.patrykandpatrick.vico.compose.chart.scroll.rememberChartScrollState
+import com.patrykandpatrick.vico.compose.component.shapeComponent
+import com.patrykandpatrick.vico.compose.component.textComponent
+import com.patrykandpatrick.vico.compose.dimensions.dimensionsOf
+import com.patrykandpatrick.vico.core.axis.AxisPosition
+import com.patrykandpatrick.vico.core.axis.formatter.AxisValueFormatter
+import com.patrykandpatrick.vico.core.chart.line.LineChart
+import com.patrykandpatrick.vico.core.component.shape.Shapes
+import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShader
+import com.patrykandpatrick.vico.core.dimensions.MutableDimensions
+import com.patrykandpatrick.vico.core.entry.entryModelOf
+import com.patrykandpatrick.vico.core.entry.entryOf
+import com.patrykandpatrick.vico.core.legend.Legend
 import kotlinx.coroutines.launch
 
 
@@ -213,131 +255,240 @@ fun ExerciseItemList(exercise: StrengthExerciseModel, viewModel: CreateRoutineVi
 fun ExerciseDetailAndConfigRoutineDialog(viewModel: CreateRoutineViewModel,strengthExerciseModel:StrengthExerciseModel){
 
     val showDetail by  viewModel.showDetailLive.observeAsState(initial = false)
+    val lazyState = rememberLazyListState()
     if (showDetail){
         ModalBottomSheet(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
             onDismissRequest = { viewModel.setExercisesVisibility(false) }
         ) {
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+                    .fillMaxSize()
+                    .padding(16.dp),
+                state = lazyState
             )
             {
 
                 item {
-                    AsyncImage(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp, bottomStart = 0.dp, bottomEnd = 0.dp)),
-                        contentScale = ContentScale.Crop,
-                        model = strengthExerciseModel.image_url,
-                        contentDescription = "exercise image"
-                    )
+                    ExerciseImageSection(strengthExerciseModel)
                 }
+
 
                 item {
                     Spacer(modifier = Modifier.padding(8.dp))
                 }
 
                 item {
-                    Text(
-                        text = strengthExerciseModel.name ?: "",
-                        fontSize = 28.sp
-                    )
+                    ExercisesQuickInfo(strengthExerciseModel)
+                }
+
+                item {
+                    ExerciseAllDetails(strengthExerciseModel)
                 }
 
 
                 item {
-
-                    Text(
-                        text = strengthExerciseModel.description ?: "",
-                        modifier = Modifier.fillMaxWidth(),
-                        fontSize = 16.sp
-                    )
-                }
-
-
-
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center) {
-                        Card(
-                            modifier = Modifier.padding(vertical = 8.dp),
-                            colors = CardColors(
-                                containerColor = colorResource(id = R.color.orange_low),
-                                contentColor = Color.Black,
-                                disabledContentColor = Color.Black,
-                                disabledContainerColor = Color.Gray)
+                        Button(
+                            onClick = {},
+                            modifier = Modifier.fillMaxSize()
                         )
                         {
-                            Text(
-                                modifier = Modifier.padding(8.dp),
-                                text = ( strengthExerciseModel.difficulty) ?: ""
-                            )
+                            Text(text = "Añadir Ejercicio")
                         }
-                        Card(
-                            modifier = Modifier.padding(vertical = 8.dp),
-                            colors = CardColors(
-                                containerColor = colorResource(id = R.color.gray_claro),
-                                contentColor = Color.Black,
-                                disabledContentColor = Color.Black,
-                                disabledContainerColor = Color.Gray)
-                        )
-                        {
-                            Text(
-                                modifier = Modifier.padding(8.dp),
-                                text = ( strengthExerciseModel.mechanic) ?: ""
-                            )
-                        }
-                    }
                 }
 
-                item{
-                    SetSeriesRepsWeights()
-                }
-
-                item {
-                    Text(text = "Musculo principal-> ${strengthExerciseModel.primary_muscle}.")
-                    Spacer(modifier = Modifier.padding(8.dp))
-                    ListDeployed(title = "Músculos secundarios", list = strengthExerciseModel.secondary_muscles?: mutableListOf())
-                    ListDeployed(title = "Equipamiento", list = strengthExerciseModel.equipment?: mutableListOf())
-                    ListDeployed(title = "Tips", list = strengthExerciseModel.tips?: mutableListOf())
-                    ListDeployed(title = "Variaciones de Ejercicios", list = strengthExerciseModel.variations?: mutableListOf())
-
-                }
-
-
-                item {
-
-                }
             }
         }
     }
 }
 
 
+@Composable
+private fun LastTimesGrafic() {
+    // Datos de peso originales
+    val weightData = listOf(
+        "01/01/2023" to 74.5f,
+        "08/01/2023" to 74.8f,
+        "15/01/2023" to 74.2f,
+        "08/01/2023" to 74.8f,
+        "15/01/2023" to 74.2f,
+        "08/01/2023" to 74.8f,
+        "15/01/2023" to 74.2f,
+        "08/01/2023" to 74.8f,
+        "15/01/2023" to 74.2f,
+    )
+
+    // Nueva línea de datos (puedes ajustar estos valores según tus necesidades)
+    val secondLineData = listOf(
+        "01/01/2023" to 9f,
+        "08/01/2023" to 3f,
+        "15/01/2023" to 3f,
+        "08/01/2023" to 7f,
+        "15/01/2023" to 70f,
+        "08/01/2023" to 8f,
+        "15/01/2023" to 2f,
+        "08/01/2023" to 7f,
+        "15/01/2023" to 7f,
+    )
+
+    // Extraer etiquetas y valores
+    val labels = weightData.map { it.first }
+
+    // Configurar entradas para ambas líneas
+    val entries1 = weightData.mapIndexed { index, (_, weight) ->
+        entryOf(x = index.toFloat(), y = weight)
+    }
+
+    val entries2 = secondLineData.mapIndexed { index, (_, weight) ->
+        entryOf(x = index.toFloat(), y = weight)
+    }
+
+    // Formateador de valores para el eje X
+    val xAxisFormatter = AxisValueFormatter<AxisPosition.Horizontal.Bottom> { value, _ ->
+        labels.getOrNull(value.toInt()) ?: ""
+    }
+
+    // Configurar el eje X en el gráfico de Vico
+    val bottomAxis = bottomAxis(
+        valueFormatter = xAxisFormatter,
+        label = textComponent(
+            color = Color.Black, // Color del texto
+            padding = dimensionsOf(horizontal = 3.dp, vertical = 2.dp),
+            margins = dimensionsOf(bottom = 4.dp),
+        )
+    )
+
+    // Modelo con ambas líneas de datos
+    val model = entryModelOf(entries1, entries2)
+
+    // Personalización de los puntos (dots) para la primera línea
+    val pointComponent1 = shapeComponent(
+        shape = Shapes.pillShape,
+        color = Color(0xFFCA5300),
+        strokeWidth = 2.dp,
+        strokeColor = Color.White
+    )
+
+    // Personalización de los puntos para la segunda línea
+    val pointComponent2 = shapeComponent(
+        shape = Shapes.pillShape,
+        color = Color(0xFF0072CA),  // Color diferente para la segunda línea
+        strokeWidth = 2.dp,
+        strokeColor = Color.White
+    )
+
+    // Etiqueta para la primera línea
+    val labelComponent1 = textComponent(
+        color = Color.DarkGray,
+        background = shapeComponent(
+            shape = Shapes.pillShape,
+            color = Color.White.copy(alpha = 0.8f),
+            strokeWidth = 1.dp,
+            strokeColor = Color.LightGray
+        ),
+        padding = dimensionsOf(horizontal = 4.dp, vertical = 2.dp),
+        margins = dimensionsOf(bottom = 4.dp),
+        textSize = 10.sp,
+        textAlign = Paint.Align.LEFT,
+    )
+
+    // Etiqueta para la segunda línea
+    val labelComponent2 = textComponent(
+        color = Color.DarkGray,
+        background = shapeComponent(
+            shape = Shapes.pillShape,
+            color = Color.White.copy(alpha = 0.8f),
+            strokeWidth = 1.dp,
+            strokeColor = Color.LightGray
+        ),
+        padding = dimensionsOf(horizontal = 4.dp, vertical = 2.dp),
+        margins = dimensionsOf(bottom = 4.dp),
+        textSize = 10.sp,
+        textAlign = Paint.Align.LEFT,
+    )
+
+    // Shader para la primera línea
+    val dynamicShader1 = DynamicShader { _, left, top, right, bottom ->
+        LinearGradientShader(
+            from = Offset(left, top),
+            to = Offset(left, bottom),
+            colors = listOf(Color(0xFFCA5300).copy(alpha = 0.5f), Color.Transparent),
+            colorStops = listOf(0f, 1f),
+            tileMode = TileMode.Clamp
+        )
+    }
+
+    // Shader para la segunda línea
+    val dynamicShader2 = DynamicShader { _, left, top, right, bottom ->
+        LinearGradientShader(
+            from = Offset(left, top),
+            to = Offset(left, bottom),
+            colors = listOf(Color(0xFF0072CA).copy(alpha = 0.5f), Color.Transparent),
+            colorStops = listOf(0f, 1f),
+            tileMode = TileMode.Clamp
+        )
+    }
+
+    Column(Modifier.padding(vertical = 16.dp)) {
+        Row {
+            Image(
+                modifier = Modifier.size(24.dp),
+                painter = painterResource(id = R.drawable.analitica),
+                contentDescription = "icon image"
+            )
+            Text(
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(8.dp),
+                text = ("últimos entrenos")
+            )
+        }
+        Chart(
+            chart = lineChart(
+                lines = listOf(
+                    lineSpec(
+                        lineColor = Color(0xFFCA5300),
+                        lineBackgroundShader = dynamicShader1,
+                        point = pointComponent1,
+                        pointSize = 8.dp,
+                        dataLabel = labelComponent1,
+                    ),
+                    lineSpec(
+                        lineColor = Color(0xFF0072CA),  // Color diferente para la segunda línea
+                        lineBackgroundShader = dynamicShader2,
+                        point = pointComponent2,
+                        pointSize = 8.dp,
+                        dataLabel = labelComponent2,
+                    )
+                ),
+                spacing = 80.dp,
+                pointPosition = LineChart.PointPosition.Center
+            ),
+            model = model,
+            bottomAxis = bottomAxis
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            LegendItem(color = Color(0xFFCA5300), text = "Kg")
+            Spacer(modifier = Modifier.width(16.dp))
+            LegendItem(color = Color(0xFF007ACC), text = "Repeticiones")
+        }
+    }
+}
 
 @Composable
-fun SetSeriesRepsWeights(){
-
-    var numSeries by remember {
-        mutableIntStateOf(0)
-    }
-    Card(modifier = Modifier
-        .fillMaxWidth()
-        .padding(top = 24.dp)) {
-        Row( horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-            Text(text = "Series", modifier = Modifier
-                .weight(1f)
-                .padding(start = 8.dp), textAlign = TextAlign.Start)
-            Stepper(value = numSeries, onValueChange = {numSeries = it})
-        }
-
-        (1..numSeries).forEach {
-            Stepper(value = numSeries, onValueChange = {numSeries = it})
-        }
+fun LegendItem(color: Color, text: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(
+            modifier = Modifier
+                .size(12.dp)
+                .background(color, shape = CircleShape)
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(text = text, fontSize = 14.sp, color = Color.Black)
     }
 }
 
@@ -368,6 +519,194 @@ fun Stepper(
             Text("+")
         }
     }
+}
+
+@Composable
+private fun ExerciseImageSection(strengthExerciseModel: StrengthExerciseModel){
+    Card(modifier = Modifier
+        .fillMaxWidth()
+        .height(300.dp)
+        .padding(vertical = 16.dp),
+        shape = RoundedCornerShape(12)
+    ) {
+        Box(contentAlignment = Alignment.BottomStart){
+            AsyncImage(
+                model = strengthExerciseModel.image_url,
+                contentDescription = "exercise image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            0f to Color.White.copy(alpha = 0f),
+                            1f to colorResource(id = R.color.orange_low).copy(alpha = 0.9f)
+                        )
+                    ))
+            Column(modifier = Modifier .padding(horizontal = 24.dp, vertical = 16.dp)) {
+                Text(strengthExerciseModel.name?:"",
+                    fontSize = 40.sp,
+                    maxLines = 1,
+                    minLines = 1,
+                    textAlign = TextAlign.Center,
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .basicMarquee()
+                )
+                Row {
+                    Image(
+                        modifier = Modifier.size(24.dp),
+                        painter = painterResource(id = R.drawable.mancuerna),
+                        contentDescription = "icon image")
+                    Text(
+                        modifier = Modifier.padding(start = 8.dp),
+                        text = strengthExerciseModel.difficulty?:""
+                    )
+                }
+            }
+
+        }
+    }
+}
+
+@Composable
+private fun ExercisesQuickInfo(strengthExerciseModel: StrengthExerciseModel){
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center) {
+        Card(
+            modifier = Modifier
+                .padding(vertical = 8.dp, horizontal = 8.dp)
+                .weight(1f),
+            colors = CardColors(
+                containerColor = colorResource(id = R.color.orange_low),
+                contentColor = Color.Black,
+                disabledContentColor = Color.Black,
+                disabledContainerColor = Color.Gray)
+        )
+        {
+
+            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                TitleAndImageIconComponent(title = "Músculos", icon = R.drawable.musculo)
+
+                Text(
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    text = strengthExerciseModel.primary_muscle?:""
+                )
+                Text(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    fontSize = 12.sp,
+                    text = strengthExerciseModel.secondary_muscles.toString()?:""
+                )
+            }
+
+
+        }
+        Card(
+            modifier = Modifier
+                .padding(vertical = 8.dp, horizontal = 8.dp)
+                .weight(1f),
+            colors = CardColors(
+                containerColor = colorResource(id = R.color.orange_low),
+                contentColor = Color.Black,
+                disabledContentColor = Color.Black,
+                disabledContainerColor = Color.Gray)
+        )
+        {
+            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                TitleAndImageIconComponent(title = "Calorías", icon = R.drawable.calorias)
+
+                Text(
+                    fontSize = 18.sp,
+                    text = strengthExerciseModel.calories_estimated?:""
+                )
+                Text(
+                    fontSize = 12.sp,
+                    text = "Estimación"
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExerciseAllDetails(strengthExerciseModel: StrengthExerciseModel){
+    var titleSelected by remember {
+        mutableIntStateOf(1)
+    }
+    Spacer(modifier = Modifier.padding(8.dp))
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .clickable { titleSelected = 1 },
+            text = "Descripción",
+            fontWeight = if (titleSelected == 1) FontWeight.Bold else FontWeight.Black,
+            color = if (titleSelected == 1) Color.Black else Color.LightGray
+        )
+        Text(
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .clickable { titleSelected = 2 },
+            text = "Técnica",
+            fontWeight = if (titleSelected == 2) FontWeight.Bold else FontWeight.Black,
+            color = if (titleSelected == 2) Color.Black else Color.LightGray
+
+        )
+        Text(
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .clickable { titleSelected = 3 },
+            text = "Variaciones",
+            fontWeight = if (titleSelected == 3) FontWeight.Bold else FontWeight.Black,
+            color = if (titleSelected == 3) Color.Black else Color.LightGray
+        )
+    }
+    HorizontalDivider()
+
+
+    AnimatedVisibility(
+        visible = titleSelected == 1,
+        enter = fadeIn() + expandVertically(),
+        exit = fadeOut() + shrinkVertically()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = strengthExerciseModel.description ?: "",
+                modifier = Modifier.fillMaxWidth(),
+                fontSize = 16.sp
+            )
+
+
+            TitleAndImageIconComponent(title = "Ideal para", icon = R.drawable.ideal)
+            Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
+                strengthExerciseModel.bestFor?.let { ListInfoComponents(list = it ) }
+            }
+            TitleAndImageIconComponent(title = "Equipamiento necesario", icon = R.drawable.equipment)
+            strengthExerciseModel.equipment?.let { ListInfoComponents(list = it ) }
+            LastTimesGrafic()
+        }
+    }
+
+// Para la opción 2
+    AnimatedVisibility(
+        visible = titleSelected == 2,
+        enter = fadeIn() + expandVertically(),
+        exit = fadeOut() + shrinkVertically()
+    ) {
+        Column {
+            TitleAndImageIconComponent(title = "Consejos", icon = R.drawable.tip)
+            strengthExerciseModel.tips?.let { ListInfoComponents(list = it ) }
+            TitleAndImageIconComponent(title = "Errores comunes", icon = R.drawable.error)
+            strengthExerciseModel.commonMistakes?.let { ListInfoComponents(list = it ) }
+        }
+    }
+
 }
 
 @Composable
@@ -410,4 +749,6 @@ fun ListDeployed( title:String, list:MutableList<String>, initial:Boolean=false)
         }
     }
 }
+
+
 
