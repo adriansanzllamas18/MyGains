@@ -35,7 +35,17 @@ class CreateRoutineViewModel @Inject constructor(
     private var _exercisesSelected = MutableLiveData<StrengthExerciseModel>()
     val exercisesSelectedlLive: MutableLiveData<StrengthExerciseModel> = _exercisesSelected
 
+    private var _exercisesToAdd = MutableLiveData<MutableList<StrengthExerciseModel>>()
+    val exercisesToAddLive: MutableLiveData<MutableList<StrengthExerciseModel>> = _exercisesToAdd
 
+
+
+
+    fun setexerciseToAddList(strengthExerciseModel: StrengthExerciseModel){
+        val listConverter:MutableList<StrengthExerciseModel> =  _exercisesToAdd.value?: mutableListOf()
+        listConverter.add(strengthExerciseModel)
+        _exercisesToAdd.postValue(listConverter)
+    }
 
     fun setExercisesVisibility(isVisble:Boolean){
         _showDetail.postValue(isVisble)

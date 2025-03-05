@@ -1,13 +1,8 @@
 package com.example.mygains.createroutineprocess.ui.screens
 
 
-import android.content.ClipData.Item
 import android.graphics.Paint
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.EaseInOutCubic
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -16,31 +11,28 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AssistChip
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
@@ -54,7 +46,6 @@ import androidx.compose.material3.SelectableChipColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
@@ -64,25 +55,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.LinearGradientShader
-import androidx.compose.ui.graphics.PathSegment
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.graphics.drawscope.DrawContext
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -90,17 +72,14 @@ import coil.compose.AsyncImage
 import com.example.mygains.R
 import com.example.mygains.createroutineprocess.data.models.StrengthExerciseModel
 import com.example.mygains.createroutineprocess.ui.CreateRoutineViewModel
+import com.example.mygains.createroutineprocess.ui.components.ExerciseItemList
+import com.example.mygains.createroutineprocess.ui.components.ExerciseItemToAddList
 import com.example.mygains.createroutineprocess.ui.components.ListInfoComponents
 import com.example.mygains.createroutineprocess.ui.components.TitleAndImageIconComponent
-import com.example.mygains.exercisesplan.data.models.Exercises
-import com.example.mygains.extras.navigationroutes.Routes
-import com.github.tehras.charts.line.LineChartData
 import com.patrykandpatrick.vico.compose.axis.horizontal.bottomAxis
-import com.patrykandpatrick.vico.compose.axis.vertical.startAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
 import com.patrykandpatrick.vico.compose.chart.line.lineChart
 import com.patrykandpatrick.vico.compose.chart.line.lineSpec
-import com.patrykandpatrick.vico.compose.chart.scroll.rememberChartScrollState
 import com.patrykandpatrick.vico.compose.component.shapeComponent
 import com.patrykandpatrick.vico.compose.component.textComponent
 import com.patrykandpatrick.vico.compose.dimensions.dimensionsOf
@@ -109,10 +88,9 @@ import com.patrykandpatrick.vico.core.axis.formatter.AxisValueFormatter
 import com.patrykandpatrick.vico.core.chart.line.LineChart
 import com.patrykandpatrick.vico.core.component.shape.Shapes
 import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShader
-import com.patrykandpatrick.vico.core.dimensions.MutableDimensions
 import com.patrykandpatrick.vico.core.entry.entryModelOf
 import com.patrykandpatrick.vico.core.entry.entryOf
-import com.patrykandpatrick.vico.core.legend.Legend
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
@@ -126,6 +104,8 @@ fun ExercisesToAddRoutine(
     val coroutineScope = rememberCoroutineScope()
     val exercises by createRoutineViewModel.exercisesLive.observeAsState(initial = mutableListOf())
     val selectedExercise by createRoutineViewModel.exercisesSelectedlLive.observeAsState(initial = null)
+    val exercisesToAddList by createRoutineViewModel.exercisesToAddLive.observeAsState(initial = mutableListOf())
+
 
     LaunchedEffect(Unit) {
         if (muscle_id.isNotEmpty()){
@@ -181,21 +161,33 @@ fun ExercisesToAddRoutine(
             modifier = Modifier.padding(8.dp)
         ) { position ->
             when (position) {
+
                 0 -> {
-                    LazyColumn() {
+                    LazyColumn(Modifier.fillMaxSize(), rememberLazyListState()) {
                         items(exercises) {exercise->
-                            ExerciseItemList(exercise, viewModel = createRoutineViewModel)
+                            ExerciseItemList(
+                                exercise,
+                                viewModel = createRoutineViewModel
+                            )
                         }
                     }
                 }
-                1 -> {
 
+                1 -> {
+                    LazyColumn(Modifier.fillMaxSize(),rememberLazyListState()) {
+                        items(exercisesToAddList) {exercise->
+                            ExerciseItemToAddList(
+                                exercise,
+                                viewModel = createRoutineViewModel,
+                            )
+                        }
+                    }
                 }
             }
         }
     }
 
-    selectedExercise?.let { ExerciseDetailAndConfigRoutineDialog(viewModel = createRoutineViewModel, strengthExerciseModel = it) }
+    selectedExercise?.let { ExerciseDetailAndConfigRoutineDialog(viewModel = createRoutineViewModel, strengthExerciseModel = it,coroutineScope,pagerState) }
 
 }
 
@@ -219,43 +211,18 @@ fun getChipColors(isSelected: Boolean) = SelectableChipColors(
 
 
 
-@Composable
-fun ExerciseItemList(exercise: StrengthExerciseModel, viewModel: CreateRoutineViewModel) {
-    Card(modifier = Modifier
-        .fillMaxWidth()
-        .padding(8.dp)
-        .clickable {
-            viewModel.setExercisesVisibility(true)
-            viewModel.setSelectedExercise(exercise)
-        }
-    )
-    {
-
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            AsyncImage(
-                model = exercise.image_url,
-                modifier = Modifier.size(100.dp),
-                contentScale = ContentScale.Crop,
-                contentDescription = "imageExercise")
-
-            Column(modifier = Modifier.padding(8.dp)) {
-                Text(text = exercise.name?:"", modifier = Modifier.fillMaxWidth())
-                Text(text = exercise.primary_muscle?:"", modifier = Modifier
-                    .background(colorResource(id = R.color.orange_low))
-                    .fillMaxWidth())
-            }
-        }
-    }
-
-}
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExerciseDetailAndConfigRoutineDialog(viewModel: CreateRoutineViewModel,strengthExerciseModel:StrengthExerciseModel){
+fun ExerciseDetailAndConfigRoutineDialog(
+    viewModel: CreateRoutineViewModel,
+    strengthExerciseModel:StrengthExerciseModel,
+    coroutineScope: CoroutineScope,
+    pagerState: PagerState){
 
     val showDetail by  viewModel.showDetailLive.observeAsState(initial = false)
     val lazyState = rememberLazyListState()
+
     if (showDetail){
         ModalBottomSheet(
             modifier = Modifier.fillMaxSize(),
@@ -289,7 +256,13 @@ fun ExerciseDetailAndConfigRoutineDialog(viewModel: CreateRoutineViewModel,stren
 
                 item {
                         Button(
-                            onClick = {},
+                            onClick = {
+                                viewModel.setexerciseToAddList(strengthExerciseModel)
+                                viewModel.setExercisesVisibility(false)
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(1)
+                                }
+                                      },
                             modifier = Modifier.fillMaxSize()
                         )
                         {
@@ -494,29 +467,33 @@ fun LegendItem(color: Color, text: String) {
 
 @Composable
 fun Stepper(
+    modifier: Modifier,
     value: Int,
     onValueChange: (Int) -> Unit,
     minValue: Int = 0,
     maxValue: Int = 800
 ) {
     Row(
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Button(
+        IconButton(
+            modifier = modifier.size(24.dp),
             onClick = { if (value > minValue) onValueChange(value - 1) },
             enabled = value > minValue
         ) {
-            Text("-")
+            Icon(painter =  painterResource(id = R.drawable.remove), contentDescription ="eliminar" )
         }
 
         Text(text = value.toString(), fontSize = 20.sp)
 
-        Button(
+        IconButton(
+            modifier = modifier.size(24.dp),
             onClick = { if (value < maxValue) onValueChange(value + 1) },
             enabled = value < maxValue
         ) {
-            Text("+")
+           Icon(painter =  painterResource(id = R.drawable.add), contentDescription ="añadir" )
         }
     }
 }
