@@ -32,7 +32,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
@@ -43,7 +45,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SelectableChipColors
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -55,6 +60,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -90,7 +96,9 @@ import com.patrykandpatrick.vico.core.component.shape.Shapes
 import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShader
 import com.patrykandpatrick.vico.core.entry.entryModelOf
 import com.patrykandpatrick.vico.core.entry.entryOf
+import com.patrykandpatrick.vico.core.extension.mutableListOf
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -161,11 +169,11 @@ fun ExercisesToAddRoutine(
             modifier = Modifier.padding(8.dp)
         ) { position ->
             when (position) {
-
                 0 -> {
                     LazyColumn(Modifier.fillMaxSize(), rememberLazyListState()) {
                         items(exercises) {exercise->
                             ExerciseItemList(
+                                borderColor = colorResource(id = R.color.orange_low),
                                 exercise,
                                 viewModel = createRoutineViewModel
                             )
@@ -174,12 +182,109 @@ fun ExercisesToAddRoutine(
                 }
 
                 1 -> {
+
+                    /*creamos otra lista ya que cuando se elimina un elemento la
+                    recomposicion intenta entrar a ese elemento que ya no existe antes de eliminarlo,
+                    evitando que la interfaz intente acceder a datos mientras se están actualizando.
+                    */
+
+                    val exerciseListElements  = remember {
+                        mutableListOf<StrengthExerciseModel>(exercisesToAddList)
+                    }
+
                     LazyColumn(Modifier.fillMaxSize(),rememberLazyListState()) {
-                        items(exercisesToAddList) {exercise->
-                            ExerciseItemToAddList(
-                                exercise,
-                                viewModel = createRoutineViewModel,
-                            )
+                        if (exerciseListElements.isNotEmpty()){
+                            items(exerciseListElements) {exercise->
+                                var showItem by remember {
+                                    mutableStateOf(true)
+                                }
+
+                                val borderToDelete  = remember {
+                                    mutableIntStateOf(R.color.orange_low)
+                                }
+                                val state = rememberSwipeToDismissBoxState(
+                                    positionalThreshold = { fullSize -> fullSize * 0.3f },
+                                    confirmValueChange = { value ->
+                                        if (value != SwipeToDismissBoxValue.Settled) {
+                                            coroutineScope.launch {
+                                                showItem = false
+                                                delay(300) // Esperar a que termine la animación
+                                                createRoutineViewModel.deleteExerciseToAddList(exercise)
+                                            }
+                                            true
+                                        } else {
+                                            false
+                                        }
+                                    }
+                                )
+                                if (showItem)
+                                    SwipeToDismissBox(
+                                        state = state,
+                                        enableDismissFromStartToEnd = false,
+                                        backgroundContent = {
+                                            val direction = state.targetValue // Obtiene el estado de deslizamiento
+
+                                            borderToDelete.intValue = when (direction) {
+                                                SwipeToDismissBoxValue.EndToStart -> R.color.orange
+                                                else ->R.color.orange_low
+                                            }
+
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .padding(horizontal = 16.dp),
+                                                contentAlignment = when (direction) {
+                                                    SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
+                                                    SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
+                                                    else -> Alignment.Center
+                                                }
+                                            ) {
+                                                if (direction != SwipeToDismissBoxValue.Settled) {
+                                                    Image(
+                                                        modifier = Modifier.size(24.dp),
+                                                        painter = painterResource(id = R.drawable.eliminar) ,
+                                                        contentDescription = "Eliminar"
+                                                    )
+                                                }
+                                            }
+                                        }
+                                        ,
+                                        content = {
+                                            ExerciseItemToAddList(
+                                                borderColor = colorResource(id = borderToDelete.value),
+                                                exercise,
+                                                viewModel = createRoutineViewModel)
+                                        }
+                                    )
+                                }
+                        }else{
+                            item {
+                                Image(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    painter = painterResource(id = R.drawable.routinenodata),
+                                    contentDescription = "rutina sin datos imagen")
+                            }
+                        }
+
+                        item {
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+                                Button(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(8.dp),
+                                    enabled = false,
+                                    onClick = { },
+                                )
+                                {
+                                    Text(text = "Crear rutina")
+                                }
+                                Image(
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .clickable { },
+                                    painter = painterResource(id = R.drawable.reloj),
+                                    contentDescription = "hora")
+                            }
                         }
                     }
                 }
@@ -252,12 +357,11 @@ fun ExerciseDetailAndConfigRoutineDialog(
                 item {
                     ExerciseAllDetails(strengthExerciseModel)
                 }
-
-
+                
                 item {
                         Button(
                             onClick = {
-                                viewModel.setexerciseToAddList(strengthExerciseModel)
+                                viewModel.setExerciseToAddList(strengthExerciseModel)
                                 viewModel.setExercisesVisibility(false)
                                 coroutineScope.launch {
                                     pagerState.animateScrollToPage(1)

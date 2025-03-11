@@ -93,6 +93,7 @@ fun ListInfoComponents(list:List<String>){
 
 @Composable
 fun ExerciseItemList(
+    borderColor: Color,
     exercise: StrengthExerciseModel,
     viewModel: CreateRoutineViewModel
 ) {
@@ -101,7 +102,7 @@ fun ExerciseItemList(
         .padding(8.dp)
         .border(
             2.dp,
-            color = colorResource(id = R.color.orange_low),
+            color = borderColor,
             shape = RoundedCornerShape(8.dp)
         )
         .clickable {
@@ -139,6 +140,7 @@ fun ExerciseItemList(
 
 @Composable
 fun ExerciseItemToAddList(
+    borderColor: Color,
     exercise: StrengthExerciseModel,
     viewModel: CreateRoutineViewModel
 ) {
@@ -150,7 +152,7 @@ fun ExerciseItemToAddList(
         .padding(8.dp)
         .border(
             2.dp,
-            color = colorResource(id = R.color.orange_low),
+            color = borderColor,
             shape = RoundedCornerShape(8.dp)
         )
         .clickable {
@@ -161,7 +163,7 @@ fun ExerciseItemToAddList(
     )
     {
         Column(verticalArrangement = Arrangement.Center) {
-            ExerciseItemList(exercise = exercise, viewModel = viewModel)
+            ExerciseItemList(exercise = exercise, viewModel = viewModel, borderColor = borderColor)
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -183,7 +185,9 @@ fun ExerciseItemToAddList(
                 }
             }
 
-            Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)) {
                 setsList.forEachIndexed { position, exercise ->
                     Row(
                         modifier = Modifier
@@ -234,7 +238,9 @@ fun ExerciseItemToAddList(
                         )
 
                         IconButton(
-                            modifier = Modifier.weight(0.5f).size(24.dp),
+                            modifier = Modifier
+                                .weight(0.5f)
+                                .size(24.dp),
                             onClick = { setsList.remove(exercise)}
                         )
                         {

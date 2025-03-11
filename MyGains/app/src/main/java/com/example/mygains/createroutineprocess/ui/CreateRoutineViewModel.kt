@@ -41,9 +41,15 @@ class CreateRoutineViewModel @Inject constructor(
 
 
 
-    fun setexerciseToAddList(strengthExerciseModel: StrengthExerciseModel){
+    fun setExerciseToAddList(strengthExerciseModel: StrengthExerciseModel){
         val listConverter:MutableList<StrengthExerciseModel> =  _exercisesToAdd.value?: mutableListOf()
         listConverter.add(strengthExerciseModel)
+        _exercisesToAdd.postValue(listConverter)
+    }
+
+    fun deleteExerciseToAddList(strengthExerciseModel: StrengthExerciseModel){
+        val listConverter:MutableList<StrengthExerciseModel> =  _exercisesToAdd.value?: mutableListOf()
+        listConverter.remove(strengthExerciseModel)
         _exercisesToAdd.postValue(listConverter)
     }
 
