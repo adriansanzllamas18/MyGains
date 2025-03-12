@@ -1,5 +1,8 @@
 package com.example.mygains.createroutineprocess.data.models
 
+import com.example.mygains.extras.utils.firebase.FirestoreIdGenerator
+import java.util.Date
+
 data class StrengthExerciseModel(
     val bestFor: MutableList<String>?= mutableListOf(),
     val calories_estimated: String? ="",
@@ -17,4 +20,19 @@ data class StrengthExerciseModel(
     val type: String? ="",
     val variations: MutableList<String>?= mutableListOf(),
     val commonMistakes: MutableList<String>?= mutableListOf()
-)
+){
+    fun toExerciseLogModel(userId:String,date: String,sets:MutableList<ExerciseSet>):ExerciseLog{
+
+        return ExerciseLog(
+            id = FirestoreIdGenerator.generateRoutineId(userId),
+            exerciseId =exerciseId?:"",
+            name = name?:"",
+            muscleGroup = muscle_group_id?:"",
+            date = date,
+            sets= sets,
+            duration = 0,
+            notes = null
+        )
+    }
+
+}

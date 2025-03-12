@@ -2,6 +2,7 @@ package com.example.mygains.createroutineprocess.ui.screens
 
 
 import android.graphics.Paint
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -24,17 +25,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
@@ -52,6 +49,7 @@ import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -60,7 +58,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -76,6 +73,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.mygains.R
+import com.example.mygains.createroutineprocess.data.models.ExerciseSet
+import com.example.mygains.createroutineprocess.data.models.ExerciseWithSets
 import com.example.mygains.createroutineprocess.data.models.StrengthExerciseModel
 import com.example.mygains.createroutineprocess.ui.CreateRoutineViewModel
 import com.example.mygains.createroutineprocess.ui.components.ExerciseItemList
@@ -112,8 +111,7 @@ fun ExercisesToAddRoutine(
     val coroutineScope = rememberCoroutineScope()
     val exercises by createRoutineViewModel.exercisesLive.observeAsState(initial = mutableListOf())
     val selectedExercise by createRoutineViewModel.exercisesSelectedlLive.observeAsState(initial = null)
-    val exercisesToAddList by createRoutineViewModel.exercisesToAddLive.observeAsState(initial = mutableListOf())
-
+    val exerciseWhitSets by createRoutineViewModel.exerciseWithSetsLive.observeAsState(initial = mutableListOf<ExerciseWithSets>())
 
     LaunchedEffect(Unit) {
         if (muscle_id.isNotEmpty()){
@@ -188,36 +186,34 @@ fun ExercisesToAddRoutine(
                     evitando que la interfaz intente acceder a datos mientras se están actualizando.
                     */
 
-                    val exerciseListElements  = remember {
-                        mutableListOf<StrengthExerciseModel>(exercisesToAddList)
-                    }
 
                     LazyColumn(Modifier.fillMaxSize(),rememberLazyListState()) {
-                        if (exerciseListElements.isNotEmpty()){
-                            items(exerciseListElements) {exercise->
-                                var showItem by remember {
-                                    mutableStateOf(true)
-                                }
+                        if (exerciseWhitSets.isNotEmpty()){
+                            itemsIndexed(
+                                items = exerciseWhitSets,
+                                key = { index, item -> index }
+                            ) { index, exercise->
 
-                                val borderToDelete  = remember {
-                                    mutableIntStateOf(R.color.orange_low)
-                                }
-                                val state = rememberSwipeToDismissBoxState(
-                                    positionalThreshold = { fullSize -> fullSize * 0.3f },
-                                    confirmValueChange = { value ->
-                                        if (value != SwipeToDismissBoxValue.Settled) {
-                                            coroutineScope.launch {
-                                                showItem = false
-                                                delay(300) // Esperar a que termine la animación
-                                                createRoutineViewModel.deleteExerciseToAddList(exercise)
-                                            }
-                                            true
-                                        } else {
-                                            false
-                                        }
+                                //asignamos el kay a cada elemento para que compose identifique cada uno cuando la vista cambie
+                                key(exercise.exercise) {
+                                    val borderToDelete  = remember {
+                                        mutableIntStateOf(R.color.orange_low)
                                     }
-                                )
-                                if (showItem)
+                                    val state = rememberSwipeToDismissBoxState(
+                                        positionalThreshold = { fullSize -> fullSize * 0.3f },
+                                        confirmValueChange = { value ->
+                                            if (value != SwipeToDismissBoxValue.Settled) {
+                                                coroutineScope.launch {
+                                                    delay(300) // Esperar a que termine la animación
+                                                    createRoutineViewModel.removeExercise(exercise.exercise)
+                                                }
+                                                true
+                                            } else {
+                                                false
+                                            }
+                                        }
+                                    )
+
                                     SwipeToDismissBox(
                                         state = state,
                                         enableDismissFromStartToEnd = false,
@@ -252,10 +248,17 @@ fun ExercisesToAddRoutine(
                                         content = {
                                             ExerciseItemToAddList(
                                                 borderColor = colorResource(id = borderToDelete.value),
-                                                exercise,
-                                                viewModel = createRoutineViewModel)
+                                                exercise = exercise.exercise,
+                                                sets = exercise.sets,
+                                                onSetsUpdated = { updatedSets ->
+                                                    createRoutineViewModel.updateSetsForExercise(exercise.exercise, updatedSets)
+                                                },
+                                                viewModel = createRoutineViewModel
+                                            )
                                         }
                                     )
+                                }
+
                                 }
                         }else{
                             item {
@@ -272,8 +275,8 @@ fun ExercisesToAddRoutine(
                                     modifier = Modifier
                                         .weight(1f)
                                         .padding(8.dp),
-                                    enabled = false,
-                                    onClick = { },
+                                    enabled = true,
+                                    onClick = {Log.i("createroutine",exerciseWhitSets.toString())},
                                 )
                                 {
                                     Text(text = "Crear rutina")
@@ -361,7 +364,7 @@ fun ExerciseDetailAndConfigRoutineDialog(
                 item {
                         Button(
                             onClick = {
-                                viewModel.setExerciseToAddList(strengthExerciseModel)
+                                viewModel.addExercise(exercise = strengthExerciseModel)
                                 viewModel.setExercisesVisibility(false)
                                 coroutineScope.launch {
                                     pagerState.animateScrollToPage(1)

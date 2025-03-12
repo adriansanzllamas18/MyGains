@@ -142,10 +142,19 @@ fun ExerciseItemList(
 fun ExerciseItemToAddList(
     borderColor: Color,
     exercise: StrengthExerciseModel,
+    sets: List<ExerciseSet> = emptyList(),
+    onSetsUpdated: (List<ExerciseSet>) -> Unit,
     viewModel: CreateRoutineViewModel
-) {
+){
 
-    val setsList = remember { mutableStateListOf<ExerciseSet>() }
+    val setsList = remember { mutableStateListOf<ExerciseSet>().apply {
+        addAll(sets)
+    }}
+
+    // Observa cambios en setsList y notifica al padre
+    LaunchedEffect(setsList.toList()) {
+        onSetsUpdated(setsList.toList())
+    }
 
     Card(modifier = Modifier
         .fillMaxWidth()

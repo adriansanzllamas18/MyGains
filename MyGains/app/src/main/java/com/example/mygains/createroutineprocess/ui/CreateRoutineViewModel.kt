@@ -4,14 +4,19 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mygains.base.BaseResponse
+import com.example.mygains.createroutineprocess.data.models.ExerciseSet
+import com.example.mygains.createroutineprocess.data.models.ExerciseWithSets
 import com.example.mygains.createroutineprocess.data.models.InfoTypeOfWorkOutModel
 import com.example.mygains.createroutineprocess.data.models.StrengthExerciseModel
 import com.example.mygains.createroutineprocess.data.models.TypeOfWorkOutModel
 import com.example.mygains.createroutineprocess.domain.usecases.CreateRoutineUsecase
+import com.google.common.collect.Sets
+import com.patrykandpatrick.vico.core.extension.mutableListOf
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.Date
 import javax.inject.Inject
 
 
@@ -35,22 +40,39 @@ class CreateRoutineViewModel @Inject constructor(
     private var _exercisesSelected = MutableLiveData<StrengthExerciseModel>()
     val exercisesSelectedlLive: MutableLiveData<StrengthExerciseModel> = _exercisesSelected
 
-    private var _exercisesToAdd = MutableLiveData<MutableList<StrengthExerciseModel>>()
-    val exercisesToAddLive: MutableLiveData<MutableList<StrengthExerciseModel>> = _exercisesToAdd
+    private var _exerciseWithSets = MutableLiveData<MutableList<ExerciseWithSets>>()
+    val exerciseWithSetsLive: MutableLiveData<MutableList<ExerciseWithSets>> = _exerciseWithSets
 
 
 
-
-    fun setExerciseToAddList(strengthExerciseModel: StrengthExerciseModel){
-        val listConverter:MutableList<StrengthExerciseModel> =  _exercisesToAdd.value?: mutableListOf()
-        listConverter.add(strengthExerciseModel)
-        _exercisesToAdd.postValue(listConverter)
+    fun addExercise(exercise: StrengthExerciseModel) {
+        val currentList = _exerciseWithSets.value ?: mutableListOf()
+        val newList = currentList.toMutableList()
+        // Añadir el ejercicio solo si no existe ya
+        if (newList.none { it.exercise == exercise }) {
+            newList.add(ExerciseWithSets(exercise))
+        }
+        _exerciseWithSets.postValue(newList)
     }
 
-    fun deleteExerciseToAddList(strengthExerciseModel: StrengthExerciseModel){
-        val listConverter:MutableList<StrengthExerciseModel> =  _exercisesToAdd.value?: mutableListOf()
-        listConverter.remove(strengthExerciseModel)
-        _exercisesToAdd.postValue(listConverter)
+    fun updateSetsForExercise(exercise: StrengthExerciseModel, sets: List<ExerciseSet>) {
+        val currentList = _exerciseWithSets.value ?: mutableListOf()
+        val newList = currentList.toMutableList()
+
+        // Encuentra el ejercicio y actualiza sus series
+        val exerciseIndex = newList.indexOfFirst { it.exercise == exercise }
+        if (exerciseIndex != -1) {
+            newList[exerciseIndex] = newList[exerciseIndex].copy(sets = sets.toMutableList())
+        }
+
+        _exerciseWithSets.postValue(newList)
+    }
+
+    fun removeExercise(exercise: StrengthExerciseModel) {
+        val currentList = _exerciseWithSets.value ?: mutableListOf()
+        val newList = currentList.toMutableList()
+        newList.removeIf { it.exercise == exercise }
+        _exerciseWithSets.postValue(newList)
     }
 
     fun setExercisesVisibility(isVisble:Boolean){
@@ -62,7 +84,7 @@ class CreateRoutineViewModel @Inject constructor(
     }
 
 
-        fun getAllWorkOuts(){
+    fun getAllWorkOuts(){
         viewModelScope.launch(Dispatchers.IO) {
             delay(2000)
             when( val result = createRoutineUsecase.getAllWorkouts()){
@@ -86,6 +108,15 @@ class CreateRoutineViewModel @Inject constructor(
         viewModelScope.launch (Dispatchers.IO){
             when(val result = createRoutineUsecase.getAllExercises(muscle_id)){
                 is BaseResponse.Success->{_exercises.postValue(result.data)}
+                is BaseResponse.Error->{}
+            }
+        }
+    }
+
+    fun saveRoutine(exercises:MutableList<StrengthExerciseModel>,date: String,sets:MutableList<ExerciseSet>){
+        viewModelScope.launch(Dispatchers.IO) {
+            when(val result = createRoutineUsecase.saveRoutine(exercises,"", sets = sets )){
+                is BaseResponse.Success->{}
                 is BaseResponse.Error->{}
             }
         }

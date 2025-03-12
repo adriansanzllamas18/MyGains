@@ -9,7 +9,7 @@ data class ExerciseLog(
     val exerciseId: String = "", // Referencia al Exercise original
     val name: String = "",
     val muscleGroup: String = "",
-    val date: Timestamp = Timestamp.now(),
+    val date: String = "",
     val sets: List<ExerciseSet> = emptyList(),
     val duration: Int = 0, // Duración en minutos
     val notes: String? = null
