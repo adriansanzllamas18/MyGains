@@ -1,27 +1,16 @@
 package com.example.mygains.newuser.domain
 
-import android.accounts.NetworkErrorException
-import android.util.Log
-import com.example.mygains.base.BaseAuthError
-import com.example.mygains.base.BaseResponse
+import com.example.mygains.base.response.errorresponse.BaseAuthError
+import com.example.mygains.base.response.BaseResponse
 import com.example.mygains.userinfo.data.models.UserData
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseNetworkException
-import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import com.google.gson.internal.bind.util.ISO8601Utils
 import kotlinx.coroutines.tasks.await
-import okio.IOException
 import javax.inject.Inject
 
 class NewUserUseCase @Inject constructor(private var  firebaseAuth: FirebaseAuth,private var db:FirebaseFirestore) {

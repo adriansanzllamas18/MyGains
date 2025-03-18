@@ -73,6 +73,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.mygains.R
+import com.example.mygains.base.response.BaseResponse
 import com.example.mygains.createroutineprocess.data.models.ExerciseSet
 import com.example.mygains.createroutineprocess.data.models.ExerciseWithSets
 import com.example.mygains.createroutineprocess.data.models.StrengthExerciseModel
@@ -81,6 +82,7 @@ import com.example.mygains.createroutineprocess.ui.components.ExerciseItemList
 import com.example.mygains.createroutineprocess.ui.components.ExerciseItemToAddList
 import com.example.mygains.createroutineprocess.ui.components.ListInfoComponents
 import com.example.mygains.createroutineprocess.ui.components.TitleAndImageIconComponent
+import com.example.mygains.extras.globalcomponents.CustomAlertDialog
 import com.patrykandpatrick.vico.compose.axis.horizontal.bottomAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
 import com.patrykandpatrick.vico.compose.chart.line.lineChart
@@ -113,6 +115,7 @@ fun ExercisesToAddRoutine(
     val exercises by createRoutineViewModel.exercisesLive.observeAsState(initial = mutableListOf())
     val selectedExercise by createRoutineViewModel.exercisesSelectedlLive.observeAsState(initial = null)
     val exerciseWhitSets by createRoutineViewModel.exerciseWithSetsLive.observeAsState(initial = mutableListOf<ExerciseWithSets>())
+    val resultAlert by createRoutineViewModel.resultSaveLive.observeAsState(initial = null)
 
     LaunchedEffect(Unit) {
         if (muscle_id.isNotEmpty()){
@@ -296,7 +299,24 @@ fun ExercisesToAddRoutine(
             }
         }
     }
-
+    if (resultAlert != null){
+        AnimatedVisibility (resultAlert!!.show){
+            when(resultAlert!!.response){
+                is BaseResponse.Success->{
+                    CustomAlertDialog(
+                        responseUi = resultAlert!!,
+                        actionDismiss = {createRoutineViewModel.upDateDialog(false)},
+                        actionConfirm = {createRoutineViewModel.upDateDialog(false)})
+                }
+                else ->{
+                    CustomAlertDialog(
+                        responseUi = resultAlert!!,
+                        actionDismiss = {createRoutineViewModel.upDateDialog(false)},
+                        actionConfirm = {createRoutineViewModel.upDateDialog(false)})
+                }
+            }
+        }
+    }
     selectedExercise?.let { ExerciseDetailAndConfigRoutineDialog(viewModel = createRoutineViewModel, strengthExerciseModel = it,coroutineScope,pagerState) }
 
 }

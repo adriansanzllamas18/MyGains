@@ -3,21 +3,20 @@ package com.example.mygains.createroutineprocess.ui
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mygains.base.BaseResponse
-import com.example.mygains.base.BaseResponseUi
+import com.example.mygains.base.response.BaseResponse
+import com.example.mygains.base.response.BaseResponseUi
 import com.example.mygains.createroutineprocess.data.models.ExerciseSet
 import com.example.mygains.createroutineprocess.data.models.ExerciseWithSets
 import com.example.mygains.createroutineprocess.data.models.InfoTypeOfWorkOutModel
 import com.example.mygains.createroutineprocess.data.models.StrengthExerciseModel
 import com.example.mygains.createroutineprocess.data.models.TypeOfWorkOutModel
 import com.example.mygains.createroutineprocess.domain.usecases.CreateRoutineUsecase
-import com.google.common.collect.Sets
-import com.patrykandpatrick.vico.core.extension.mutableListOf
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.Date
+import kotlinx.coroutines.time.withTimeout
+import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 
@@ -44,9 +43,15 @@ class CreateRoutineViewModel @Inject constructor(
     private var _exerciseWithSets = MutableLiveData<MutableList<ExerciseWithSets>>()
     val exerciseWithSetsLive: MutableLiveData<MutableList<ExerciseWithSets>> = _exerciseWithSets
 
-    private var _ResultSave = MutableLiveData<BaseResponseUi>()
-    val resultSaveLive: MutableLiveData<BaseResponseUi> = _ResultSave
+    private var _ResultSave = MutableLiveData<BaseResponseUi?>()
+    val resultSaveLive: MutableLiveData<BaseResponseUi?> = _ResultSave
 
+
+
+    fun upDateDialog(show:Boolean){
+        val re =_ResultSave.value?.copy(show = show)
+        _ResultSave.postValue(re)
+    }
 
     fun addExercise(exercise: StrengthExerciseModel) {
         val currentList = _exerciseWithSets.value ?: mutableListOf()
@@ -120,7 +125,7 @@ class CreateRoutineViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             when(val result = createRoutineUsecase.saveRoutine(exercises,date)){
                 is BaseResponse.Success->{}
-                is BaseResponse.Error->{}
+                is BaseResponse.Error->{_ResultSave.postValue(BaseResponseUi(show = true, response = result, message = result.mapError()))}
             }
         }
     }

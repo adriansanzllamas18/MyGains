@@ -1,16 +1,25 @@
 package com.example.mygains.createroutineprocess.data.repositoryimpl
 
-import com.example.mygains.base.BaseAuthError
-import com.example.mygains.base.BaseResponse
+import com.example.mygains.base.response.errorresponse.BaseAuthError
+import com.example.mygains.base.response.BaseResponse
+import com.example.mygains.base.response.errorresponse.BaseFireStoreError
 import com.example.mygains.createroutineprocess.data.models.DailyRoutine
 import com.example.mygains.createroutineprocess.data.models.InfoTypeOfWorkOutModel
 import com.example.mygains.createroutineprocess.data.models.StrengthExerciseModel
 import com.example.mygains.createroutineprocess.data.models.TypeOfWorkOutModel
 import com.example.mygains.createroutineprocess.domain.repositoryInterfaces.CreateRoutineRepositoryInterface
+import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.SetOptions
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.tasks.await
-import okhttp3.internal.wait
+import kotlinx.coroutines.withTimeout
 import java.io.IOException
 import javax.inject.Inject
 
@@ -56,11 +65,27 @@ class CreateRoutineRepositoryImpl @Inject constructor(var firestore: FirebaseFir
             "exercises" to routine.exercises
         )
 
-      try {
-          val result = firestore.collection("users").document(routine.userId).collection("routineHistoric").document().set(routineMap).await()
-          return BaseResponse.Success("Rutina creada correctamente")
-      }catch (ex:Exception){
-          return BaseResponse.Error(BaseAuthError.UnknownError(ex.message))
-      }
+        return try {
+            withTimeout(15000) { // 15 segundos de timeout
+                // Realizar la operación con el Firestore configurado para no persistir
+                val result = firestore.collection("users").document(routine.userId)
+                    .collection("routineHistoric")
+                    .document()
+                    .set(routineMap,SetOptions.merge()).await()
+                BaseResponse.Success("Rutina creada correctamente.")
+            }
+
+        } catch (e: TimeoutCancellationException) {
+            BaseResponse.Error(BaseFireStoreError.TimeOut)
+        } catch (e: FirebaseFirestoreException) {
+            when (e.code) {
+                FirebaseFirestoreException.Code.UNKNOWN -> BaseResponse.Error(BaseFireStoreError.UnknownError)
+                FirebaseFirestoreException.Code.NOT_FOUND -> BaseResponse.Error(BaseFireStoreError.DocumentNotFound)
+                FirebaseFirestoreException.Code.UNAVAILABLE -> BaseResponse.Error(BaseFireStoreError.Unavailable)
+                else -> BaseResponse.Error(BaseFireStoreError.UnknownError)
+            }
+        } catch (e: Exception) {
+            BaseResponse.Error(BaseFireStoreError.UnknownError)
+        }
     }
 }

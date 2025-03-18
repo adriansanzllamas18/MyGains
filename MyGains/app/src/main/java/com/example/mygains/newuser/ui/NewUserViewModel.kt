@@ -1,29 +1,16 @@
 package com.example.mygains.newuser.ui
 
-import android.app.Activity
-import android.content.Context
-import android.content.Intent
-import android.util.Log
 import android.util.Patterns
-import androidx.activity.result.ActivityResultLauncher
-import androidx.core.content.ContextCompat.getString
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mygains.extras.utils.FormatterUtils
-import com.example.mygains.R
-import com.example.mygains.base.BaseAuthError
-import com.example.mygains.base.BaseResponse
+import com.example.mygains.base.response.BaseResponse
 import com.example.mygains.newuser.domain.NewUserUseCase
 import com.example.mygains.userinfo.data.models.UserData
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okio.IOException
 import javax.inject.Inject
 
 @HiltViewModel

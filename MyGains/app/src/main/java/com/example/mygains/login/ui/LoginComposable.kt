@@ -325,7 +325,7 @@ fun GoogleSignInButton(googleAccount: ManagedActivityResultLauncher<Intent, Acti
 
     val context = LocalContext.current
 
-        Button(
+    Button(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 24.dp, end = 24.dp),
