@@ -83,16 +83,11 @@ class LoginViewModel @Inject constructor(private var loginUseCase: LoginUseCase)
 
 
     fun loginWithGoogle(account: GoogleSignInAccount){
-
         _isLoading.value= true
-
         viewModelScope.launch(Dispatchers.IO) {
             var idToken= account.idToken
-
             if (idToken!= null){
-
                 try {
-
                     // esto quiere decir que si no devuelve un objeto user es decir que devuelva null significa que ha ido mal el inicio de sesion
                     _loginResult.postValue(loginUseCase.createUserWithGoogleCredentials(account) != null)
                     _isLoading.postValue(false)

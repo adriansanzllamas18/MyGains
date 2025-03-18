@@ -7,14 +7,14 @@ data class DailyRoutine(
     val exercises: List<ExerciseLog> = listOf(),
     val notes: String = "",
     // Características diferenciadoras
-    val energyLevel: Int = 5, // Escala 1-10 de cómo se sintió el usuario durante el entrenamiento
+    val energyLevel: Int? = null, // Escala 1-10 de cómo se sintió el usuario durante el entrenamiento
     val mood: String = "", // Estado de ánimo pre/post entrenamiento
     //val playlist: PlaylistInfo? = null, // Información sobre música escuchada durante el entrenamiento
     //val weatherConditions: WeatherInfo? = null, // Condiciones meteorológicas (útil para entrenamientos al aire libre)
     //val performanceRating: Int = 0, // Autoevaluación del usuario sobre su rendimiento (1-5)
     //val goals: List<TrainingGoal> = listOf(), // Objetivos específicos para esta sesión
     //val location: GymLocation? = null,  Lugar donde se realizó el entrenamiento
-    // val challengeCompleted: List<ChallengeInfo> = listOf(),  Desafíos completados en esta sesión
+    //val challengeCompleted: List<ChallengeInfo> = listOf(),  Desafíos completados en esta sesión
     val tags: List<String> = listOf() // Etiquetas personalizadas para filtrar entrenamientos
 ) {
     /*

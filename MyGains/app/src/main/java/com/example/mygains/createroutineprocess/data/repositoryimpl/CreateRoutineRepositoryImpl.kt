@@ -57,7 +57,7 @@ class CreateRoutineRepositoryImpl @Inject constructor(var firestore: FirebaseFir
         )
 
       try {
-          val result = firestore.collection("routineHistoric").document().set(routineMap).await()
+          val result = firestore.collection("users").document(routine.userId).collection("routineHistoric").document().set(routineMap).await()
           return BaseResponse.Success("Rutina creada correctamente")
       }catch (ex:Exception){
           return BaseResponse.Error(BaseAuthError.UnknownError(ex.message))

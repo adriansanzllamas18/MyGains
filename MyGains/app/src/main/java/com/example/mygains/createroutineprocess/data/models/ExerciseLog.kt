@@ -7,6 +7,7 @@ data class ExerciseLog(
     @DocumentId
     val id: String = "",
     val exerciseId: String = "", // Referencia al Exercise original
+    val routineId:String ="",//Referencia a la rutina donde se realizo
     val name: String = "",
     val muscleGroup: String = "",
     val date: String = "",

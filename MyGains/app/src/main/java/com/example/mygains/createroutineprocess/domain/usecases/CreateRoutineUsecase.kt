@@ -5,10 +5,12 @@ import com.example.mygains.base.BaseResponse
 import com.example.mygains.createroutineprocess.data.models.DailyRoutine
 import com.example.mygains.createroutineprocess.data.models.ExerciseLog
 import com.example.mygains.createroutineprocess.data.models.ExerciseSet
+import com.example.mygains.createroutineprocess.data.models.ExerciseWithSets
 import com.example.mygains.createroutineprocess.data.models.InfoTypeOfWorkOutModel
 import com.example.mygains.createroutineprocess.data.models.StrengthExerciseModel
 import com.example.mygains.createroutineprocess.data.models.TypeOfWorkOutModel
 import com.example.mygains.createroutineprocess.data.repositoryimpl.CreateRoutineRepositoryImpl
+import com.example.mygains.exercisesplan.data.models.Exercises
 import com.example.mygains.exercisesplan.data.models.MuscleGroupe
 import com.example.mygains.extras.utils.firebase.FirestoreIdGenerator
 import com.google.firebase.auth.FirebaseAuth
@@ -30,22 +32,34 @@ class CreateRoutineUsecase @Inject constructor(private var createRoutineReposito
         return createRoutineRepositoryImpl.getAllExercises(muscle_id)
     }
 
-    suspend fun saveRoutine(routine:MutableList<StrengthExerciseModel>, date:String,sets:MutableList<ExerciseSet>):BaseResponse<String>{
+    suspend fun saveRoutine(routine:MutableList<ExerciseWithSets>,date:String):BaseResponse<String>{
         val userId = firebaseAuth.currentUser?.uid
         val list= mutableListOf<ExerciseLog>()
-        if (userId!= null){
-            routine.forEach {model->
-                list.add(model.toExerciseLogModel(userId = userId, date = date, sets = sets))
+        return if (userId!= null){
+            val routineId = FirestoreIdGenerator.generateRoutineId(userId)
+            routine.forEach { exerciseWithSets ->
+                list.add(
+                    ExerciseLog(
+                    id = FirestoreIdGenerator.generateExerciseId(userId),
+                    exerciseId = exerciseWithSets.exercise.exerciseId?:"",
+                    routineId = routineId,
+                    name = exerciseWithSets.exercise.name?:"",
+                    muscleGroup = exerciseWithSets.exercise.muscle_group_id?:"",
+                    date = date,
+                    sets = exerciseWithSets.sets,
+                    duration = 0,
+                    notes = ""
+                    )
+                )
             }
-
-            return createRoutineRepositoryImpl.saveRoutine(DailyRoutine(
-                id = FirestoreIdGenerator.generateRoutineId(userId),
+            createRoutineRepositoryImpl.saveRoutine(DailyRoutine(
+                id = routineId,
                 userId = userId,
                 date = date ,
                 exercises = list)
             )
         }else{
-            return BaseResponse.Error(BaseAuthError.UnknownError("Error inesperado"))
+            BaseResponse.Error(BaseAuthError.UnknownError("Error inesperado"))
         }
     }
 }

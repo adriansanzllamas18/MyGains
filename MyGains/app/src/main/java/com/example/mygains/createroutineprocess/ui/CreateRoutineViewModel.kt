@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mygains.base.BaseResponse
+import com.example.mygains.base.BaseResponseUi
 import com.example.mygains.createroutineprocess.data.models.ExerciseSet
 import com.example.mygains.createroutineprocess.data.models.ExerciseWithSets
 import com.example.mygains.createroutineprocess.data.models.InfoTypeOfWorkOutModel
@@ -43,6 +44,8 @@ class CreateRoutineViewModel @Inject constructor(
     private var _exerciseWithSets = MutableLiveData<MutableList<ExerciseWithSets>>()
     val exerciseWithSetsLive: MutableLiveData<MutableList<ExerciseWithSets>> = _exerciseWithSets
 
+    private var _ResultSave = MutableLiveData<BaseResponseUi>()
+    val resultSaveLive: MutableLiveData<BaseResponseUi> = _ResultSave
 
 
     fun addExercise(exercise: StrengthExerciseModel) {
@@ -113,9 +116,9 @@ class CreateRoutineViewModel @Inject constructor(
         }
     }
 
-    fun saveRoutine(exercises:MutableList<StrengthExerciseModel>,date: String,sets:MutableList<ExerciseSet>){
+    fun saveRoutine(exercises:MutableList<ExerciseWithSets>,date: String){
         viewModelScope.launch(Dispatchers.IO) {
-            when(val result = createRoutineUsecase.saveRoutine(exercises,"", sets = sets )){
+            when(val result = createRoutineUsecase.saveRoutine(exercises,date)){
                 is BaseResponse.Success->{}
                 is BaseResponse.Error->{}
             }

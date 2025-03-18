@@ -99,6 +99,7 @@ import com.patrykandpatrick.vico.core.extension.mutableListOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 
 @Composable
@@ -213,7 +214,6 @@ fun ExercisesToAddRoutine(
                                             }
                                         }
                                     )
-
                                     SwipeToDismissBox(
                                         state = state,
                                         enableDismissFromStartToEnd = false,
@@ -276,7 +276,9 @@ fun ExercisesToAddRoutine(
                                         .weight(1f)
                                         .padding(8.dp),
                                     enabled = true,
-                                    onClick = {Log.i("createroutine",exerciseWhitSets.toString())},
+                                    onClick = {
+                                        createRoutineViewModel.saveRoutine(exerciseWhitSets,LocalDate.now().toString())
+                                              },
                                 )
                                 {
                                     Text(text = "Crear rutina")
@@ -376,7 +378,6 @@ fun ExerciseDetailAndConfigRoutineDialog(
                             Text(text = "Añadir Ejercicio")
                         }
                 }
-
             }
         }
     }

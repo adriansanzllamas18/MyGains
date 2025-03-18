@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mygains.extras.utils.FormatterUtils
 import com.example.mygains.R
+import com.example.mygains.base.BaseAuthError
 import com.example.mygains.base.BaseResponse
 import com.example.mygains.newuser.domain.NewUserUseCase
 import com.example.mygains.userinfo.data.models.UserData
@@ -71,9 +72,8 @@ class NewUserViewModel @Inject constructor(private var newUserUseCase: NewUserUs
 
             try {
                 when( val response = newUserUseCase.createUserWithEmailPass(userData)){
-
                     is BaseResponse.Error ->{
-                        _result.postValue(response.error.mapAuthErrorToMessage(response.error))
+                        _result.postValue(response.mapError())
                         _isAlert.postValue(true)
                         _isLoading.postValue(false)
                     }

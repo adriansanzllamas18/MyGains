@@ -41,7 +41,6 @@ class NewUserUseCase @Inject constructor(private var  firebaseAuth: FirebaseAuth
         } catch (e: Exception) {
         BaseResponse.Error(BaseAuthError.UnknownError(e.message))
         }
-
     }
 
     // Guardar información del usuario en Firestore

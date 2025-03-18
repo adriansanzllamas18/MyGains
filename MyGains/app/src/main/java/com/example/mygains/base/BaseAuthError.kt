@@ -1,6 +1,7 @@
 package com.example.mygains.base
 
-sealed class BaseAuthError {
+
+sealed class BaseAuthError: BaseResponseError() {
 
     object EmailAlreadyExists : BaseAuthError()
     object InvalidCredentials : BaseAuthError()
