@@ -1,4 +1,4 @@
-package com.example.mygains.createroutineprocess.ui.screens
+package com.example.mygains.createroutineprocess.ui.screens.stregnth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
@@ -28,11 +28,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.mygains.createroutineprocess.data.models.InfoTypeOfWorkOutModel
-import com.example.mygains.createroutineprocess.ui.CreateRoutineViewModel
 import com.example.mygains.extras.navigationroutes.Routes
 
 

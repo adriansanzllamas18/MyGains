@@ -1,4 +1,4 @@
-package com.example.mygains.createroutineprocess.domain.usecases
+package com.example.mygains.createroutineprocess.domain.usecases.strength
 
 import com.example.mygains.base.response.errorresponse.BaseAuthError
 import com.example.mygains.base.response.BaseResponse
@@ -8,17 +8,13 @@ import com.example.mygains.createroutineprocess.data.models.ExerciseWithSets
 import com.example.mygains.createroutineprocess.data.models.InfoTypeOfWorkOutModel
 import com.example.mygains.createroutineprocess.data.models.StrengthExerciseModel
 import com.example.mygains.createroutineprocess.data.models.TypeOfWorkOutModel
-import com.example.mygains.createroutineprocess.data.repositoryimpl.CreateRoutineRepositoryImpl
+import com.example.mygains.createroutineprocess.data.repositoryimpl.strength.CreateRoutineRepositoryImpl
 import com.example.mygains.extras.utils.firebase.FirestoreIdGenerator
 import com.google.firebase.auth.FirebaseAuth
 import javax.inject.Inject
 
 class CreateRoutineUsecase @Inject constructor(private var createRoutineRepositoryImpl: CreateRoutineRepositoryImpl, private var firebaseAuth: FirebaseAuth) {
 
-
-    suspend fun getAllWorkouts(): BaseResponse<MutableList<TypeOfWorkOutModel>> {
-        return createRoutineRepositoryImpl.getAllTrainingData()
-    }
 
     suspend fun getAllInfoWorkOuts(workout_id: String): BaseResponse<MutableList<InfoTypeOfWorkOutModel>> {
         return createRoutineRepositoryImpl.getAllInfoWorkOuts(workout_id)

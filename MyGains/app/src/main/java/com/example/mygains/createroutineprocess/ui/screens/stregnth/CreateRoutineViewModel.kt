@@ -1,4 +1,4 @@
-package com.example.mygains.createroutineprocess.ui
+package com.example.mygains.createroutineprocess.ui.screens.stregnth
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,23 +10,18 @@ import com.example.mygains.createroutineprocess.data.models.ExerciseWithSets
 import com.example.mygains.createroutineprocess.data.models.InfoTypeOfWorkOutModel
 import com.example.mygains.createroutineprocess.data.models.StrengthExerciseModel
 import com.example.mygains.createroutineprocess.data.models.TypeOfWorkOutModel
-import com.example.mygains.createroutineprocess.domain.usecases.CreateRoutineUsecase
+import com.example.mygains.createroutineprocess.domain.usecases.strength.CreateRoutineUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.time.withTimeout
-import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 
 @HiltViewModel
 class CreateRoutineViewModel @Inject constructor(
-    private var createRoutineUsecase:CreateRoutineUsecase)
-    :ViewModel() {
-
-    private var _workouts = MutableLiveData<MutableList<TypeOfWorkOutModel>>()
-    val workoutsLive: MutableLiveData<MutableList<TypeOfWorkOutModel>> = _workouts
+    private var createRoutineUsecase: CreateRoutineUsecase
+) :ViewModel() {
 
     private var _infoWorkouts = MutableLiveData<MutableList<InfoTypeOfWorkOutModel>>()
     val infoWorkoutsLive: MutableLiveData<MutableList<InfoTypeOfWorkOutModel>> = _infoWorkouts
@@ -91,16 +86,6 @@ class CreateRoutineViewModel @Inject constructor(
         _exercisesSelected.postValue(exerciseSelected)
     }
 
-
-    fun getAllWorkOuts(){
-        viewModelScope.launch(Dispatchers.IO) {
-            delay(2000)
-            when( val result = createRoutineUsecase.getAllWorkouts()){
-                is BaseResponse.Success->{_workouts.postValue(result.data)}
-                is BaseResponse.Error->{}
-            }
-        }
-    }
 
 
     fun getAllInfoWorkOuts(workout_id:String){

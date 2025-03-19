@@ -11,14 +11,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.mygains.createroutineprocess.ui.CreateRoutineViewModel
-import com.example.mygains.createroutineprocess.ui.screens.ExercisesToAddRoutine
-import com.example.mygains.createroutineprocess.ui.screens.InfoTypeOfWorkout
-import com.example.mygains.createroutineprocess.ui.screens.TypeOfTrainingScreen
+import com.example.mygains.createroutineprocess.ui.screens.stregnth.CreateRoutineViewModel
+import com.example.mygains.createroutineprocess.ui.screens.stregnth.ExercisesToAddRoutine
+import com.example.mygains.createroutineprocess.ui.screens.stregnth.InfoTypeOfWorkout
+import com.example.mygains.createroutineprocess.ui.screens.workouts.TypeOfWorkoutsScreen
 import com.example.mygains.dashboard.ui.MyDashBoard
 import com.example.mygains.exercisesplan.ui.ExcercisesPlanCompossable
 import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.plan.ui.PlanCompossable
+import com.example.mygains.scanproducts.ui.ScanProductComposable
 import com.example.mygains.userinfo.ui.screens.UserInfoComposable
 
 
@@ -57,8 +58,8 @@ fun AfterAuthNavigationWrapper(
         composable(Routes.ExcercisesPlan.routes){ backStackEntry->
             ExcercisesPlanCompossable(nav = nav, backStackEntry.arguments?.getString("date").orEmpty())
         }
-        composable(Routes.GainsScanner.routes){TypeOfTrainingScreen(nav,createRoutineViewModel = createRoutineViewModel)}
-        composable(Routes.TypesWorkOuts.routes){TypeOfTrainingScreen(nav,createRoutineViewModel)}
+        composable(Routes.GainsScanner.routes){ ScanProductComposable() }
+        composable(Routes.TypesWorkOuts.routes){ TypeOfWorkoutsScreen(nav) }
         composable(Routes.InfoTypeOfWorkout.routes) { backStackEntry->
             InfoTypeOfWorkout(nav , backStackEntry.arguments?.getString("workout_id").orEmpty(),createRoutineViewModel)
         }

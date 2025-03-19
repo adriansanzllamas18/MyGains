@@ -1,8 +1,7 @@
-package com.example.mygains.createroutineprocess.ui.screens
+package com.example.mygains.createroutineprocess.ui.screens.stregnth
 
 
 import android.graphics.Paint
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -74,10 +73,8 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.mygains.R
 import com.example.mygains.base.response.BaseResponse
-import com.example.mygains.createroutineprocess.data.models.ExerciseSet
 import com.example.mygains.createroutineprocess.data.models.ExerciseWithSets
 import com.example.mygains.createroutineprocess.data.models.StrengthExerciseModel
-import com.example.mygains.createroutineprocess.ui.CreateRoutineViewModel
 import com.example.mygains.createroutineprocess.ui.components.ExerciseItemList
 import com.example.mygains.createroutineprocess.ui.components.ExerciseItemToAddList
 import com.example.mygains.createroutineprocess.ui.components.ListInfoComponents
@@ -97,7 +94,6 @@ import com.patrykandpatrick.vico.core.component.shape.Shapes
 import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShader
 import com.patrykandpatrick.vico.core.entry.entryModelOf
 import com.patrykandpatrick.vico.core.entry.entryOf
-import com.patrykandpatrick.vico.core.extension.mutableListOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
