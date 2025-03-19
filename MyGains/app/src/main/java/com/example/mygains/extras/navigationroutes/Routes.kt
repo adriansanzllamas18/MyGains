@@ -18,11 +18,12 @@ sealed class Routes(val routes: String) {
      }
 
 
-    object TypesWorkOuts: Routes("typesworkouts")
+    object TypesWorkOuts: Routes("typesworkouts/{date}"){
+        fun createRout(date: String) = "typesworkouts/$date"
+    }
 
     object Exercises: Routes("exercises/{muscle_id}"){
         fun createRout(muscle_id: String)="exercises/$muscle_id"
     }
-
 
 }

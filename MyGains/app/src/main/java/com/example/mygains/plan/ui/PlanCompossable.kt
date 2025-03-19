@@ -273,7 +273,6 @@ fun MyHeader(
     planViewModel: PlanViewModel,
     selectedDay: String
 ) {
-
         Row(modifier= modifier.fillMaxWidth()) {
             ConstraintLayout(Modifier.fillMaxWidth()) {
                 val (title,add) = createRefs()
@@ -284,7 +283,7 @@ fun MyHeader(
                             end.linkTo(parent.end)
                             top.linkTo(parent.top)
                         }
-                        .clickable { nav.navigate(Routes.ExcercisesPlan.createRout(selectedDay)) }
+                        .clickable { nav.navigate(Routes.TypesWorkOuts.createRout(date = selectedDay)) }
                         .size(24.dp)
                 )
                 Text(text = "Mi plan", modifier = Modifier.constrainAs(title){

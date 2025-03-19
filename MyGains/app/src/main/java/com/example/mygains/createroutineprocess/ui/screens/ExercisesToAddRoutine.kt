@@ -305,14 +305,22 @@ fun ExercisesToAddRoutine(
                 is BaseResponse.Success->{
                     CustomAlertDialog(
                         responseUi = resultAlert!!,
-                        actionDismiss = {createRoutineViewModel.upDateDialog(false)},
-                        actionConfirm = {createRoutineViewModel.upDateDialog(false)})
+                        actionDismiss = {
+                            createRoutineViewModel.upDateDialog(false)
+                                        },
+                        actionConfirm = {
+                            createRoutineViewModel.upDateDialog(false)
+                        })
                 }
                 else ->{
                     CustomAlertDialog(
                         responseUi = resultAlert!!,
-                        actionDismiss = {createRoutineViewModel.upDateDialog(false)},
-                        actionConfirm = {createRoutineViewModel.upDateDialog(false)})
+                        actionDismiss = {
+                            createRoutineViewModel.upDateDialog(false)
+                                        },
+                        actionConfirm = {
+                            createRoutineViewModel.upDateDialog(false)
+                        })
                 }
             }
         }

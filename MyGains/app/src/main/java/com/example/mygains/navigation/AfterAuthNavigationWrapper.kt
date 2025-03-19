@@ -57,8 +57,8 @@ fun AfterAuthNavigationWrapper(
         composable(Routes.ExcercisesPlan.routes){ backStackEntry->
             ExcercisesPlanCompossable(nav = nav, backStackEntry.arguments?.getString("date").orEmpty())
         }
-        composable(Routes.GainsScanner.routes){ TypeOfTrainingScreen(nav,createRoutineViewModel = createRoutineViewModel)}
-        composable(Routes.TypesWorkOuts.routes){ TypeOfTrainingScreen(nav,createRoutineViewModel) }
+        composable(Routes.GainsScanner.routes){TypeOfTrainingScreen(nav,createRoutineViewModel = createRoutineViewModel)}
+        composable(Routes.TypesWorkOuts.routes){TypeOfTrainingScreen(nav,createRoutineViewModel)}
         composable(Routes.InfoTypeOfWorkout.routes) { backStackEntry->
             InfoTypeOfWorkout(nav , backStackEntry.arguments?.getString("workout_id").orEmpty(),createRoutineViewModel)
         }
