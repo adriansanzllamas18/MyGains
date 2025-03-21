@@ -91,7 +91,9 @@ fun MyTypeOfTrainingBody(data: MutableList<TypeOfWorkOutModel>,nav: NavHostContr
                 .height(300.dp)
                 .clickable {
                     if (!typeofworkoutmodel.id_workout.isNullOrEmpty())
-                        nav.navigate(Routes.InfoTypeOfWorkout.createRout(typeofworkoutmodel.id_workout!!))
+                        nav.navigate(Routes.InfoTypeOfWorkout.createRout(typeofworkoutmodel.id_workout!!)){
+                            launchSingleTop =  true
+                        }
                 }
                 .padding(vertical = 16.dp),
                 shape = RoundedCornerShape(12)

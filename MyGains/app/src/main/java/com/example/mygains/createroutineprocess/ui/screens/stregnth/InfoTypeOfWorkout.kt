@@ -73,7 +73,12 @@ fun MyBodyInfoWorkOut(infolist:MutableList<InfoTypeOfWorkOutModel>,nav: NavHostC
                     .height(200.dp)
                     .padding(vertical = 16.dp, horizontal = 8.dp),
                 shape = RoundedCornerShape(12),
-                onClick = {nav.navigate(Routes.Exercises.createRout(data.muscle_id?:""))}
+                onClick = {
+
+                    nav.navigate(Routes.Exercises.createRout(data.muscle_id?:"")) {
+                        launchSingleTop = true
+                    }
+                   }
             ) {
                 Box(contentAlignment = Alignment.BottomStart) {
                     AsyncImage(

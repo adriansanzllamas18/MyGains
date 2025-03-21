@@ -6,11 +6,13 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import com.example.mygains.createroutineprocess.ui.screens.stregnth.CreateRoutineViewModel
 import com.example.mygains.createroutineprocess.ui.screens.stregnth.ExercisesToAddRoutine
 import com.example.mygains.createroutineprocess.ui.screens.stregnth.InfoTypeOfWorkout
@@ -28,8 +30,6 @@ fun AfterAuthNavigationWrapper(
     modifier: Modifier,
     nav: NavHostController
 ) {
-
-    val createRoutineViewModel: CreateRoutineViewModel = hiltViewModel()
 
     NavHost(
         navController = nav,
@@ -60,12 +60,37 @@ fun AfterAuthNavigationWrapper(
         }
         composable(Routes.GainsScanner.routes){ ScanProductComposable() }
         composable(Routes.TypesWorkOuts.routes){ TypeOfWorkoutsScreen(nav) }
-        composable(Routes.InfoTypeOfWorkout.routes) { backStackEntry->
-            InfoTypeOfWorkout(nav , backStackEntry.arguments?.getString("workout_id").orEmpty(),createRoutineViewModel)
+
+        // Usamos remember para obtener y conservar la referencia al BackStackEntry del grafo de navegación.
+        // Esto es crucial por varios motivos:
+        // 1. Evita búsquedas repetidas en la pila de navegación durante recomposiciones
+        // 2. Garantiza que siempre usemos la misma instancia del ViewModel en todas las pantallas del flujo
+        // 3. Previene errores de "No destination with route X is on the NavController's back stack"
+        //    que ocurrirían si intentamos buscar la entrada en cada recomposición
+        // El ViewModel se mantendrá vivo mientras exista este grafo de navegación y se destruirá
+        // automáticamente cuando salgamos completamente de este flujo.
+
+
+        navigation(startDestination = Routes.InfoTypeOfWorkout.routes, route = "create_rotine_flow") {
+
+            composable(Routes.InfoTypeOfWorkout.routes) { backStackEntry ->
+                // Use the current navigation graph's entry instead:
+                val parentEntry = remember { nav.getBackStackEntry("create_rotine_flow") }
+                val createRoutineViewModel: CreateRoutineViewModel = hiltViewModel(
+                    viewModelStoreOwner = parentEntry
+                )
+                InfoTypeOfWorkout(nav, backStackEntry.arguments?.getString("workout_id").orEmpty(), createRoutineViewModel)
+            }
+
+            composable(Routes.Exercises.routes) { backStackEntry ->
+                // Use the same parent entry again:
+                val parentEntry = remember { nav.getBackStackEntry("create_rotine_flow") }
+                val createRoutineViewModel: CreateRoutineViewModel = hiltViewModel(
+                    viewModelStoreOwner = parentEntry
+                )
+                ExercisesToAddRoutine(nav, backStackEntry.arguments?.getString("muscle_id").orEmpty(), createRoutineViewModel)
+            }
         }
 
-        composable(Routes.Exercises.routes) { backStackEntry->
-            ExercisesToAddRoutine(nav , backStackEntry.arguments?.getString("muscle_id").orEmpty(),createRoutineViewModel)
-        }
     }
 }

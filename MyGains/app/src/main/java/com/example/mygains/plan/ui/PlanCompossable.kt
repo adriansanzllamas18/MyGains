@@ -283,7 +283,12 @@ fun MyHeader(
                             end.linkTo(parent.end)
                             top.linkTo(parent.top)
                         }
-                        .clickable { nav.navigate(Routes.TypesWorkOuts.createRout(date = selectedDay)) }
+                        .clickable {
+                            nav.navigate(Routes.TypesWorkOuts.createRout(date = selectedDay)) {
+                               launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
                         .size(24.dp)
                 )
                 Text(text = "Mi plan", modifier = Modifier.constrainAs(title){

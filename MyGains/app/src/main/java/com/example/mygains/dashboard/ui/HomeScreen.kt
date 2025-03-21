@@ -175,11 +175,22 @@ private fun setTopBarByCurrentScreen(rout:String):String{
         else->{""}
     }
 }
-private fun setTopBarActionBack(rout:String, nav: NavController):()->Unit{
-    return when(rout){
-        Routes.InfoTypeOfWorkout.routes -> {{}}
-        Routes.TypesWorkOuts.routes -> {{}}
-        Routes.Exercises.routes -> {{}}
-        else->{{nav.popBackStack()}}
+private fun setTopBarActionBack(rout: String, nav: NavController): () -> Unit {
+    return when(rout) {
+        Routes.InfoTypeOfWorkout.routes -> {{
+            // Navegación normal hacia atrás
+            nav.popBackStack()
+        }}
+        Routes.TypesWorkOuts.routes -> {{
+            // Al volver a TypesWorkOuts, elimina InfoType y Exercise y la misma, tambn guardamos el estado para que no se haga la llamada todo el rato
+            nav.popBackStack(Routes.TypesWorkOuts.routes, inclusive = true,saveState = true)
+        }}
+        Routes.Exercises.routes -> {{
+            // Navegación normal hacia atrás
+            nav.popBackStack()
+        }}
+        else -> {{
+            nav.popBackStack()
+        }}
     }
 }
