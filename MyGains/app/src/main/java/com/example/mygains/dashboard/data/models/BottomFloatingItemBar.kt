@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -34,7 +35,8 @@ sealed class BottomFloatingItemBar {
             Icon(
                 modifier = Modifier.size(24.dp),
                 painter = painterResource(id = R.drawable.hogar),
-                contentDescription = ""
+                contentDescription = "",
+                tint = colorResource(id = R.color.orange_low)
             )
         },
         override val modifier: Modifier = Modifier
@@ -42,7 +44,7 @@ sealed class BottomFloatingItemBar {
             .zIndex(1f)
             .size(80.dp)
             .border(
-                width = 4.dp,
+                width = 8.dp,
                 color = Color.White,
                 shape = CircleShape
             ),
@@ -59,7 +61,8 @@ sealed class BottomFloatingItemBar {
                 Icon(
                     modifier = Modifier.size(24.dp),
                     imageVector = Icons.Default.Person,
-                    contentDescription = ""
+                    contentDescription = "",
+                    tint = colorResource(id = R.color.orange_low)
                 )
             }else{
                 AsyncImage(
@@ -75,7 +78,7 @@ sealed class BottomFloatingItemBar {
             .zIndex(1f)
             .size(80.dp)
             .border(
-                width = 4.dp,
+                width = 8.dp,
                 color = Color.White,
                 shape = CircleShape
             ),
@@ -88,7 +91,8 @@ sealed class BottomFloatingItemBar {
             Icon(
                 modifier = Modifier.size(24.dp),
                 painter = painterResource(id = R.drawable.calendario_lineas_boligrafo),
-                contentDescription = ""
+                contentDescription = "",
+                tint = colorResource(id = R.color.orange_low)
             )
         },
         override val modifier: Modifier= Modifier
@@ -96,10 +100,11 @@ sealed class BottomFloatingItemBar {
             .zIndex(1f)
             .size(80.dp)
             .border(
-                width = 4.dp,
+                width = 8.dp,
                 color = Color.White,
                 shape = CircleShape
-            ),
+            )
+        ,
         override val alignment: Alignment= Alignment.TopCenter,
     ):BottomFloatingItemBar()
 }

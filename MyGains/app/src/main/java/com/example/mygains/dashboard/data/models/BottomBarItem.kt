@@ -31,9 +31,10 @@ sealed class BottomBarItem  {
         override val rout: String = Routes.Home.routes,
         override val icon:@Composable () -> Unit={
             Icon(
-                modifier =Modifier.size(24.dp),
+                modifier = Modifier.size(24.dp),
                 painter = painterResource(id = R.drawable.hogar),
-                contentDescription = ""
+                contentDescription = "",
+                tint = Color.White
             )
         }
     ): BottomBarItem()
@@ -48,7 +49,8 @@ sealed class BottomBarItem  {
                 Icon(
                     modifier =Modifier.size(24.dp),
                     imageVector = Icons.Default.Person,
-                    contentDescription = ""
+                    contentDescription = "",
+                    tint = Color.White
                 )
             }else{
 
@@ -70,7 +72,8 @@ sealed class BottomBarItem  {
             Icon(
                 modifier =Modifier.size(24.dp),
                 painter = painterResource(id = R.drawable.calendario_lineas_boligrafo),
-                contentDescription = ""
+                contentDescription = "",
+                tint = Color.White
             )
         }
     ):BottomBarItem()
