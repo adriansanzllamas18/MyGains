@@ -1,5 +1,6 @@
 package com.example.mygains.dashboard.ui
 
+import android.os.Build
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -110,7 +111,7 @@ fun MyBottomNavigation(nav: NavHostController, image: String, currentDestination
         // BottomBar
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp)
+            shape = RoundedCornerShape(32.dp)
         ) {
 
             NavigationBar(
@@ -143,7 +144,6 @@ fun MyBottomNavigation(nav: NavHostController, image: String, currentDestination
                                 }
 
                             },
-
                             icon = it.icon
                         )
                     }
@@ -178,6 +178,7 @@ private fun setTopBarByCurrentScreen(rout:String):String{
         Routes.InfoTypeOfWorkout.routes -> "Grupos Musculares"
         Routes.TypesWorkOuts.routes -> "Entrenos"
         Routes.Exercises.routes -> "Ejercicios"
+        Routes.Configuration.routes -> "Configuración"
         else->{""}
     }
 }

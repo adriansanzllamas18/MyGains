@@ -26,4 +26,6 @@ sealed class Routes(val routes: String) {
         fun createRout(muscle_id: String)="exercises/$muscle_id"
     }
 
+    object Configuration: Routes("configuration")
+
 }

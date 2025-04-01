@@ -13,6 +13,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.example.mygains.configuration.ui.ConfigurationComposable
 import com.example.mygains.createroutineprocess.ui.screens.stregnth.CreateRoutineViewModel
 import com.example.mygains.createroutineprocess.ui.screens.stregnth.ExercisesToAddRoutine
 import com.example.mygains.createroutineprocess.ui.screens.stregnth.InfoTypeOfWorkout
@@ -91,6 +92,8 @@ fun AfterAuthNavigationWrapper(
                 ExercisesToAddRoutine(nav, backStackEntry.arguments?.getString("muscle_id").orEmpty(), createRoutineViewModel)
             }
         }
+
+        composable(Routes.Configuration.routes){ ConfigurationComposable(nav) }
 
     }
 }

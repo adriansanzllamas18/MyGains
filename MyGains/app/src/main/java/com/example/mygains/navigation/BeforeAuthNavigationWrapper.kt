@@ -32,6 +32,7 @@ fun  BeforeAuthNavigationWrapper(
         modifier = modifier
     )
     {
+
         composable(Routes.Splash.routes){ SplashScreenComposable(navHostController = nav) }
         composable(
             Routes.Login.routes,
@@ -48,6 +49,7 @@ fun  BeforeAuthNavigationWrapper(
                 slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(500))
             }
         ){ NewUserComposable(navHostController = nav) }
+
         composable(Routes.Home.routes){ HomeScreen()}
     }
 }

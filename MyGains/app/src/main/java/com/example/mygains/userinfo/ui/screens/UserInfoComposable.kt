@@ -85,6 +85,9 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.mygains.R
+import com.example.mygains.configuration.data.model.ConfigurationItemModel
+import com.example.mygains.extras.globalcomponents.ItemListComponent
+import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.userinfo.data.models.WeightRegister
 import com.example.mygains.userinfo.data.models.UserData
 import com.example.mygains.userinfo.ui.UserInfoViewModel
@@ -117,7 +120,7 @@ fun UserInfoComposable(nav: NavHostController) {
     // Usamos LazyColumn en lugar de Column para una lista desplazable
     LazyColumn(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(horizontal = 16.dp, vertical = 24.dp)
             .fillMaxSize()
     ) {
         // Header, Imagen, Títulos y demás contenidos se agregan como items en LazyColumn
@@ -158,6 +161,16 @@ fun UserInfoComposable(nav: NavHostController) {
             UserDailyProgress(
                 modifier = Modifier.padding(top = 24.dp, bottom = 24.dp),
                 userInfoViewModel = userInfoViewModel
+            )
+        }
+        
+        item {
+            ItemListComponent(
+                ConfigurationItemModel(leftIcon = R.drawable.configuration_icon,
+                text = "Configuración",
+                action = {
+                    nav.navigate(Routes.Configuration.routes)
+                })
             )
         }
     }
