@@ -159,9 +159,14 @@ fun LoginScreen( nav: NavHostController){
     LaunchedEffect(loginResult) {
         if (loginResult) {
             nav.navigate(Routes.Home.routes){
-                    popUpTo(Routes.Login.routes) { inclusive = true }
+                // Solo elimina pantallas de la pila que estén por encima
+                nav.graph.startDestinationRoute?.let { rout ->
+                    popUpTo(rout) {
+                        inclusive = true
+                    }
                 }
             }
+        }
     }
 }
 
@@ -221,7 +226,7 @@ fun LoginEmailPassword( loginViewModel: LoginViewModel) {
     // var email = rememberSaveable{ mutableStateOf("") }
     //var pass = rememberSaveable{ mutableStateOf("") }
 
-        Column(Modifier.fillMaxWidth()) {
+    Column(Modifier.fillMaxWidth()) {
         MyEmailText(email){loginViewModel.onLoginChanged(email= it, pass = pass)}
         MyPassText(pass) { loginViewModel.onLoginChanged(email= email, pass = it)}
         MyTitleForgot(Modifier.align(Alignment.End))

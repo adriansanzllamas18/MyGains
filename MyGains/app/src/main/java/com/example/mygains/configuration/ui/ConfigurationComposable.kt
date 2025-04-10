@@ -182,12 +182,22 @@ fun ConfigurationComposable(nav: NavHostController) {
 
     if (resultAlert != null){
 
-        AnimatedVisibility (resultAlert!!.show){
-            when(resultAlert!!.response){
-                is BaseResponse.Success->{
-                    
+        when(resultAlert!!.response){
+            is BaseResponse.Success->{
+                nav.navigate(Routes.Login.routes){
+                    //  elimina pantallas de la pila que estén por encima y la destino
+                    nav.graph.startDestinationRoute?.let { rout ->
+                        popUpTo(Routes.Home.routes) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
                 }
-                else ->{
+            }
+
+            else ->{
+                AnimatedVisibility (resultAlert!!.show){
                     CustomAlertDialog(
                         responseUi = resultAlert!!,
                         actionDismiss = {

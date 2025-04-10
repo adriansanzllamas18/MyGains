@@ -14,7 +14,7 @@ import javax.inject.Inject
 class ConfigurationRepositoryImpl @Inject constructor(private var auth: FirebaseAuth): ConfigurationRepositoryInterface {
     override fun logOut(): BaseResponse<Boolean> {
         return try {
-            auth.signOut().wait()
+            auth.signOut()
             BaseResponse.Success(true)
         } catch (e: FirebaseAuthInvalidUserException) {
             BaseResponse.Error(BaseAuthError.UserNotFound)

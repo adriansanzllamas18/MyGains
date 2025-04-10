@@ -94,6 +94,5 @@ fun AfterAuthNavigationWrapper(
         }
 
         composable(Routes.Configuration.routes){ ConfigurationComposable(nav) }
-
     }
 }

@@ -50,6 +50,6 @@ fun  BeforeAuthNavigationWrapper(
             }
         ){ NewUserComposable(navHostController = nav) }
 
-        composable(Routes.Home.routes){ HomeScreen()}
+        //composable(Routes.Home.routes){ HomeScreen()}
     }
 }
