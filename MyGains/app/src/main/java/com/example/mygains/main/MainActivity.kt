@@ -7,11 +7,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,6 +26,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -46,6 +51,7 @@ import com.example.mygains.R
 import com.example.mygains.dashboard.data.models.BottomBarItem
 import com.example.mygains.dashboard.data.models.BottomFloatingItemBar
 import com.example.mygains.dashboard.ui.DashBoardViewModel
+import com.example.mygains.extras.globalcomponents.CustomBottomNavigationBar
 import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.navigation.AfterAuthNavigationWrapper
 import com.example.mygains.navigation.BeforeAuthNavigationWrapper
@@ -106,14 +112,18 @@ fun MyApp() {
 
     val listScreensBottomBar = mutableListOf(Routes.Perfil.routes,Routes.Home.routes,Routes.Plan.routes)
 
-    val listScreensNoBottomAndTopBar = mutableListOf(Routes.Splash.routes,Routes.Login.routes)
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination= navBackStackEntry ?.destination
 
-    Scaffold(bottomBar = {
+    val scrollstate = rememberScrollState()
+
+
+    Scaffold(
+        modifier = Modifier.systemBarsPadding(),
+        bottomBar = {
         if (currentDestination?.route in listScreensBottomBar)
-            MyBottomNavigation(navController,imageUser.image?:"",currentDestination)
+            CustomBottomNavigationBar(navController)
     },
         topBar = {
             if (currentDestination?.route in listScreensTopBar)
@@ -121,91 +131,13 @@ fun MyApp() {
         }
     ) {innerPading->
         GlobalNavigationWrapper(
-            modifier = Modifier.fillMaxWidth().padding(innerPading),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(innerPading),
             nav = navController
         )
     }
 
-}
-
-
-
-@Composable
-fun MyBottomNavigation(nav: NavHostController, image: String, currentDestination: NavDestination?) {
-
-
-    val itemList = mutableListOf(
-        BottomBarItem.Profile(image),
-        BottomBarItem.Home(),
-        BottomBarItem.Plan()
-    )
-    val floatingItemList= mutableListOf(
-        BottomFloatingItemBar.Profile(image),
-        BottomFloatingItemBar.Home(),
-        BottomFloatingItemBar.Plan()
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth(),
-        contentAlignment = Alignment.TopCenter
-    ) {
-        // FAB dinámico basado en currentComposable
-        floatingItemList.forEach {
-            if (currentDestination?.route == it.rout){
-                FloatingActionButton(
-                    onClick = { },
-                    modifier = it.modifier.align(it.alignment),
-                    containerColor = Color.Gray,
-                    shape = CircleShape,
-                ){
-                    it.icon.invoke()
-                }
-            }
-        }
-        // BottomBar
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(32.dp)
-        ) {
-
-            NavigationBar(
-                containerColor = Color.DarkGray,
-                tonalElevation = NavigationBarDefaults.Elevation
-            ) {
-                itemList.forEach {
-                    if (currentDestination?.route == it.rout) {
-                        NavigationBarItem(
-                            selected = false,
-                            onClick = { },
-                            icon = { Box(modifier = Modifier.size(24.dp)) }
-                        )
-                    } else {
-                        NavigationBarItem(
-                            selected = false,
-                            onClick = {
-                                nav.navigate(it.rout) {
-                                    // Solo elimina pantallas de la pila que estén por encima
-                                    nav.graph.startDestinationRoute?.let { rout ->
-                                        popUpTo(Routes.Home.routes) {//dentro del grafo hacemos que home sea la ruta de inicio en vez de startdestination
-                                            saveState = true
-                                        }
-                                        launchSingleTop = true
-                                        restoreState = true
-                                    }
-                                }
-                                nav.currentBackStackEntry?.destination?.hierarchy?.forEach {
-                                    Log.i("entry", it.route.toString())
-                                }
-
-                            },
-                            icon = it.icon
-                        )
-                    }
-                }
-            }
-        }
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
