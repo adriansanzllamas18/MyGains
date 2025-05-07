@@ -72,7 +72,6 @@ import com.example.mygains.R
 import com.example.mygains.dashboard.data.models.BottomBarItem
 import com.example.mygains.dashboard.data.models.BottomFloatingItemBar
 import com.example.mygains.extras.navigationroutes.Routes
-import com.example.mygains.navigation.AfterAuthNavigationWrapper
 import com.example.mygains.userinfo.data.models.UserData
 
 

@@ -20,7 +20,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import com.example.mygains.R
 import com.example.mygains.extras.navigationroutes.Routes
-import com.example.mygains.navigation.AfterAuthNavigationWrapper
+
 import com.example.mygains.navigation.BeforeAuthNavigationWrapper
 import com.example.mygains.plan.ui.PlanViewModel
 import kotlinx.coroutines.delay
