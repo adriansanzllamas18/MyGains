@@ -13,4 +13,14 @@
     <color name="azul_oscuro">#004080</color>
     <color name="gray_claro">#FFE0E0E0</color>
 
+
+    <color name="blue_soft">#eaf6ff</color>
+    <color name="blue_icon">#629ce4</color>
+    <color name="green_soft">#eeffea</color>
+    <color name="green_icon">#4fd180</color>
+    <color name="purple_icond"> #a56dbe</color>
+    <color name="purple_soft">#f8e7ff</color>
+
+
+
 </resources>
