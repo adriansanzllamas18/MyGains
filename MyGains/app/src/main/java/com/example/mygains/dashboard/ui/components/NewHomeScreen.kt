@@ -1,5 +1,6 @@
 package com.example.mygains.dashboard.ui.components
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.RepeatMode
@@ -46,6 +47,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
@@ -58,6 +60,7 @@ import androidx.navigation.NavHostController
 import com.example.mygains.R
 import com.example.mygains.dashboard.data.models.ShortCutsItem
 import com.example.mygains.dashboard.ui.DashBoardViewModel
+import com.example.mygains.extras.dimensions.Dimensions
 import com.example.mygains.userinfo.data.models.UserData
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -146,22 +149,30 @@ fun BodyHomeScreen(nav: NavHostController, animateHeader: Boolean) {
 @Composable
 fun ShortCutsSection(nav: NavHostController, animateHeader: Boolean) {
 
+    val configuration = LocalConfiguration.current
+    val windowSize = Dimensions.WindowSize.fromWidth(configuration.screenWidthDp)
+    val dimensions = Dimensions.AppDimensions.fromWindowSize(windowSize)
+
+
+
     var shortCutsList = mutableListOf(
         ShortCutsItem.ScannerShortcut(),
+        ShortCutsItem.StatsShortcut(),
+        ShortCutsItem.StatsShortcut(),
         ShortCutsItem.StatsShortcut(),
         ShortCutsItem.ParchuesShortcut(),
         ShortCutsItem.RatsShortcut()
     )
 
     val height by animateDpAsState(
-        targetValue = if (animateHeader) 140.dp else 100.dp,
+        targetValue = if (animateHeader) dimensions.cardHeight else (dimensions.cardHeight.value.toInt()-20).dp,
         animationSpec = tween(durationMillis = 500)
     )
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp)
+            .padding(vertical = dimensions.spacing)
     )
     {
         Text(
@@ -173,14 +184,14 @@ fun ShortCutsSection(nav: NavHostController, animateHeader: Boolean) {
         FlowRow(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp),
+                .padding(vertical = dimensions.spacing),
             maxItemsInEachRow = 2,
         ) {
             shortCutsList.forEach { shortcut ->
                 Box(
                     modifier = Modifier
                         .weight(1f, fill = true)
-                        .padding(8.dp)
+                        .padding(dimensions.spacing)
                         .size(height)
                         .clickable {
                             nav.navigate(shortcut.route)
@@ -216,7 +227,7 @@ fun ShortCutsSection(nav: NavHostController, animateHeader: Boolean) {
                                 Text(
                                     text = shortcut.title,
                                     textAlign = TextAlign.Center,
-                                    modifier = Modifier.padding(vertical = 8.dp),
+                                    modifier = Modifier.padding(vertical = dimensions.spacing),
                                     fontFamily = FontFamily(Font(R.font.montserratbold))
                                 )
                             }
