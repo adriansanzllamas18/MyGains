@@ -10,9 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.example.mygains.dashboard.ui.HomeScreen
-import com.example.mygains.dashboard.ui.MyDashBoard
 import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.login.ui.LoginScreen
 import com.example.mygains.newuser.ui.NewUserComposable

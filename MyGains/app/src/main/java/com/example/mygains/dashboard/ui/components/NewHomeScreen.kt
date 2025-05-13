@@ -1,12 +1,20 @@
 package com.example.mygains.dashboard.ui.components
 
-import android.graphics.drawable.shapes.Shape
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.repeatable
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,119 +22,99 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.fontResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.example.mygains.R
 import com.example.mygains.dashboard.data.models.ShortCutsItem
+import com.example.mygains.dashboard.ui.DashBoardViewModel
+import com.example.mygains.userinfo.data.models.UserData
 
-@Preview(showBackground = true)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewHomeScreen() {
-    ConstraintLayout(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(colorResource(id = R.color.gray_claro))
-    )
-    {
+fun NewHomeScreen(nav: NavHostController) {
 
-        val(box,body,header) = createRefs()
-        val horizontalGuideline = createGuidelineFromTop(0.1f)
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .constrainAs(box) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-                .height(200.dp)
-                .clip(
-                    RoundedCornerShape(
-                        topStart = 0.dp,
-                        topEnd = 0.dp,
-                        bottomStart = 30.dp,
-                        bottomEnd = 30.dp
-                    )
-                )
-                .background(
-                    brush = Brush.verticalGradient(
-                        colorStops = arrayOf(
-                            0.4f to Color(0xFFFCE5D8),
-                            1f to Color(0xFFCA5300)
-                        )
-                    )
+    val dashBoardViewModel: DashBoardViewModel = hiltViewModel()
+    val userData: UserData by dashBoardViewModel.userDataLive.observeAsState(initial = UserData())
+    val scrollState= rememberLazyListState()
 
-                )
-        )
-        Box(
-            modifier = Modifier.fillMaxWidth()
-                .constrainAs(header){
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-        ){
-            HeaderHomeScreen()
-        }
+    val animateHeader by remember {
+        derivedStateOf { scrollState.firstVisibleItemScrollOffset > 0 }
+    }
 
-        Column(
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .constrainAs(body) {
-                    top.linkTo(header.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-                .fillMaxWidth()
-                .clip(
-                    RoundedCornerShape(
-                        30.dp
-                    )
-                )
-                .background(Color.White)
+    Box(modifier = Modifier.fillMaxSize()){
+
+        AnimatedGradientBox(animateHeader)
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            state = scrollState
         )
         {
-            BodyHomeScreen()
-        }
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ){
+                    HeaderHomeScreen(userData, dashBoardViewModel,animateHeader)
+                }
+            }
 
+            item {
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth()
+                        .clip(
+                            RoundedCornerShape(
+                                30.dp
+                            )
+                        )
+                        .background(Color.White)
+                )
+                {
+                    BodyHomeScreen(nav, animateHeader)
+                }
+            }
+
+        }
     }
+
 }
 
 @Composable
-fun BodyHomeScreen() {
+fun BodyHomeScreen(nav: NavHostController, animateHeader: Boolean) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -149,13 +137,14 @@ fun BodyHomeScreen() {
             HorizontalDivider(modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp))
-            ShortCutsSection()
+            ShortCutsSection(nav = nav,animateHeader)
         }
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ShortCutsSection() {
+fun ShortCutsSection(nav: NavHostController, animateHeader: Boolean) {
 
     var shortCutsList = mutableListOf(
         ShortCutsItem.ScannerShortcut(),
@@ -163,7 +152,12 @@ fun ShortCutsSection() {
         ShortCutsItem.ParchuesShortcut(),
         ShortCutsItem.RatsShortcut()
     )
-    
+
+    val height by animateDpAsState(
+        targetValue = if (animateHeader) 140.dp else 100.dp,
+        animationSpec = tween(durationMillis = 500)
+    )
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -176,45 +170,60 @@ fun ShortCutsSection() {
             fontFamily = FontFamily(Font( R.font.montserratbold))
         )
 
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+        FlowRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
-        )
-        {
-          items(shortCutsList){shortcut->
-              Card(
-                  modifier = Modifier
-                      .padding(8.dp)
-                      .height(120.dp),
-                  elevation = CardDefaults.cardElevation(
-                      defaultElevation = 4.dp,
-                      pressedElevation = 8.dp
-                  ),
-                  colors = CardColors(containerColor = colorResource(id = shortcut.color), contentColor = Color.Black, disabledContentColor = Color.White, disabledContainerColor = Color.LightGray)
-              )
-              {
-                  Column(
-                      modifier = Modifier.fillMaxSize(),
-                      horizontalAlignment = Alignment.CenterHorizontally,
-                      verticalArrangement = Arrangement.Center
-                  ) {
+            maxItemsInEachRow = 2,
+        ) {
+            shortCutsList.forEach { shortcut ->
+                Box(
+                    modifier = Modifier
+                        .weight(1f, fill = true)
+                        .padding(8.dp)
+                        .size(height)
+                        .clickable {
+                            nav.navigate(shortcut.route)
+                        }
+                ) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        elevation = CardDefaults.cardElevation(
+                            defaultElevation = 4.dp,
+                            pressedElevation = 8.dp
+                        ),
+                        colors = CardColors(
+                            containerColor = colorResource(id = shortcut.color),
+                            contentColor = Color.Black,
+                            disabledContentColor = Color.White,
+                            disabledContainerColor = Color.LightGray
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                tint = colorResource(id = shortcut.iconColor),
+                                modifier = Modifier.size(40.dp),
+                                painter = painterResource(id = shortcut.icon),
+                                contentDescription = "scannnerIcon"
+                            )
 
-                      Icon(
-                          tint = colorResource(id = shortcut.iconColor),
-                          modifier = Modifier.size(40.dp),
-                          painter = painterResource(id = shortcut.icon),
-                          contentDescription = "scannnerIcon")
-
-                      Text(
-                          text = shortcut.title,
-                          modifier = Modifier.padding(vertical = 8.dp),
-                          fontFamily = FontFamily(Font( R.font.montserratbold))
-                      )
-                  }
-              }
-          }
+                            AnimatedVisibility(visible = animateHeader) {
+                                Text(
+                                    text = shortcut.title,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.padding(vertical = 8.dp),
+                                    fontFamily = FontFamily(Font(R.font.montserratbold))
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -269,7 +278,34 @@ fun ForTodaySection() {
 }
 
 @Composable
-fun HeaderHomeScreen() {
+fun HeaderHomeScreen(
+    userData: UserData,
+    dashBoardViewModel: DashBoardViewModel,
+    animateHeader: Boolean
+) {
+
+    val iconSize by animateDpAsState(
+        targetValue = if (animateHeader) 0.dp else 24.dp,
+        animationSpec = tween(500)
+    )
+    //para cuando tenga ntificaciones
+    /*val iconSize by animateDpAsState(
+        targetValue = if (animateHeader) 0.dp else 24.dp,
+        animationSpec = repeatable(
+            iterations = 3,                      // Número de repeticiones
+            animation = tween(durationMillis = 300), // Animación a repetir
+            repeatMode = RepeatMode.Reverse      // Modo de repetición (Restart o Reverse)
+        )
+    )*/
+
+    val fontSizeValue by animateFloatAsState(
+        targetValue = if (animateHeader) 0f else 14f,
+        animationSpec = snap(delayMillis = 10)
+    )
+
+    // Convertimos el float a sp
+    val fontSize = fontSizeValue.sp
+    val motivationText = rememberSaveable{ mutableStateOf( dashBoardViewModel.getMotivationText()) }
 
     Row(
         modifier = Modifier
@@ -279,24 +315,75 @@ fun HeaderHomeScreen() {
     {
         Column(Modifier.weight(1f)) {
             Text(
-                text = "Hola de nuevo adrian!",
+                text = "Hola de nuevo ${userData.name?:""}!",
                 fontSize = 18.sp,
                 fontFamily = FontFamily(Font(R.font.montserratbold))
             )
             Text(
+                fontSize = fontSize,
                 modifier = Modifier.padding(vertical = 8.dp),
-                text = "Un dia mas que cuenta , sigue asi!",
+                text = motivationText.value,
                 fontFamily = FontFamily(Font(R.font.montserratregular))
-
             )
         }
 
         Icon(
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size(iconSize),
             painter = painterResource(id = R.drawable.campana_config_icon),
             contentDescription ="notification"
         )
 
     }
 
+}
+
+
+@Composable
+fun AnimatedGradientBox(animateHeader: Boolean) {
+    // Definimos los colores iniciales y finales para la animación
+    val startColor1 = Color(0xFFFCE5D8)
+    val endColor1 = Color(0xFFCA5300)
+
+    // Colores alternativos para el estado animado
+    val startColor2 = Color(0xFFE8F0FF) // Puedes cambiar estos colores
+    val endColor2 = Color(0xFF0052CA) // Puedes cambiar estos colores
+
+    // Animamos la transición entre colores
+    val animatedStartColor by animateColorAsState(
+        targetValue = if (animateHeader) startColor2 else startColor1,
+        animationSpec = tween(durationMillis = 500)
+    )
+
+    val animatedEndColor by animateColorAsState(
+        targetValue = if (animateHeader) endColor2 else endColor1,
+        animationSpec = tween(durationMillis = 500)
+    )
+
+    // También animamos la altura
+    val height by animateDpAsState(
+        targetValue = if (animateHeader) 100.dp else 200.dp,
+        animationSpec = tween(durationMillis = 500)
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(height)
+            .clip(
+                RoundedCornerShape(
+                    topStart = 0.dp,
+                    topEnd = 0.dp,
+                    bottomStart = 30.dp,
+                    bottomEnd = 30.dp
+                )
+            )
+            .background(
+                brush = Brush.verticalGradient(
+                    colorStops = arrayOf(
+                        0.4f to animatedStartColor,
+                        1f to animatedEndColor
+                    )
+                )
+            )
+    )
 }

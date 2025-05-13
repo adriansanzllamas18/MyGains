@@ -132,5 +132,10 @@ dependencies {
     implementation("com.patrykandpatrick.vico:compose:1.6.4")
     implementation("com.patrykandpatrick.vico:compose-m3:1.6.4")
 
+    
+    //dimensiones
+    implementation (libs.androidx.material3.window.size)
+
+
 
 }

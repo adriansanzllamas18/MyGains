@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -17,8 +16,7 @@ import com.example.mygains.createroutineprocess.ui.screens.stregnth.CreateRoutin
 import com.example.mygains.createroutineprocess.ui.screens.stregnth.ExercisesToAddRoutine
 import com.example.mygains.createroutineprocess.ui.screens.stregnth.InfoTypeOfWorkout
 import com.example.mygains.createroutineprocess.ui.screens.workouts.TypeOfWorkoutsScreen
-import com.example.mygains.dashboard.ui.HomeScreen
-import com.example.mygains.dashboard.ui.MyDashBoard
+import com.example.mygains.dashboard.ui.components.NewHomeScreen
 import com.example.mygains.exercisesplan.ui.ExcercisesPlanCompossable
 import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.login.ui.LoginScreen
@@ -61,7 +59,7 @@ fun GlobalNavigationWrapper(
         ){ NewUserComposable(navHostController = nav) }
 
 
-        composable(Routes.Home.routes){ MyDashBoard(nav) }
+        composable(Routes.Home.routes){ NewHomeScreen(nav) }
         composable(Routes.Perfil.routes){ UserInfoComposable(nav = nav) }
         //refactorizar el apartado del resultactivity para el inicio de sesion con google
         //composable(Routes.NewUser.routes){ NewUserComposable(newUserViewModel = newUserViewmodel, navigationController, onSignInClick = { newUserViewmodel.signInWithGoogle(this@MainActivity,signInLauncher, this@MainActivity)  }) }
