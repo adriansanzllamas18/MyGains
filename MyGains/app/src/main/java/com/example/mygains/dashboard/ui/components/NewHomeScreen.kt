@@ -244,7 +244,6 @@ fun ForTodaySection() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-
             .shadow(
                 elevation = 8.dp,
                 shape = RoundedCornerShape(12.dp),
