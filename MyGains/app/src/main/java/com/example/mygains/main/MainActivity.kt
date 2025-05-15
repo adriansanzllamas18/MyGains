@@ -88,8 +88,7 @@ fun MyApp() {
 
     val navController = rememberNavController()
 
-    var dashBoardViewModel: DashBoardViewModel = hiltViewModel()
-    val imageUser  by dashBoardViewModel.userDataLive.observeAsState(UserData())
+
 
     val listScreensTopBar= mutableListOf(Routes.NewUser.routes,Routes.GainsScanner.routes,Routes.InfoTypeOfWorkout.routes,
         Routes.TypesWorkOuts.routes,Routes.Exercises.routes,Routes.Configuration.routes)

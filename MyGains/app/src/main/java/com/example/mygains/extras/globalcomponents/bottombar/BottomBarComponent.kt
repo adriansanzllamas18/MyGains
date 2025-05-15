@@ -34,10 +34,13 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.mygains.R
 import com.example.mygains.dashboard.data.models.BottomBarItem
+import com.example.mygains.dashboard.ui.DashBoardViewModel
 import com.example.mygains.extras.navigationroutes.Routes
+import com.example.mygains.userinfo.data.models.UserData
 
 @Composable
 fun CustomBottomNavigationBar(nav: NavHostController){
@@ -45,8 +48,11 @@ fun CustomBottomNavigationBar(nav: NavHostController){
 
     var selectedItemIndex by remember { mutableStateOf(1) }
 
+    var bottombarViewModel: BottombarViewModel = hiltViewModel()
+    val imageUser  by bottombarViewModel.userDataLive.observeAsState(UserData())
+
     val itemList = mutableListOf(
-        BottomBarItem.Profile(isSelected = selectedItemIndex == 0),
+        BottomBarItem.Profile(isSelected = selectedItemIndex == 0, image = imageUser.image?:""),
         BottomBarItem.Home(isSelected = selectedItemIndex == 1),
         BottomBarItem.Plan(isSelected = selectedItemIndex == 2)
     )
