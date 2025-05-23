@@ -21,7 +21,7 @@ class ConfigurationRepositoryImpl @Inject constructor(private var auth: Firebase
         } catch (e: FirebaseNetworkException) {
             BaseResponse.Error(BaseAuthError.NetworkError)
         } catch (e: Exception) {
-            BaseResponse.Error(BaseAuthError.UnknownError("Ha ocurrido un error interno."))
+            BaseResponse.Error(BaseAuthError.UnknownError)
         }
     }
 }

@@ -51,7 +51,7 @@ class CreateRoutineUsecase @Inject constructor(private var createRoutineReposito
                 exercises = list)
             )
         }else{
-            BaseResponse.Error(BaseAuthError.UnknownError("Error inesperado."))
+            BaseResponse.Error(BaseAuthError.UnknownError)
         }
     }
 }

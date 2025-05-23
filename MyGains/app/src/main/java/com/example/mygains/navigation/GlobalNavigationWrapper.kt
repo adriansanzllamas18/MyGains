@@ -16,7 +16,7 @@ import com.example.mygains.createroutineprocess.ui.screens.stregnth.CreateRoutin
 import com.example.mygains.createroutineprocess.ui.screens.stregnth.ExercisesToAddRoutine
 import com.example.mygains.createroutineprocess.ui.screens.stregnth.InfoTypeOfWorkout
 import com.example.mygains.createroutineprocess.ui.screens.workouts.TypeOfWorkoutsScreen
-import com.example.mygains.dashboard.ui.components.NewHomeScreen
+import com.example.mygains.dashboard.ui.NewHomeScreen
 import com.example.mygains.exercisesplan.ui.ExcercisesPlanCompossable
 import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.login.ui.LoginScreen

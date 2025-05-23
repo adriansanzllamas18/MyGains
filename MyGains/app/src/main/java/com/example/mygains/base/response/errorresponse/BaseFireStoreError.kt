@@ -8,7 +8,7 @@ sealed class BaseFireStoreError : BaseResponseError() {
     object TimeOut : BaseFireStoreError()
 
 
-    fun mapAuthErrorToMessage(error: BaseFireStoreError): String {
+    fun mapFireStoreErrorToMessage(error: BaseFireStoreError): String {
         return when (error) {
             is DocumentNotFound -> "Ups, datos no encontrados."
             is UnknownError -> "Error desconocido , intentelo más tarde."

@@ -1,15 +1,9 @@
-package com.example.mygains.dashboard.data.models
+package com.example.mygains.extras.globalcomponents.bottombar.model
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -87,7 +81,7 @@ sealed class BottomBarItem  {
                )
             }
         },
-    ):BottomBarItem()
+    ): BottomBarItem()
 
     data class Plan(
         override val isSelected: Boolean = false,
@@ -107,5 +101,5 @@ sealed class BottomBarItem  {
                 tint = Color.White
             )
         },
-    ):BottomBarItem()
+    ): BottomBarItem()
 }

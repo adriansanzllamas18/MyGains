@@ -1,40 +1,45 @@
 package com.example.mygains.dashboard.ui
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mygains.createroutineprocess.data.repositoryimpl.strength.CreateRoutineRepositoryImpl
+import com.example.mygains.dashboard.data.models.HomeScreenModel
+import com.example.mygains.dashboard.domain.usecases.DashBoardUseCase
 import com.example.mygains.login.ui.LoginScreen
 import com.example.mygains.userinfo.data.models.UserData
 import com.example.mygains.userinfo.domain.usecases.UserInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DashBoardViewModel @Inject constructor(private var infoUseCase: UserInfoUseCase):ViewModel() {
+class DashBoardViewModel @Inject constructor(private var infoUseCase: UserInfoUseCase, private var dashBoardUseCase: DashBoardUseCase):ViewModel() {
 
-    private val _UserData= MutableLiveData<UserData>()
-    val userDataLive : LiveData<UserData> = _UserData
 
+    private val _uiState = MutableStateFlow<DashBoardUIState> (DashBoardUIState.Loading)
+    val uiState :StateFlow<DashBoardUIState> = _uiState
 
 
     init {
         getUserData()
-        Log.i("viewmodel", " se crea")
     }
 
     fun getUserData(){
          viewModelScope.launch(Dispatchers.IO) {
-             _UserData.postValue(infoUseCase.readUserInfo())
+             _uiState.emit(DashBoardUIState.Succes(HomeScreenModel( userData = infoUseCase.readUserInfo()?:UserData())))
          }
     }
 
     fun getMotivationText():String{
-        var motive = mutableListOf<String>("Que no decaiga.","Cada paso cuenta.","¡Sigue adelante, el esfuerzo siempre da frutos!","No importa lo difícil, ¡tú eres más fuerte que el reto!")
+        val motive = mutableListOf<String>("Que no decaiga.","Cada paso cuenta.","¡Sigue adelante, el esfuerzo siempre da frutos!","No importa lo difícil, ¡tú eres más fuerte que el reto!")
         return motive.random()
     }
 

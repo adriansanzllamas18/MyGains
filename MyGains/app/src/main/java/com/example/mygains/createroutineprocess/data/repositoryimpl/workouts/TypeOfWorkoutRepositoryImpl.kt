@@ -14,7 +14,7 @@ class TypeOfWorkoutRepositoryImpl @Inject constructor(private var firestore: Fir
             val data =  firestore.collection("workouts").get().await()
             BaseResponse.Success(data = data.toObjects(TypeOfWorkOutModel::class.java))
         }catch (ex:Exception){
-            BaseResponse.Error(BaseAuthError.UnknownError(ex.message))
+            BaseResponse.Error(BaseAuthError.UnknownError)
         }
     }
 }

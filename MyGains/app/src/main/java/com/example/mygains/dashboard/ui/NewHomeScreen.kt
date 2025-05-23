@@ -1,12 +1,9 @@
-package com.example.mygains.dashboard.ui.components
+package com.example.mygains.dashboard.ui
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.repeatable
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -30,14 +27,13 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -59,62 +55,70 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.mygains.R
 import com.example.mygains.dashboard.data.models.ShortCutsItem
-import com.example.mygains.dashboard.ui.DashBoardViewModel
 import com.example.mygains.extras.dimensions.Dimensions
+import com.example.mygains.extras.globalcomponents.loadercomponent.LoaderComponent
 import com.example.mygains.userinfo.data.models.UserData
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewHomeScreen(nav: NavHostController) {
 
 
     val dashBoardViewModel: DashBoardViewModel = hiltViewModel()
-    val userData: UserData by dashBoardViewModel.userDataLive.observeAsState(initial = UserData())
+    //val userData: UserData by dashBoardViewModel.userDataLive.observeAsState(initial = UserData())
+    val uiState  by dashBoardViewModel.uiState.collectAsState()
     val scrollState= rememberLazyListState()
 
     val animateHeader by remember {
         derivedStateOf { scrollState.firstVisibleItemScrollOffset > 0 }
     }
 
-    Box(modifier = Modifier.fillMaxSize()){
 
-        AnimatedGradientBox(animateHeader)
+    when(val state = uiState){
+        is DashBoardUIState.Error -> {}
+        is DashBoardUIState.Loading -> { LoaderComponent()}
+        is DashBoardUIState.Succes -> {
+            Box(modifier = Modifier.fillMaxSize()){
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            state = scrollState
-        )
-        {
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ){
-                    HeaderHomeScreen(userData, dashBoardViewModel,animateHeader)
-                }
-            }
+                AnimatedGradientBox(animateHeader)
 
-            item {
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth()
-                        .clip(
-                            RoundedCornerShape(
-                                30.dp
-                            )
-                        )
-                        .background(Color.White)
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    state = scrollState
                 )
                 {
-                    BodyHomeScreen(nav, animateHeader)
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        ){
+                            HeaderHomeScreen(state.homeScreenModel.userData, dashBoardViewModel,animateHeader)
+                        }
+                    }
+
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .fillMaxWidth()
+                                .clip(
+                                    RoundedCornerShape(
+                                        30.dp
+                                    )
+                                )
+                                .background(Color.White)
+                        )
+                        {
+                            BodyHomeScreen(nav, animateHeader)
+                        }
+                    }
+
                 }
             }
-
         }
     }
 
 }
+
 
 @Composable
 fun BodyHomeScreen(nav: NavHostController, animateHeader: Boolean) {

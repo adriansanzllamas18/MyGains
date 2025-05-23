@@ -11,7 +11,7 @@ sealed class BaseResponse < out T>() {
          fun mapError():String{
             return when (error){
                 is BaseAuthError -> {error.mapAuthErrorToMessage(error)}
-                is BaseFireStoreError -> {error.mapAuthErrorToMessage(error)}
+                is BaseFireStoreError -> {error.mapFireStoreErrorToMessage(error)}
                 else -> "Error inesperado."
              }
          }

@@ -1,5 +1,10 @@
 package com.example.mygains.base.response.errorresponse
 
+import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+
 
 sealed class BaseAuthError: BaseResponseError() {
 
@@ -8,7 +13,17 @@ sealed class BaseAuthError: BaseResponseError() {
     object UserNotFound : BaseAuthError()
     object NetworkError : BaseAuthError()
     object TimeOut : BaseAuthError()
-    data class UnknownError(val message: String?) : BaseAuthError()
+    object UnknownError : BaseAuthError()
+
+    fun exceptionToTypeFireStoreException(exception: Exception):BaseAuthError{
+        return when (exception){
+            is FirebaseAuthUserCollisionException ->{EmailAlreadyExists}
+            is FirebaseAuthInvalidCredentialsException ->{InvalidCredentials}
+            is FirebaseAuthInvalidUserException ->{UserNotFound}
+            is FirebaseNetworkException ->{NetworkError}
+            else -> {UnknownError}
+        }
+    }
 
     fun mapAuthErrorToMessage(error: BaseAuthError): String {
         return when (error) {

@@ -28,7 +28,7 @@ class NewUserUseCase @Inject constructor(private var  firebaseAuth: FirebaseAuth
         } catch (e: FirebaseNetworkException) {
         BaseResponse.Error(BaseAuthError.NetworkError)
         } catch (e: Exception) {
-        BaseResponse.Error(BaseAuthError.UnknownError(e.message))
+        BaseResponse.Error(BaseAuthError.UnknownError)
         }
     }
 

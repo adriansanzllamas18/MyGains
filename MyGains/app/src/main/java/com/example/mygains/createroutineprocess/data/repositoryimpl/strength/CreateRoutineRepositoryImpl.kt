@@ -30,7 +30,7 @@ class CreateRoutineRepositoryImpl @Inject constructor(var firestore: FirebaseFir
             return BaseResponse.Success(result.toObjects(InfoTypeOfWorkOutModel::class.java))
 
         }catch (ex: IOException){
-            return BaseResponse.Error(BaseAuthError.UnknownError(ex.message))
+            return BaseResponse.Error(BaseAuthError.UnknownError)
         }
     }
 
@@ -39,7 +39,7 @@ class CreateRoutineRepositoryImpl @Inject constructor(var firestore: FirebaseFir
             val data= firestore.collection("exercises").whereEqualTo("muscle_group_id", muscle_id).get().await()
             return BaseResponse.Success(data.toObjects(StrengthExerciseModel::class.java))
         }catch (ex:Exception){
-            return BaseResponse.Error(BaseAuthError.UnknownError(ex.message))
+            return BaseResponse.Error(BaseAuthError.UnknownError)
         }
     }
 
