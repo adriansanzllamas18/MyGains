@@ -57,7 +57,7 @@ import com.example.mygains.R
 import com.example.mygains.dashboard.data.models.ShortCutsItem
 import com.example.mygains.extras.dimensions.Dimensions
 import com.example.mygains.extras.globalcomponents.loadercomponent.LoaderComponent
-import com.example.mygains.userinfo.data.models.UserData
+import com.example.mygains.userinfo.data.models.UserDataModel
 
 @Composable
 fun NewHomeScreen(nav: NavHostController) {
@@ -91,7 +91,7 @@ fun NewHomeScreen(nav: NavHostController) {
                             modifier = Modifier
                                 .fillMaxWidth()
                         ){
-                            HeaderHomeScreen(state.homeScreenModel.userData, dashBoardViewModel,animateHeader)
+                            HeaderHomeScreen(state.homeScreenModel.userDataModel, dashBoardViewModel,animateHeader)
                         }
                     }
 
@@ -293,7 +293,7 @@ fun ForTodaySection() {
 
 @Composable
 fun HeaderHomeScreen(
-    userData: UserData,
+    userDataModel: UserDataModel,
     dashBoardViewModel: DashBoardViewModel,
     animateHeader: Boolean
 ) {
@@ -329,7 +329,7 @@ fun HeaderHomeScreen(
     {
         Column(Modifier.weight(1f)) {
             Text(
-                text = "Hola de nuevo ${userData.name?:""}!",
+                text = "Hola de nuevo ${userDataModel.name?:""}!",
                 fontSize = 18.sp,
                 fontFamily = FontFamily(Font(R.font.montserratbold))
             )

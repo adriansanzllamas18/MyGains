@@ -2,7 +2,7 @@ package com.example.mygains.newuser.domain
 
 import com.example.mygains.base.response.errorresponse.BaseAuthError
 import com.example.mygains.base.response.BaseResponse
-import com.example.mygains.userinfo.data.models.UserData
+import com.example.mygains.userinfo.data.models.UserDataModel
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -15,9 +15,9 @@ import javax.inject.Inject
 
 class NewUserUseCase @Inject constructor(private var  firebaseAuth: FirebaseAuth,private var db:FirebaseFirestore) {
 
-    suspend fun createUserWithEmailPass(userData: UserData): BaseResponse<String> {
+    suspend fun createUserWithEmailPass(userDataModel: UserDataModel): BaseResponse<String> {
         return try {
-            firebaseAuth.createUserWithEmailAndPassword(userData.email,userData.pass).await()
+            firebaseAuth.createUserWithEmailAndPassword(userDataModel.email,userDataModel.pass).await()
             BaseResponse.Success("Se ha creado con exito.")
         } catch (e: FirebaseAuthUserCollisionException) {
         BaseResponse.Error(BaseAuthError.EmailAlreadyExists)
@@ -33,13 +33,13 @@ class NewUserUseCase @Inject constructor(private var  firebaseAuth: FirebaseAuth
     }
 
     // Guardar información del usuario en Firestore
-    suspend fun saveInfoUser(userData: UserData): Boolean {
+    suspend fun saveInfoUser(userDataModel: UserDataModel): Boolean {
         val user = hashMapOf(
-            "name" to userData.name,
-            "first_name" to userData.first_name,
-            "second_name" to userData.second_name,
-            "email" to userData.email,
-            "image" to userData.image
+            "name" to userDataModel.name,
+            "first_name" to userDataModel.first_name,
+            "second_name" to userDataModel.second_name,
+            "email" to userDataModel.email,
+            "image" to userDataModel.image
         )
 
 

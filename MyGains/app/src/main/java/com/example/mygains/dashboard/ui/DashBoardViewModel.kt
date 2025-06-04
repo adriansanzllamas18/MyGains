@@ -1,22 +1,15 @@
 package com.example.mygains.dashboard.ui
 
-import android.util.Log
-import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mygains.createroutineprocess.data.repositoryimpl.strength.CreateRoutineRepositoryImpl
+import com.example.mygains.base.response.BaseResponse
 import com.example.mygains.dashboard.data.models.HomeScreenModel
 import com.example.mygains.dashboard.domain.usecases.DashBoardUseCase
-import com.example.mygains.login.ui.LoginScreen
-import com.example.mygains.userinfo.data.models.UserData
 import com.example.mygains.userinfo.domain.usecases.UserInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,7 +27,15 @@ class DashBoardViewModel @Inject constructor(private var infoUseCase: UserInfoUs
 
     fun getUserData(){
          viewModelScope.launch(Dispatchers.IO) {
-             _uiState.emit(DashBoardUIState.Succes(HomeScreenModel( userData = infoUseCase.readUserInfo()?:UserData())))
+             when( val response = dashBoardUseCase.readInfoUser()){
+                 is BaseResponse.Error->{
+                     _uiState.emit(DashBoardUIState.Error(response.mapError()))
+                 }
+                 is BaseResponse.Success->{
+                     _uiState.emit(DashBoardUIState.Succes(HomeScreenModel( userDataModel = response.data)))
+                 }
+             }
+
          }
     }
 

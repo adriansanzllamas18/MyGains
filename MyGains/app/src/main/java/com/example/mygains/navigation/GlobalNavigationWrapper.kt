@@ -24,6 +24,7 @@ import com.example.mygains.newuser.ui.NewUserComposable
 import com.example.mygains.plan.ui.PlanCompossable
 import com.example.mygains.scanproducts.ui.ScanProductComposable
 import com.example.mygains.splashscreen.ui.SplashScreenComposable
+import com.example.mygains.userinfo.ui.screens.NewUserInfoScreen
 import com.example.mygains.userinfo.ui.screens.UserInfoComposable
 
 
@@ -60,7 +61,7 @@ fun GlobalNavigationWrapper(
 
 
         composable(Routes.Home.routes){ NewHomeScreen(nav) }
-        composable(Routes.Perfil.routes){ UserInfoComposable(nav = nav) }
+        composable(Routes.Perfil.routes){ NewUserInfoScreen() }
         //refactorizar el apartado del resultactivity para el inicio de sesion con google
         //composable(Routes.NewUser.routes){ NewUserComposable(newUserViewModel = newUserViewmodel, navigationController, onSignInClick = { newUserViewmodel.signInWithGoogle(this@MainActivity,signInLauncher, this@MainActivity)  }) }
         composable(route = Routes.Plan.routes) { backStackEntry->

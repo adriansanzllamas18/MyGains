@@ -40,7 +40,7 @@ import androidx.navigation.NavHostController
 import com.example.mygains.R
 import com.example.mygains.extras.globalcomponents.bottombar.model.BottomBarItem
 import com.example.mygains.extras.navigationroutes.Routes
-import com.example.mygains.userinfo.data.models.UserData
+import com.example.mygains.userinfo.data.models.UserDataModel
 
 @Composable
 fun CustomBottomNavigationBar(nav: NavHostController, currentDestination: NavDestination?){
@@ -49,7 +49,7 @@ fun CustomBottomNavigationBar(nav: NavHostController, currentDestination: NavDes
     var selectedItemIndex by remember { mutableStateOf(currentDestination?.route?:"") }
 
     var bottombarViewModel: BottombarViewModel = hiltViewModel()
-    val imageUser  by bottombarViewModel.userDataLive.observeAsState(UserData())
+    val imageUser  by bottombarViewModel.userDataModelLive.observeAsState(UserDataModel())
 
     val itemList = mutableListOf(
         BottomBarItem.Profile(isSelected = selectedItemIndex == Routes.Perfil.routes, image = imageUser.image?:""),

@@ -1,6 +1,6 @@
 package com.example.mygains.userinfo.data.repositoryImpl
 
-import com.example.mygains.userinfo.data.models.UserData
+import com.example.mygains.userinfo.data.models.UserDataModel
 import com.example.mygains.userinfo.data.models.WeightRegister
 import com.example.mygains.userinfo.domain.repositoryInterfaces.UserInfoInterface
 import com.google.firebase.auth.FirebaseAuth
@@ -11,16 +11,16 @@ import java.time.LocalDateTime
 import javax.inject.Inject
 
 class UserInfoImpl @Inject constructor(private var firestore: FirebaseFirestore, private var firebaseAuth: FirebaseAuth):UserInfoInterface{
-    override suspend fun readUserInfo(): UserData? {
+    override suspend fun readUserInfo(): UserDataModel? {
         val result =
             firebaseAuth.currentUser?.let{ firestore.collection("users").document(it.uid).get().await() }
 
         return if (result != null) {
             if (result.exists()){
-                return result.toObject(UserData::class.java)
+                return result.toObject(UserDataModel::class.java)
             }else
-                return UserData()
-        }else  UserData()
+                return UserDataModel()
+        }else  UserDataModel()
     }
 
 

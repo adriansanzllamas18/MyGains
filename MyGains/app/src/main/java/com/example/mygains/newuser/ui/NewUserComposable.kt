@@ -2,14 +2,11 @@ package com.example.mygains.newuser.ui
 
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
@@ -18,7 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -30,7 +26,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -41,7 +36,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -61,7 +55,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.mygains.R
 import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.login.ui.Loader
-import com.example.mygains.userinfo.data.models.UserData
+import com.example.mygains.userinfo.data.models.UserDataModel
 
 @Composable
 fun NewUserComposable( navHostController: NavHostController ) {
@@ -141,7 +135,7 @@ fun Footer( newUserViewModel: NewUserViewModel) {
 @Composable
 fun BodyInfo(newUserViewModel: NewUserViewModel) {
 
-    val user: UserData by newUserViewModel.userLive.observeAsState(initial = UserData())
+    val user: UserDataModel by newUserViewModel.userLive.observeAsState(initial = UserDataModel())
     val isTextInfoVisible : Boolean  by newUserViewModel.textInfoLive.observeAsState(initial = false)
 
 
@@ -321,7 +315,7 @@ fun LoginButtonCreate(modifier: Modifier, isButtonEnable:Boolean, newUserViewMod
 
     Column(modifier = modifier){
         Button(onClick = {
-            newUserViewModel.createUser(newUserViewModel.userLive.value?: UserData())
+            newUserViewModel.createUser(newUserViewModel.userLive.value?: UserDataModel())
         }, modifier= Modifier
             .padding(start = 24.dp, end = 24.dp, bottom = 16.dp)
             .fillMaxWidth(),

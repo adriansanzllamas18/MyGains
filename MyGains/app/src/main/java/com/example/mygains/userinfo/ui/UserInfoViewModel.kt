@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mygains.userinfo.data.models.WeightRegister
-import com.example.mygains.userinfo.data.models.UserData
+import com.example.mygains.userinfo.data.models.UserDataModel
 import com.example.mygains.userinfo.domain.usecases.UserInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -15,8 +15,8 @@ import javax.inject.Inject
 @HiltViewModel
 class UserInfoViewModel @Inject constructor(private var userInfoUseCase: UserInfoUseCase):ViewModel() {
 
-    private val _user= MutableLiveData<UserData>(UserData())
-    val userLive : LiveData<UserData> = _user
+    private val _user= MutableLiveData<UserDataModel>(UserDataModel())
+    val userLive : LiveData<UserDataModel> = _user
 
 
     private val _listWeights= MutableLiveData<MutableList<WeightRegister>>(mutableListOf())
@@ -35,7 +35,7 @@ class UserInfoViewModel @Inject constructor(private var userInfoUseCase: UserInf
             try {
                 if (saveResult.weight.isNotEmpty()&& saveResult.date.isNotEmpty()){
                     userInfoUseCase.saveWeightInInfoUser(saveResult)
-                    _user.postValue(UserData(weight = saveResult.weight, lastUpdateWeight = saveResult.date))
+                    _user.postValue(UserDataModel(weight = saveResult.weight, lastUpdateWeight = saveResult.date))
 
                     getWeightsByTime("")
                 }else{

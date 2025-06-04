@@ -2,37 +2,22 @@ package com.example.mygains.userinfo.ui.screens
 
 import android.content.Context
 import android.util.DisplayMetrics
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Close
@@ -57,14 +42,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.LinearGradientShader
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -89,7 +69,7 @@ import com.example.mygains.configuration.data.model.ConfigurationItemModel
 import com.example.mygains.extras.globalcomponents.ItemListComponent
 import com.example.mygains.extras.navigationroutes.Routes
 import com.example.mygains.userinfo.data.models.WeightRegister
-import com.example.mygains.userinfo.data.models.UserData
+import com.example.mygains.userinfo.data.models.UserDataModel
 import com.example.mygains.userinfo.ui.UserInfoViewModel
 import com.patrykandpatrick.vico.compose.axis.horizontal.bottomAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
@@ -114,7 +94,7 @@ fun UserInfoComposable(nav: NavHostController) {
 
     val userInfoViewModel: UserInfoViewModel = hiltViewModel()
 
-    val result: UserData by userInfoViewModel.userLive.observeAsState(initial = UserData())
+    val result: UserDataModel by userInfoViewModel.userLive.observeAsState(initial = UserDataModel())
     userInfoViewModel.readUserInfo()
 
     // Usamos LazyColumn en lugar de Column para una lista desplazable
@@ -123,10 +103,7 @@ fun UserInfoComposable(nav: NavHostController) {
             .padding(horizontal = 16.dp, vertical = 24.dp)
             .fillMaxSize()
     ) {
-        // Header, Imagen, Títulos y demás contenidos se agregan como items en LazyColumn
         item {
-            // Aquí puedes agregar tu header, si es necesario
-            // Por ejemplo, si tienes un encabezado con título o una imagen de portada.
             Text(
                 text = "Información del Usuario",
                 style = MaterialTheme.typography.titleLarge,
@@ -137,7 +114,7 @@ fun UserInfoComposable(nav: NavHostController) {
         // Imagen del Usuario
         item {
             UserInfoImage(
-                userData = result
+                userDataModel = result
             )
         }
 
@@ -151,7 +128,7 @@ fun UserInfoComposable(nav: NavHostController) {
         // Información adicional en tarjeta
         item {
             UserInfiCardView(
-                userData = result,
+                userDataModel = result,
                 infoViewModel = userInfoViewModel
             )
         }
@@ -306,7 +283,7 @@ fun UserInfoTitle(modifier: Modifier) {
 }
 
 @Composable
-fun UserInfiCardView(userData: UserData, infoViewModel: UserInfoViewModel) {
+fun UserInfiCardView(userDataModel: UserDataModel, infoViewModel: UserInfoViewModel) {
 
 
     var isAlert by remember{mutableStateOf(false)}
@@ -330,7 +307,7 @@ fun UserInfiCardView(userData: UserData, infoViewModel: UserInfoViewModel) {
                         start.linkTo(parent.start)
                     }, colorResource(id = R.color.black))
 
-            Text(text = userData.weight +" Kg", fontSize = 24.sp, fontStyle = FontStyle(R.font.poppins), modifier = Modifier
+            Text(text = userDataModel.weight +" Kg", fontSize = 24.sp, fontStyle = FontStyle(R.font.poppins), modifier = Modifier
                 .constrainAs(weight) {
                     start.linkTo(icon.end)
                     top.linkTo(parent.top)
@@ -338,7 +315,7 @@ fun UserInfiCardView(userData: UserData, infoViewModel: UserInfoViewModel) {
                 }
                 .padding(start = 8.dp), color = Color.Black)
 
-            Text(text = " ${userData.lastUpdateWeight} act.", fontSize = 18.sp, fontStyle = FontStyle(R.font.poppins), modifier = Modifier.constrainAs(date){
+            Text(text = " ${userDataModel.lastUpdateWeight} act.", fontSize = 18.sp, fontStyle = FontStyle(R.font.poppins), modifier = Modifier.constrainAs(date){
                 end.linkTo(parent.end)
                 top.linkTo(parent.top)
                 bottom.linkTo(parent.bottom)
@@ -398,10 +375,10 @@ fun UserInfiCardView(userData: UserData, infoViewModel: UserInfoViewModel) {
 }
 
 @Composable
-fun UserInfoImage( userData: UserData) {
+fun UserInfoImage(userDataModel: UserDataModel) {
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center){
-            if (userData.image!!.isNotEmpty()){
-                Image(painter = rememberAsyncImagePainter(userData.image), contentDescription = "image",
+            if (userDataModel.image!!.isNotEmpty()){
+                Image(painter = rememberAsyncImagePainter(userDataModel.image), contentDescription = "image",
                     Modifier
                         .size(180.dp)
                         .clip(CircleShape),
@@ -413,15 +390,15 @@ fun UserInfoImage( userData: UserData) {
             }
 
 
-            Text(text = userData.name + " " + userData.first_name +" " +userData.second_name
+            Text(text = userDataModel.name + " " + userDataModel.first_name +" " +userDataModel.second_name
                 , fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
-            Text(text = userData.email, fontSize = 18.sp, color = Color(color = 0xFFCA5300))
+            Text(text = userDataModel.email, fontSize = 18.sp, color = Color(color = 0xFFCA5300))
         }
 }
 
 @Composable
-fun UserInfoHeader(modifier: Modifier, nav: NavHostController, userData: UserData) {
+fun UserInfoHeader(modifier: Modifier, nav: NavHostController, userDataModel: UserDataModel) {
 
 
     Row(modifier= modifier.fillMaxWidth()) {

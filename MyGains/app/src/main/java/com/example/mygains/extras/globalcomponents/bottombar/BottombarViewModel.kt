@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mygains.userinfo.data.models.UserData
+import com.example.mygains.userinfo.data.models.UserDataModel
 import com.example.mygains.userinfo.domain.usecases.UserInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -19,8 +19,8 @@ class BottombarViewModel @Inject constructor(private var infoUseCase: UserInfoUs
 
     // esto se deberia de pillar de la cache accediendo a room
 
-    private val _UserData= MutableLiveData<UserData>()
-    val userDataLive : LiveData<UserData> = _UserData
+    private val _UserDataModel= MutableLiveData<UserDataModel>()
+    val userDataModelLive : LiveData<UserDataModel> = _UserDataModel
 
     init {
         getUserData()
@@ -30,7 +30,7 @@ class BottombarViewModel @Inject constructor(private var infoUseCase: UserInfoUs
 
     fun getUserData(){
         viewModelScope.launch(Dispatchers.IO) {
-            _UserData.postValue(infoUseCase.readUserInfo())
+            _UserDataModel.postValue(infoUseCase.readUserInfo())
         }
     }
 }

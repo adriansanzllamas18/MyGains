@@ -1,15 +1,9 @@
 package com.example.mygains.userinfo.domain.usecases
 
-import androidx.camera.core.impl.CameraRepository
 import com.example.mygains.userinfo.data.models.WeightRegister
-import com.example.mygains.userinfo.data.models.UserData
+import com.example.mygains.userinfo.data.models.UserDataModel
 import com.example.mygains.userinfo.data.repositoryImpl.UserInfoImpl
 import com.example.mygains.userinfo.domain.usecases.interfaces.UserInfoUseCaseInterface
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
-import kotlinx.coroutines.tasks.await
-import java.time.LocalDateTime
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -69,7 +63,7 @@ class UserInfoUseCase @Inject constructor(private val repository: UserInfoImpl):
 
         return weightsList
     }*/
-    override suspend fun readUserInfo(): UserData? {
+    override suspend fun readUserInfo(): UserDataModel? {
         return repository.readUserInfo()
     }
 
