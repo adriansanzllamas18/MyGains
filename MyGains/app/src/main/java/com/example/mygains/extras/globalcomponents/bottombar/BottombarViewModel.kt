@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.mygains.base.response.BaseResponse
 import com.example.mygains.userinfo.data.models.UserDataModel
 import com.example.mygains.userinfo.domain.usecases.UserInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,7 +31,13 @@ class BottombarViewModel @Inject constructor(private var infoUseCase: UserInfoUs
 
     fun getUserData(){
         viewModelScope.launch(Dispatchers.IO) {
-            _UserDataModel.postValue(infoUseCase.readUserInfo())
+
+            when(val response = infoUseCase.getUserInfo()){
+                is BaseResponse.Success->{
+                    _UserDataModel.postValue(response.data)
+                }
+                is BaseResponse.Error->{}
+            }
         }
     }
 }

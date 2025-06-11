@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.mygains.base.response.BaseResponse
 import com.example.mygains.dashboard.data.models.HomeScreenModel
 import com.example.mygains.dashboard.domain.usecases.DashBoardUseCase
+import com.example.mygains.dashboard.ui.states.DashBoardUIState
 import com.example.mygains.userinfo.domain.usecases.UserInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +18,7 @@ import javax.inject.Inject
 class DashBoardViewModel @Inject constructor(private var infoUseCase: UserInfoUseCase, private var dashBoardUseCase: DashBoardUseCase):ViewModel() {
 
 
-    private val _uiState = MutableStateFlow<DashBoardUIState> (DashBoardUIState.Loading)
+    private val _uiState = MutableStateFlow<DashBoardUIState>(DashBoardUIState.Loading)
     val uiState :StateFlow<DashBoardUIState> = _uiState
 
 

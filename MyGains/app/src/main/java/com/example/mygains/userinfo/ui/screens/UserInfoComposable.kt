@@ -92,7 +92,7 @@ import java.time.LocalDate
 @Composable
 fun UserInfoComposable(nav: NavHostController) {
 
-    val userInfoViewModel: UserInfoViewModel = hiltViewModel()
+    /*val userInfoViewModel: UserInfoViewModel = hiltViewModel()
 
     val result: UserDataModel by userInfoViewModel.userLive.observeAsState(initial = UserDataModel())
     userInfoViewModel.readUserInfo()
@@ -472,7 +472,7 @@ fun LottieExample(modifier: Modifier = Modifier) {
             }
 
         }
-
+*/
 }
 
 // Función para encontrar el punto más cercano al toque

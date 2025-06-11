@@ -55,6 +55,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.mygains.R
 import com.example.mygains.dashboard.data.models.ShortCutsItem
+import com.example.mygains.dashboard.ui.states.DashBoardUIState
 import com.example.mygains.extras.dimensions.Dimensions
 import com.example.mygains.extras.globalcomponents.loadercomponent.LoaderComponent
 import com.example.mygains.userinfo.data.models.UserDataModel

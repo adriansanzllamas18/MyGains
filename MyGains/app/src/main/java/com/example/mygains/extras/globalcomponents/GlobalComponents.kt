@@ -58,10 +58,10 @@ fun CustomAlertDialog(responseUi: BaseResponseUi, actionDismiss:()->Unit , actio
 fun ItemListComponent(
     configModel: ConfigurationItemModel
 ){
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(8.dp)
             .border(
                 width = 4.dp,
                 shape = CircleShape,

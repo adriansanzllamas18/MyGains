@@ -7,5 +7,6 @@ data class UserDataModel(
     var email:String= "" ,
     var weight:String="",
     var lastUpdateWeight:String="",
-    var image:String?=""
+    var image:String?="",
+    var pass:String="" //TODO cambiar este parametro
 )
