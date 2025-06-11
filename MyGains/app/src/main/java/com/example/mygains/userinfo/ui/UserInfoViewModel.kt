@@ -80,7 +80,7 @@ class UserInfoViewModel @Inject constructor(private var userInfoUseCase: UserInf
 
     private fun readUserNutritionGoalsData(){
         viewModelScope.launch (Dispatchers.IO){
-            when(val response = userInfoUseCase.readUserNutritionGoalsData()){
+            when(val response = userInfoUseCase.readUserCurrentNutritionData()){
                 is BaseResponse.Success->{
                     _nutritionSectionSate.emit(UserNutritionGoalsSectionUIState.Succes(response.data))
                     _refreshing.postValue(false)

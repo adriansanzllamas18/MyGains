@@ -2,9 +2,11 @@ package com.example.mygains.repositories
 
 import com.example.mygains.base.response.BaseResponse
 import com.example.mygains.base.response.errorresponse.BaseFireStoreError
+import com.example.mygains.userinfo.data.models.UserCurrentNutritionDataModel
 import com.example.mygains.userinfo.data.models.UserDataModel
 import com.example.mygains.userinfo.data.models.UserHealthDataModel
 import com.example.mygains.userinfo.data.models.UserNutritionDataModel
+import com.example.mygains.userinfo.data.models.UserNutritionGoalsDataModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
@@ -57,7 +59,7 @@ class UserInfoRepository @Inject constructor(private var firestore: FirebaseFire
         }
     }
 
-    suspend fun readUserUserNutritionGoalsData():BaseResponse<UserNutritionDataModel>{
+    suspend fun readUserNutritionGoalsData():BaseResponse<UserNutritionGoalsDataModel>{
 
         return  try {
             val result = firebaseAuth.currentUser?.uid?.let { uid->
@@ -71,7 +73,30 @@ class UserInfoRepository @Inject constructor(private var firestore: FirebaseFire
             if (result == null || result.isEmpty){
                 BaseResponse.Error(BaseFireStoreError.DocumentNotFound)
             }else{
-                BaseResponse.Success(result.toObjects(UserNutritionDataModel::class.java).last())
+                BaseResponse.Success(result.toObjects(UserNutritionGoalsDataModel::class.java).last())
+            }
+
+        }catch (ex:Exception){
+            BaseResponse.Error(BaseFireStoreError.UnknownError)
+        }
+    }
+
+
+    suspend fun readUserCurrentNutritionData():BaseResponse<UserCurrentNutritionDataModel>{
+
+        return  try {
+            val result = firebaseAuth.currentUser?.uid?.let { uid->
+                firestore.collection("users")
+                    .document(uid)
+                    .collection("historicUserCurrentNutritionData")
+                    .get()
+                    .await()
+            }
+
+            if (result == null || result.isEmpty){
+                BaseResponse.Error(BaseFireStoreError.DocumentNotFound)
+            }else{
+                BaseResponse.Success(result.toObjects(UserCurrentNutritionDataModel::class.java).last())
             }
 
         }catch (ex:Exception){

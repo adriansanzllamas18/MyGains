@@ -152,18 +152,18 @@ fun MyNutritionSection(userInfoViewModel: UserInfoViewModel) {
                 fontFamily = FontFamily(Font( R.font.montserratbold))
             )
 
-            CaloriesSection()
+            CaloriesSection(goalCals = userNutritionData.userNutritionGoalsDataModel.goalCalories, currentCals = userNutritionData.userCurrentNutritionDataModel.currentCalories)
             ProgressBarNutritionIndicator(
-                goalValue = userNutritionData.goalProtein,
-                currentValue = userNutritionData.currentProtein ,
+                goalValue = userNutritionData.userNutritionGoalsDataModel.goalProtein,
+                currentValue = userNutritionData.userCurrentNutritionDataModel.currentProtein ,
                 Color(0xFF64B5F6))
             ProgressBarNutritionIndicator(
-                goalValue = userNutritionData.goalCarbs,
-                currentValue = userNutritionData.currentCarbs ,
+                goalValue = userNutritionData.userNutritionGoalsDataModel.goalCarbs,
+                currentValue = userNutritionData.userCurrentNutritionDataModel.currentCarbs ,
                 Color(0xFFFBC02D))
             ProgressBarNutritionIndicator(
-                goalValue =  userNutritionData.goalFat,
-                currentValue = userNutritionData.currentFat ,
+                goalValue =  userNutritionData.userNutritionGoalsDataModel.goalFat,
+                currentValue = userNutritionData.userCurrentNutritionDataModel.currentFat ,
                 Color(0xFFFFAB91))
         }
     }
@@ -172,7 +172,7 @@ fun MyNutritionSection(userInfoViewModel: UserInfoViewModel) {
 
 
 @Composable
-fun CaloriesSection() {
+fun CaloriesSection(currentCals:Double,goalCals:Double) {
     Column (
         modifier = Modifier
             .fillMaxWidth()
@@ -182,13 +182,13 @@ fun CaloriesSection() {
     )
     {
         Text(
-            text = "2300",
+            text = currentCals.toString(),
             textAlign = TextAlign.Center,
             fontSize = 14.sp,
             fontFamily = FontFamily(Font( R.font.montserratregular))
         )
         Text(
-            text = "/"+"2300",
+            text = "/$goalCals",
             textAlign = TextAlign.Center,
             fontSize = 14.sp,
             fontFamily = FontFamily(Font( R.font.montserratbold))
