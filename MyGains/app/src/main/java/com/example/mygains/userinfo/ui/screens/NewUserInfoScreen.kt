@@ -21,8 +21,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Button
@@ -80,6 +82,7 @@ fun NewUserInfoScreen() {
 
 
     PullToRefreshBox(
+        modifier = Modifier.fillMaxSize(),
         isRefreshing = refreshState ,
         onRefresh = {
            userInfoViewModel.refreshData()
@@ -95,10 +98,10 @@ fun NewUserInfoScreen() {
             }
 
             item {
-                MyHealthSection(userInfoViewModel)
+                MyNutritionSection(userInfoViewModel)
             }
             item {
-                MyNutritionSection(userInfoViewModel)
+                MyHealthSection(userInfoViewModel)
             }
             item {
                 ItemListComponent(
@@ -125,7 +128,6 @@ fun MyNutritionSection(userInfoViewModel: UserInfoViewModel) {
 
     when(val state = nutritionSectionState ){
         is UserNutritionGoalsSectionUIState.Loading->{
-
         }
         is UserNutritionGoalsSectionUIState.Succes->{
             userNutritionData = state.userNutritionData
@@ -154,14 +156,17 @@ fun MyNutritionSection(userInfoViewModel: UserInfoViewModel) {
 
             CaloriesSection(goalCals = userNutritionData.userNutritionGoalsDataModel.goalCalories, currentCals = userNutritionData.userCurrentNutritionDataModel.currentCalories)
             ProgressBarNutritionIndicator(
+                title = "Proteínas",
                 goalValue = userNutritionData.userNutritionGoalsDataModel.goalProtein,
                 currentValue = userNutritionData.userCurrentNutritionDataModel.currentProtein ,
                 Color(0xFF64B5F6))
             ProgressBarNutritionIndicator(
+                title = "Carbs",
                 goalValue = userNutritionData.userNutritionGoalsDataModel.goalCarbs,
                 currentValue = userNutritionData.userCurrentNutritionDataModel.currentCarbs ,
                 Color(0xFFFBC02D))
             ProgressBarNutritionIndicator(
+                title = "Grasas",
                 goalValue =  userNutritionData.userNutritionGoalsDataModel.goalFat,
                 currentValue = userNutritionData.userCurrentNutritionDataModel.currentFat ,
                 Color(0xFFFFAB91))
@@ -197,7 +202,7 @@ fun CaloriesSection(currentCals:Double,goalCals:Double) {
 }
 
 @Composable
-fun ProgressBarNutritionIndicator(goalValue:Double,currentValue:Double, color: Color){
+fun ProgressBarNutritionIndicator(title:String,goalValue:Double,currentValue:Double, color: Color){
 
 
     var initAnimation by remember {
@@ -238,7 +243,7 @@ fun ProgressBarNutritionIndicator(goalValue:Double,currentValue:Double, color: C
         ){
             Row {
                 Text(
-                    text = "Proteinas",
+                    text = title,
                     textAlign = TextAlign.Center,
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font( R.font.montserratregular))
@@ -299,7 +304,9 @@ fun MyHealthSection(userInfoViewModel: UserInfoViewModel) {
 
             when (val uiState = uiState) {
                 is UserProfileHealthSectionUIState.Loading -> {
-                    Box(modifier = Modifier.fillMaxWidth().size(180.dp)) {
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .size(180.dp)) {
                         LoaderComponent()
                     }
                 }
@@ -406,8 +413,8 @@ fun MyHealthSection(userInfoViewModel: UserInfoViewModel) {
 
                 is UserProfileHealthSectionUIState.Error -> {
                     AsyncImage(modifier = Modifier
-                        .size(180.dp)
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .size(180.dp),
                         model = R.drawable.nodata_health_image,
                         contentDescription = "imagenodata" )
                 }

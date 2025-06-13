@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mygains.base.response.BaseResponse
 import com.example.mygains.base.response.errorresponse.BaseFireStoreError
+import com.example.mygains.userinfo.data.models.UserNutritionDataModel
 import com.example.mygains.userinfo.domain.usecases.UserInfoUseCase
 import com.example.mygains.userinfo.ui.states.UserNutritionGoalsSectionUIState
 import com.example.mygains.userinfo.ui.states.UserProfileHealthSectionUIState
@@ -14,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -39,6 +41,8 @@ class UserInfoViewModel @Inject constructor(private var userInfoUseCase: UserInf
         readUserInfo()
         readUserHealthData()
         readUserNutritionGoalsData()
+        readUsercurrentNutritionData()
+
     }
 
     private fun readUserInfo(){
@@ -80,9 +84,61 @@ class UserInfoViewModel @Inject constructor(private var userInfoUseCase: UserInf
 
     private fun readUserNutritionGoalsData(){
         viewModelScope.launch (Dispatchers.IO){
-            when(val response = userInfoUseCase.readUserCurrentNutritionData()){
+            when(val response = userInfoUseCase.readusergoal()){
                 is BaseResponse.Success->{
-                    _nutritionSectionSate.emit(UserNutritionGoalsSectionUIState.Succes(response.data))
+                    _nutritionSectionSate.getAndUpdate { currentState ->
+                        when (val state = currentState) {
+                            is UserNutritionGoalsSectionUIState.Succes -> {
+                                // Preserva los datos existentes y actualiza solo goals
+                                UserNutritionGoalsSectionUIState.Succes(
+                                    state.userNutritionData.copy(
+                                        userNutritionGoalsDataModel = response.data
+                                    )
+                                )
+                            }
+                            else -> {
+                                // Si no hay estado previo, crea uno nuevo
+                                UserNutritionGoalsSectionUIState.Succes(
+                                    UserNutritionDataModel(userNutritionGoalsDataModel = response.data)
+                                )
+                            }
+                        }
+                    }
+                    _refreshing.postValue(false)
+                }
+                is BaseResponse.Error->{
+                    if (response.error == BaseFireStoreError.DocumentNotFound){
+                        _nutritionSectionSate.emit(UserNutritionGoalsSectionUIState.NoDataYet)
+                    }else{
+                        _nutritionSectionSate.emit(UserNutritionGoalsSectionUIState.Error(response.mapError()))
+                    }
+                    _refreshing.postValue(false)
+                }
+            }
+        }
+    }
+    private fun readUsercurrentNutritionData(){
+        viewModelScope.launch (Dispatchers.IO){
+            when(val response = userInfoUseCase.readusercurrent()){
+                is BaseResponse.Success->{
+                    _nutritionSectionSate.getAndUpdate { currentState ->
+                        when (val state = currentState) {
+                            is UserNutritionGoalsSectionUIState.Succes -> {
+                                // Preserva los datos existentes y actualiza solo goals
+                                UserNutritionGoalsSectionUIState.Succes(
+                                    state.userNutritionData.copy(
+                                        userCurrentNutritionDataModel = response.data
+                                    )
+                                )
+                            }
+                            else -> {
+                                // Si no hay estado previo, crea uno nuevo
+                                UserNutritionGoalsSectionUIState.Succes(
+                                    UserNutritionDataModel(userCurrentNutritionDataModel = response.data)
+                                )
+                            }
+                        }
+                    }
                     _refreshing.postValue(false)
                 }
                 is BaseResponse.Error->{
@@ -101,6 +157,7 @@ class UserInfoViewModel @Inject constructor(private var userInfoUseCase: UserInf
         _healthSateSecton.update { (UserProfileHealthSectionUIState.Loading) }
         readUserHealthData()
         readUserNutritionGoalsData()
+        readUsercurrentNutritionData()
         _refreshing.postValue(true)
     }
 }

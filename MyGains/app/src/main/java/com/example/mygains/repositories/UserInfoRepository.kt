@@ -11,8 +11,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.tasks.await
+import java.text.DateFormat
+import java.time.LocalDate
 import javax.inject.Inject
 
 class UserInfoRepository @Inject constructor(private var firestore: FirebaseFirestore,private var firebaseAuth: FirebaseAuth) {
@@ -66,6 +69,7 @@ class UserInfoRepository @Inject constructor(private var firestore: FirebaseFire
                 firestore.collection("users")
                     .document(uid)
                     .collection("historicUserNutritionGoalsData")
+                    .orderBy("dateRegister",Query.Direction.DESCENDING)
                     .get()
                     .await()
             }
@@ -89,6 +93,7 @@ class UserInfoRepository @Inject constructor(private var firestore: FirebaseFire
                 firestore.collection("users")
                     .document(uid)
                     .collection("historicUserCurrentNutritionData")
+                    .whereEqualTo("registerDate", LocalDate.now().toString())
                     .get()
                     .await()
             }

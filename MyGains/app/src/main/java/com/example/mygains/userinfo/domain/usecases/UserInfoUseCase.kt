@@ -26,7 +26,7 @@ class UserInfoUseCase @Inject constructor(private val userInfoRepository: UserIn
         return userInfoRepository.readUserHealthData()
     }
 
-    suspend fun readUserCurrentNutritionData():BaseResponse<UserNutritionDataModel>{
+    /*suspend fun readUserCurrentNutritionData():BaseResponse<UserNutritionDataModel>{
 
         return try {
             // Ejecutar primera llamada
@@ -55,6 +55,15 @@ class UserInfoUseCase @Inject constructor(private val userInfoRepository: UserIn
         } catch (ex: Exception) {
             BaseResponse.Error(BaseFireStoreError.UnknownError)
         }
+    }*/
+
+
+    suspend fun readusercurrent():BaseResponse<UserCurrentNutritionDataModel>{
+        return userInfoRepository.readUserCurrentNutritionData()
+    }
+
+    suspend fun readusergoal():BaseResponse<UserNutritionGoalsDataModel>{
+        return userInfoRepository.readUserNutritionGoalsData()
     }
 
 }
