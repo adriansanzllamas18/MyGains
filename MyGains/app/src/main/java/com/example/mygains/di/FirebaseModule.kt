@@ -35,6 +35,4 @@ class FirebaseModule {
     fun privideUidCurrentUser(): String? {
         return FirebaseAuth.getInstance().uid
     }
-
-
 }

@@ -95,7 +95,6 @@ fun ProductInfoBottomSheetComposable(product: ProductResultResponse){
 
         }else{
             item {
-                ShowAnimationNotFound(product.status_verbose?:"Error")
             }
         }
 
@@ -106,33 +105,7 @@ fun ProductInfoBottomSheetComposable(product: ProductResultResponse){
     }
 }
 
-@Composable
-fun ShowAnimationNotFound(textError: String) {
-    // Carga la composición del recurso Lottie
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.nofoundfoondanimation))
 
-    var isPlaying by remember {
-        mutableStateOf(true)
-    }
-    // Animación con progreso controlado
-    val progress by animateLottieCompositionAsState(
-        composition = composition,
-        iterations = LottieConstants.IterateForever,
-        isPlaying = isPlaying // Añadido el control de reproducción
-    )
-
-    Column( Modifier
-        .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-
-        Text(text = textError, fontSize = 18.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-        LottieAnimation(
-            composition = composition,
-            progress = progress,
-            modifier = Modifier
-                .size(200.dp)
-        )
-    }
-}
 
 @Composable
 fun Foot() {
@@ -183,27 +156,8 @@ fun ProductTags(text:String) {
 
 @Composable
 fun NutriScoreAndNova(productResponse: ProductResponse) {
-    Card(Modifier.padding(16.dp),
-        colors = CardColors(containerColor = colorResource(
-        id = R.color.orange_low
-    ), contentColor = Color.Black, disabledContentColor = Color.Transparent, disabledContainerColor = Color.Transparent)) {
-        Row(Modifier.padding(16.dp)) {
-            Image(painter = painterResource(id = FormatterUtils().getNutriScoreByType(productResponse.nutriScore.toString())), contentDescription = "",
-                Modifier
-                    .weight(0.33f)
-                    .size(100.dp))
-            Image(painter = painterResource(id = FormatterUtils().getNovaScoreByType(productResponse.novaGroup.toString())), contentDescription = "",
-                Modifier
-                    .weight(0.33f)
-                    .size(100.dp))
 
-            Image(painter = painterResource(id = FormatterUtils().getEcoScoreByType(productResponse.ecoScore.toString())), contentDescription = "",
-                Modifier
-                    .weight(0.33f)
-                    .size(100.dp))
-        }
-    }
-    }
+}
 
 
 @Composable

@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 class UserInfoRepository @Inject constructor(private var firestore: FirebaseFirestore,private var firebaseAuth: FirebaseAuth) {
 
-
+  //TODO CAMBIAR FUNCIONES HACERLAS PRIVADAS Y CREAR INTERFACES PARA INJECTAR LA INTERFAZ Y NO LA IMPLEMENTACION
     suspend fun readUserInfo(): BaseResponse<UserDataModel> {
         val currentUser = firebaseAuth.currentUser
 

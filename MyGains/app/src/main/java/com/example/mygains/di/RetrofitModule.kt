@@ -15,6 +15,8 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class RetrofitModule() {
 
+
+    //TODO CAMBIAR NOMBRE POR EL SERVICIO QUE DEVUELVE , ES DECIR EN ESTE CASO GETPROFUCT FROM OPENFOODFACTS
     @Singleton
     @Provides
     fun getRetrofit():Retrofit{
@@ -24,6 +26,7 @@ class RetrofitModule() {
         val client = OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .build()
+
         return Retrofit.Builder()
             .baseUrl("https://world.openfoodfacts.org/api/v0/")
             .client(client)

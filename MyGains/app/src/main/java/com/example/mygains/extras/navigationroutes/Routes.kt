@@ -12,8 +12,13 @@ sealed class Routes(val routes: String) {
          fun createRout(date: String)="excercisesplan/$date"
      }
      object GainsScanner: Routes("gainsscanner")
+     object CameraScaner: Routes("camerascanner")
+     object FoodDeatil: Routes("fooddetail/{codebar}"){
+         fun createRout(codebar: String)="fooddetail/$codebar"
+     }
 
-     object InfoTypeOfWorkout: Routes("infotypeofworkout/{workout_id}"){
+
+    object InfoTypeOfWorkout: Routes("infotypeofworkout/{workout_id}"){
          fun createRout(workout_id: String)="infotypeofworkout/$workout_id"
      }
 

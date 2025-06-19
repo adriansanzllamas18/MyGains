@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -82,8 +83,15 @@ fun MyApp() {
 
 
 
-    val listScreensTopBar= mutableListOf(Routes.NewUser.routes,Routes.GainsScanner.routes,Routes.InfoTypeOfWorkout.routes,
-        Routes.TypesWorkOuts.routes,Routes.Exercises.routes,Routes.Configuration.routes)
+    val listScreensTopBar= mutableListOf(Routes.NewUser.routes,
+        Routes.GainsScanner.routes,
+        Routes.InfoTypeOfWorkout.routes,
+        Routes.TypesWorkOuts.routes,
+        Routes.Exercises.routes,
+        Routes.Configuration.routes,
+        Routes.CameraScaner.routes,
+        Routes.FoodDeatil.routes
+    )
 
     val listScreensBottomBar = mutableListOf(Routes.Perfil.routes,Routes.Home.routes,Routes.Plan.routes)
 
@@ -125,8 +133,9 @@ fun CustomTopAppBar(navController: NavController, currentDestination: NavDestina
         title = {
             Text(
                 text = setTopBarByCurrentScreen(currentDestination?.route?:""),
-                Modifier.padding(start = 16.dp),
-                fontSize = 24.sp
+                Modifier.fillMaxWidth(),
+                fontSize = 24.sp,
+                textAlign = TextAlign.Center
             )
         },
         modifier = Modifier.fillMaxWidth()
@@ -139,6 +148,9 @@ private fun setTopBarByCurrentScreen(rout:String):String{
         Routes.TypesWorkOuts.routes -> "Entrenos"
         Routes.Exercises.routes -> "Ejercicios"
         Routes.Configuration.routes -> "Configuración"
+        Routes.GainsScanner.routes -> "MyScaner"
+        Routes.CameraScaner.routes -> "MyScaner"
+        Routes.FoodDeatil.routes -> "Detalle de Alimento"
         else->{""}
     }
 }

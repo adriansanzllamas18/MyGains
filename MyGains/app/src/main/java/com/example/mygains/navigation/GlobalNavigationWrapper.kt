@@ -11,6 +11,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.example.mygains.camerascaner.ui.CameraPreview
 import com.example.mygains.configuration.ui.ConfigurationComposable
 import com.example.mygains.createroutineprocess.ui.screens.stregnth.CreateRoutineViewModel
 import com.example.mygains.createroutineprocess.ui.screens.stregnth.ExercisesToAddRoutine
@@ -19,13 +20,13 @@ import com.example.mygains.createroutineprocess.ui.screens.workouts.TypeOfWorkou
 import com.example.mygains.dashboard.ui.NewHomeScreen
 import com.example.mygains.exercisesplan.ui.ExcercisesPlanCompossable
 import com.example.mygains.extras.navigationroutes.Routes
+import com.example.mygains.fooddetail.ui.FoodDetailComposable
 import com.example.mygains.login.ui.LoginScreen
 import com.example.mygains.newuser.ui.NewUserComposable
 import com.example.mygains.plan.ui.PlanCompossable
 import com.example.mygains.scanproducts.ui.ScanProductComposable
 import com.example.mygains.splashscreen.ui.SplashScreenComposable
 import com.example.mygains.userinfo.ui.screens.NewUserInfoScreen
-import com.example.mygains.userinfo.ui.screens.UserInfoComposable
 
 
 @Composable
@@ -70,7 +71,13 @@ fun GlobalNavigationWrapper(
         composable(Routes.ExcercisesPlan.routes){ backStackEntry->
             ExcercisesPlanCompossable(nav = nav, backStackEntry.arguments?.getString("date").orEmpty())
         }
-        composable(Routes.GainsScanner.routes){ ScanProductComposable() }
+        composable(Routes.GainsScanner.routes){ ScanProductComposable(navController = nav)}
+        composable(Routes.CameraScaner.routes){ CameraPreview(nav) }
+        composable(Routes.FoodDeatil.routes){ backStackEntry->
+            FoodDetailComposable(nav,backStackEntry.arguments?.getString("codebar").orEmpty())
+        }
+
+
         composable(Routes.TypesWorkOuts.routes){ TypeOfWorkoutsScreen(nav) }
 
         // Usamos remember para obtener y conservar la referencia al BackStackEntry del grafo de navegación.

@@ -15,7 +15,7 @@ class ScanBarCodeUseCase @Inject constructor( var retrofit: Retrofit) {
 
             var result= retrofit.create(ApiService::class.java).getProductInfo("product/$codebar.json")
 
-            if (result.isSuccessful){
+            /*if (result.isSuccessful){
                 val jsonResponse = result.body()
 
                 var status= jsonResponse?.get("status")?.asInt
@@ -63,7 +63,7 @@ class ScanBarCodeUseCase @Inject constructor( var retrofit: Retrofit) {
                     productResultResponse= ProductResultResponse(status = "500", status_verbose = "Error, compruebe su conexión o intentelo más tarde")
                 }
 
-            }
+            }*/
         }catch (ex:Exception){
             productResultResponse= ProductResultResponse(status = "500", status_verbose = "Error, compruebe su conexión o intentelo más tarde")
         }
