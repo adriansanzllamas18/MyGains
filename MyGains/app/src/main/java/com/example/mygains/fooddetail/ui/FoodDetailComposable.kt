@@ -107,9 +107,10 @@ fun DetailSection(foodDetailModel: FoodDetailModel) {
                 .fillMaxWidth()
                 .aspectRatio(16f / 9f),
             model = foodDetailModel.imageUrl,
+            error = painterResource(id = R.drawable.pan),
             contentDescription = "food image" ,
-            placeholder = painterResource(id = R.drawable.cardio_slider),
-            contentScale = ContentScale.FillWidth
+            placeholder = painterResource(id = R.drawable.pan),
+            contentScale = ContentScale.Crop
         )
 
         Row (
@@ -197,7 +198,7 @@ fun AdvancedNutrimentsSection(nutrimentsModel: NutrimentsModel){
             (nutrimentsModel.saturatedFat100g?:"Sin datos").toString()
         )
         BoxItemDataDetail("Azúcares",(nutrimentsModel.sugars100g?:"Sin datos").toString())
-        BoxItemDataDetail("Sal", (nutrimentsModel.salt100g?:"Sin datos").toString())
+        BoxItemDataDetail("Sal",(nutrimentsModel.salt100g?:"Sin datos").toString())
         BoxItemDataDetail("Sodio", (nutrimentsModel.sodium100g?:"Sin datos").toString())
         BoxItemDataDetail("Fibra", (nutrimentsModel.fiber100g?:"Sin datos").toString())
     }
@@ -353,7 +354,8 @@ private fun ShowAnimationNotFound(textError: String) {
     )
 
     Column( Modifier
-        .fillMaxSize(),
+        .fillMaxSize()
+        .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     )

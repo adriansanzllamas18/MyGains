@@ -129,7 +129,7 @@ fun BarCodeComposable(viewModel: ScanBarCodeViewModel, navController: NavControl
                 .padding(start = 24.dp, end = 24.dp, bottom = 24.dp)
                 .fillMaxWidth()
                 ,enabled = barcode.length==13,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(color = 0xFFCA5300 ))) {
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Black)) {
                 Text(text = "Buscar")
             }
 

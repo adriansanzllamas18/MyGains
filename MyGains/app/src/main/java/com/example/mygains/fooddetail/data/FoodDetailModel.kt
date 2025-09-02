@@ -24,14 +24,14 @@ val nutritionGrades: String? = null, // Nutri-Score (A, B, C, D, E)
 val ecoscore: String? = null, // Eco-Score (A, B, C, D, E)
 
 @SerializedName("nova_group")
-val novaScore: Int? = null, // NOVA Score (1, 2, 3, 4)
+val novaScore: String? = null, // NOVA Score (1, 2, 3, 4)
 
 // Información adicional útil
 val quantity: String? = null,
 @SerializedName("serving_size")
 val servingSize: String? = null,
 @SerializedName("serving_quantity")
-val servingQuantity: Double? = null,
+val servingQuantity: String? =null,
 @SerializedName("packaging_tags")
 val packagingTags: List<String>? = null,
 @SerializedName("ingredients_text")

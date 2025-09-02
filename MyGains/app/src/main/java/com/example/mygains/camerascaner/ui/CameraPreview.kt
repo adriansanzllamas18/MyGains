@@ -9,7 +9,9 @@ import androidx.annotation.OptIn
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,7 +23,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -50,7 +56,6 @@ import java.util.concurrent.Executors
 @Composable
 fun CameraPreview(nav: NavHostController) {
 
-    var cameraScanViewModel:ScanBarCodeViewModel = hiltViewModel()
 
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -60,10 +65,6 @@ fun CameraPreview(nav: NavHostController) {
         mutableStateOf(
             ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
         )
-    }
-
-    val shouldShowRationale = remember {
-        ActivityCompat.shouldShowRequestPermissionRationale(context as Activity, Manifest.permission.CAMERA)
     }
 
     val cameraExecutor: ExecutorService = remember { Executors.newSingleThreadExecutor() }
@@ -84,23 +85,18 @@ fun CameraPreview(nav: NavHostController) {
     if (hasCameraPermission) {
         CameraExecutorComponentSection(cameraExecutor = cameraExecutor,cameraProviderFuture,lifecycleOwner, nav = nav)
     } else {
-        if (shouldShowRationale) {
-            AlertDialog(
-                onDismissRequest = { /* Close dialog if dismissed */ },
-                title = { Text("Permiso Necesario") },
-                text = { Text("La cámara es necesaria para escanear códigos de barras.") },
-                confirmButton = {
-                    TextButton(onClick = { launcher.launch(Manifest.permission.CAMERA) }) {
-                        Text("Permitir")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { }) {
-                        Text("Cancelar")
-                    }
-                }
-            )
-        }
+        Column(
+                modifier = Modifier.fillMaxSize().padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ){
+                Text(
+                    text = "Se necesitan permisos de cámara para poder acceder a la lectura de codigos de barras, puedes activar esta funcion en los ajustes de tu dispositivo.",
+                    textAlign = TextAlign.Center,
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily(Font(R.font.montserratregular))
+                )
+            }
     }
 }
 

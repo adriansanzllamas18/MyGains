@@ -5,102 +5,103 @@ import com.google.gson.annotations.SerializedName
 data class NutrimentsModel(
     // Energía - valores por 100g
     @SerializedName("energy-kcal_100g")
-    val energyKcal100g: Double? = null,
+    val energyKcal100g: String? = null,
     @SerializedName("energy-kj_100g")
-    val energyKj100g: Double? = null,
+    val energyKj100g: String? = null,
 
     // Energía - valores por porción
     @SerializedName("energy-kcal_serving")
-    val energyKcalServing: Double? = null,
+    val energyKcalServing: String? = null,
     @SerializedName("energy-kj_serving")
-    val energyKjServing: Double? = null,
+    val energyKjServing: String? = null,
 
     // Macronutrientes - valores por 100g
     @SerializedName("fat_100g")
-    val fat100g: Double? = null,
+    val fat100g: String? = null,
     @SerializedName("saturated-fat_100g")
-    val saturatedFat100g: Double? = null,
+    val saturatedFat100g: String? = null,
     @SerializedName("carbohydrates_100g")
-    val carbohydrates100g: Double? = null,
+    val carbohydrates100g: String? = null,
     @SerializedName("sugars_100g")
-    val sugars100g: Double? = null,
+    val sugars100g: String? = null,
     @SerializedName("fiber_100g")
-    val fiber100g: Double? = null,
+    val fiber100g: String? = null,
     @SerializedName("proteins_100g")
-    val proteins100g: Double? = null,
+    val proteins100g: String? = null,
     @SerializedName("salt_100g")
-    val salt100g: Double? = null,
+    val salt100g: String? = null,
     @SerializedName("sodium_100g")
-    val sodium100g: Double? = null,
+    val sodium100g: String? = null,
 
     // Macronutrientes - valores por porción
     @SerializedName("fat_serving")
-    val fatServing: Double? = null,
+    val fatServing: String? = null,
     @SerializedName("saturated-fat_serving")
-    val saturatedFatServing: Double? = null,
+    val saturatedFatServing: String? = null,
     @SerializedName("carbohydrates_serving")
-    val carbohydratesServing: Double? = null,
+    val carbohydratesServing: String? = null,
     @SerializedName("sugars_serving")
-    val sugarsServing: Double? = null,
+    val sugarsServing: String? = null,
     @SerializedName("fiber_serving")
-    val fiberServing: Double? = null,
+    val fiberServing: String? = null,
     @SerializedName("proteins_serving")
-    val proteinsServing: Double? = null,
+    val proteinsServing: String? = null,
     @SerializedName("salt_serving")
-    val saltServing: Double? = null,
+    val saltServing: String? = null,
     @SerializedName("sodium_serving")
-    val sodiumServing: Double? = null,
+    val sodiumServing: String? = null,
 
     // Grupo Nova
     @SerializedName("nova-group")
-    val novaGroup: Int? = null,
+    val novaGroup: String? = null,
     @SerializedName("nova-group_100g")
-    val novaGroup100g: Int? = null,
+    val novaGroup100g: String? = null,
     @SerializedName("nova-group_serving")
-    val novaGroupServing: Int? = null,
+    val novaGroupServing: String? = null,
 
     // Vitaminas del complejo B
     @SerializedName("vitamin-b1_100g")
-    val vitaminB1_100g: Double? = null,
+    val vitaminB1_100g: String? = null,
     @SerializedName("vitamin-b2_100g")
-    val vitaminB2_100g: Double? = null,
+    val vitaminB2_100g: String? = null,
     @SerializedName("vitamin-b6_100g")
-    val vitaminB6_100g: Double? = null,
+    val vitaminB6_100g: String? = null,
     @SerializedName("vitamin-b9_100g")
-    val vitaminB9_100g: Double? = null,
+    val vitaminB9_100g: String? = null,
     @SerializedName("vitamin-b12_100g")
-    val vitaminB12_100g: Double? = null,
+    val vitaminB12_100g: String? = null,
     @SerializedName("vitamin-pp_100g")
-    val vitaminPP_100g: Double? = null, // Niacina (B3)
+    val vitaminPP_100g: String? = null, // Niacina (B3)
     @SerializedName("pantothenic-acid_100g")
-    val pantothenicAcid100g: Double? = null, // B5
+    val pantothenicAcid100g: String? = null, // B5
     @SerializedName("biotin_100g")
-    val biotin100g: Double? = null,
+    val biotin100g: String? = null,
 
     // Vitaminas del complejo B - por porción
     @SerializedName("vitamin-b1_serving")
-    val vitaminB1Serving: Double? = null,
+    val vitaminB1Serving: String? = null,
     @SerializedName("vitamin-b2_serving")
-    val vitaminB2Serving: Double? = null,
+    val vitaminB2Serving: String? = null,
     @SerializedName("vitamin-b6_serving")
-    val vitaminB6Serving: Double? = null,
+    val vitaminB6Serving: String? = null,
     @SerializedName("vitamin-b9_serving")
-    val vitaminB9Serving: Double? = null,
+    val vitaminB9Serving: String? = null,
     @SerializedName("vitamin-b12_serving")
-    val vitaminB12Serving: Double? = null,
+    val vitaminB12Serving: String? = null,
     @SerializedName("vitamin-pp_serving")
-    val vitaminPPServing: Double? = null,
+    val vitaminPPServing: String? = null,
     @SerializedName("pantothenic-acid_serving")
-    val pantothenicAcidServing: Double? = null,
+    val pantothenicAcidServing: String? = null,
     @SerializedName("biotin_serving")
-    val biotinServing: Double? = null,
+    val biotinServing: String? = null,
 
     // Estimaciones de frutas y vegetales
     @SerializedName("fruits-vegetables-legumes-estimate-from-ingredients_100g")
-    val fruitsVegetablesLegumes100g: Double? = null,
+    val fruitsVegetablesLegumes100g: String? = null,
     @SerializedName("fruits-vegetables-nuts-estimate-from-ingredients_100g")
-    val fruitsVegetablesNuts100g: Double? = null
-){
+    val fruitsVegetablesNuts100g: String? = null
+)
+{
 
     /**
      * Verifica si todos los macronutrientes principales (por 100g) son nulos

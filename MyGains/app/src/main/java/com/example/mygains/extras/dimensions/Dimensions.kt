@@ -41,17 +41,17 @@ class Dimensions {
                     WindowSize.Compact -> AppDimensions(
                         padding = 8.dp,
                         spacing = 4.dp,
-                        cardHeight = 100.dp
+                        cardHeight = 120.dp
                     )
                     WindowSize.Medium -> AppDimensions(
                         padding = 16.dp,
                         spacing = 8.dp,
-                        cardHeight = 120.dp
+                        cardHeight = 140.dp
                     )
                     WindowSize.Expanded -> AppDimensions(
                         padding = 24.dp,
                         spacing = 12.dp,
-                        cardHeight = 140.dp
+                        cardHeight = 150.dp
                     )
                 }
             }

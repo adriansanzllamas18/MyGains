@@ -112,6 +112,22 @@ fun NewHomeScreen(nav: NavHostController) {
                             BodyHomeScreen(nav, animateHeader)
                         }
                     }
+                    item {
+                        Column(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .fillMaxWidth()
+                                .clip(
+                                    RoundedCornerShape(
+                                        30.dp
+                                    )
+                                )
+                                .background(Color.White)
+                        )
+                        {
+                            BodyHomeScreen(nav, animateHeader)
+                        }
+                    }
 
                 }
             }
@@ -162,8 +178,6 @@ fun ShortCutsSection(nav: NavHostController, animateHeader: Boolean) {
 
     var shortCutsList = mutableListOf(
         ShortCutsItem.ScannerShortcut(),
-        ShortCutsItem.StatsShortcut(),
-        ShortCutsItem.StatsShortcut(),
         ShortCutsItem.StatsShortcut(),
         ShortCutsItem.ParchuesShortcut(),
         ShortCutsItem.RatsShortcut()
@@ -217,7 +231,7 @@ fun ShortCutsSection(nav: NavHostController, animateHeader: Boolean) {
                         )
                     ) {
                         Column(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.fillMaxSize().padding(8.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
@@ -225,16 +239,28 @@ fun ShortCutsSection(nav: NavHostController, animateHeader: Boolean) {
                                 tint = colorResource(id = shortcut.iconColor),
                                 modifier = Modifier.size(40.dp),
                                 painter = painterResource(id = shortcut.icon),
-                                contentDescription = "scannnerIcon"
+                                contentDescription = "shortcut icon"
                             )
 
                             AnimatedVisibility(visible = animateHeader) {
-                                Text(
-                                    text = shortcut.title,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.padding(vertical = dimensions.spacing),
-                                    fontFamily = FontFamily(Font(R.font.montserratbold))
+                                Column (
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalAlignment = Alignment.CenterHorizontally,
                                 )
+                                {
+                                    Text(
+                                        text = shortcut.title,
+                                        fontSize = 14.sp,
+                                        textAlign = TextAlign.Center,
+                                        fontFamily = FontFamily(Font(R.font.montserratbold))
+                                    )
+                                    Text(
+                                        text = shortcut.subtitle,
+                                        fontSize = 10.sp,
+                                        textAlign = TextAlign.Center,
+                                        fontFamily = FontFamily(Font(R.font.montserratregular))
+                                    )
+                                }
                             }
                         }
                     }
