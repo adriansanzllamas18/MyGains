@@ -1,6 +1,5 @@
 package com.example.mygains.fooddetail.ui
 
-import android.widget.GridLayout
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -145,6 +144,7 @@ fun DetailSection(foodDetailModel: FoodDetailModel) {
         }
 
         Column {
+
             Text(
                 modifier = Modifier.padding(horizontal = 8.dp),
                 text = "Cantidad a servir",
@@ -152,6 +152,9 @@ fun DetailSection(foodDetailModel: FoodDetailModel) {
                 fontFamily = FontFamily(Font( R.font.montserratbold)
                 )
             )
+
+
+
 
             TextField(value = "100", onValueChange = {}, modifier = Modifier
                 .fillMaxWidth()

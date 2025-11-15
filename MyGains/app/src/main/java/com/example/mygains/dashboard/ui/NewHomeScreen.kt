@@ -112,23 +112,6 @@ fun NewHomeScreen(nav: NavHostController) {
                             BodyHomeScreen(nav, animateHeader)
                         }
                     }
-                    item {
-                        Column(
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .fillMaxWidth()
-                                .clip(
-                                    RoundedCornerShape(
-                                        30.dp
-                                    )
-                                )
-                                .background(Color.White)
-                        )
-                        {
-                            BodyHomeScreen(nav, animateHeader)
-                        }
-                    }
-
                 }
             }
         }
@@ -192,9 +175,11 @@ fun ShortCutsSection(nav: NavHostController, animateHeader: Boolean) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = dimensions.spacing)
+            .padding(18.dp)
     )
     {
         Text(
+            modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
             text = "ACCIONES  RAPIDAS",
             fontSize = 18.sp,
             fontFamily = FontFamily(Font( R.font.montserratbold))
@@ -253,12 +238,6 @@ fun ShortCutsSection(nav: NavHostController, animateHeader: Boolean) {
                                         fontSize = 14.sp,
                                         textAlign = TextAlign.Center,
                                         fontFamily = FontFamily(Font(R.font.montserratbold))
-                                    )
-                                    Text(
-                                        text = shortcut.subtitle,
-                                        fontSize = 10.sp,
-                                        textAlign = TextAlign.Center,
-                                        fontFamily = FontFamily(Font(R.font.montserratregular))
                                     )
                                 }
                             }
